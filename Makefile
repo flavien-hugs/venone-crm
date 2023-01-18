@@ -47,4 +47,8 @@ current: ## Shows the current revision of the database.
 	$(MANAGE) flask db current
 
 shell: ## Flask Shell Load
-	flask shell
+	$(MANAGE) flask shell
+
+.PHONY: kill-process
+kill-process: ## Kill process the server
+	sudo lsof -t -i tcp:5000 | xargs kill -9
