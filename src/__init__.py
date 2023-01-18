@@ -4,36 +4,30 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask, request, make_response
 
-from flask_restx import Api
 from flask_cors import CORS
+from flask_mail import Mail
+from flask_bcrypt import Bcrypt
+from flask_moment import Moment
 from flask_migrate import Migrate
+from flask_login import LoginManager
+from flask_flatpages import FlatPages
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
 
 from config import config
 
-db = SQLAlchemy()
 cors = CORS()
+mail = Mail()
+bcrypt = Bcrypt()
+db = SQLAlchemy()
+moment = Moment()
 migrate = Migrate()
-jwt = JWTManager()
+pages = FlatPages()
+login_manager = LoginManager()
 
-authorizations = {"Bearer": {"type": "apiKey", "in": "header", "name": "Authorization"}}
-api = Api(
-    version="1.0",
-    title="Venone API",
-    description="A Venone API",
-    authorizations=authorizations,
-)
-
-
-def output_xml(data, code, headers=None):
-    """Makes a Flask response with a XML encoded body"""
-    resp = make_response(dumps({"response": data}), code)
-    resp.headers.extend(headers or {})
-    return resp
-
-
-api.representations["application/xml"] = output_xml
+login_manager.login_view = "admin.loginPage"
+login_manager.session_protection = "strong"
+login_manager.login_message_category = "info"
+login_manager.needs_refresh_message_category = "danger"
 
 
 def create_venone_app(config_name):
@@ -41,15 +35,26 @@ def create_venone_app(config_name):
     venone_app.config.from_object(config[config_name])
     config[config_name].init_app(venone_app)
 
+    mail.init_app(venone_app)
+    bcrypt.init_app(venone_app)
+    moment.init_app(venone_app)
+    pages.init_app(venone_app)
     cors.init_app(venone_app)
-    jwt.init_app(venone_app)
-    api.init_app(venone_app)
+    login_manager.init_app(venone_app)
+
     migrate.init_app(venone_app, db)
     db.init_app(venone_app)
 
     with venone_app.app_context():
 
-        from .auth import auth  # noqa
+        from .auth.routes import auth_view
+        venone_app.register_blueprint(auth_view)
+
+        try:
+            if not os.path.exists("upload"):
+                os.mkdir("upload")
+        except OSError:
+            pass
 
         if not venone_app.debug:
             if not os.path.exists("logs"):
@@ -67,6 +72,14 @@ def create_venone_app(config_name):
             venone_app.logger.addHandler(file_handler)
             venone_app.logger.setLevel(logging.INFO)
             venone_app.logger.info("running venone app")
+
+        @venone_app.before_request
+        def log_entry():
+            venone_app.logger.debug("Demande de traitement")
+
+        @venone_app.teardown_request
+        def log_exit(exc):
+            venone_app.logger.debug("Traitement de la demande terminé", exc_info=exc)
 
         @venone_app.after_request
         def after_request(response):
