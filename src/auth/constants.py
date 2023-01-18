@@ -1,12 +1,12 @@
 import enum
 
-class Gender(enum.Enum):
+class Gender(str, enum.Enum):
     HOMME = "Mr"
     FEMME = "Mme"
     MDLLE = "Mlle"
 
 
-class Country(enum.Enum):
+class Country(str, enum.Enum):
     CIV = "Côte d'Ivoire"
     BEN = "Benin"
     BF = "Burkina Faso"
@@ -21,6 +21,6 @@ class Country(enum.Enum):
     TOG = "Togo"
 
 
-class AccountType(enum.Enum):
+class AccountType(str, enum.Enum):
     IS_HOUSE_OWNER = "Propriétaire de maison"
     IS_AGENCIE_COMPANY = "Agence immobilière"
