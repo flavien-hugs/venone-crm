@@ -1,11 +1,13 @@
-import os
 import logging as lg
-
-from src import create_venone_app, db
-from src.auth.models import VNRole, VNUser
+import os
 
 from dotenv import load_dotenv
-from flask_migrate import Migrate, upgrade
+from flask_migrate import Migrate
+from flask_migrate import upgrade
+from src import create_venone_app
+from src import db
+from src.auth.models import VNRole
+from src.auth.models import VNUser
 
 dotenv_path = os.path.join(os.path.dirname(__file__), ".flaskenv")
 if os.path.exists(dotenv_path):
