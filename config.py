@@ -3,12 +3,27 @@ Global Flask Application Setting
 See `.flaskenv` for default settings.
  """
 import os
-
+from typing import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
+DATABASE_URI = os.environ.get(
+    "DATABASE_URL"
+) or "sqlite:///" + os.path.join(BASE_DIR, "dev.sqlite3")
+engine = create_engine(
+    DATABASE_URI, connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_db() -> Generator:
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
 
 class Config:
 
@@ -42,6 +57,8 @@ class Config:
 
     WEBSITE_BUILDER = "gestion.venone.app"
 
+    SQLALCHEMY_DATABASE_URI = DATABASE_URI
+
     @staticmethod
     def init_app(venone_app):
         pass
@@ -49,23 +66,10 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL"
-    ) or "sqlite:///" + os.path.join(BASE_DIR, "dev.sqlite3")
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URI, connect_args={"check_same_thread": False}
-    )
-    sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    WTF_CSRF_ENABLED = False
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL"
-    ) or "sqlite:///" + os.path.join(BASE_DIR, "prod.sqlite3")
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URI, connect_args={"check_same_thread": False}
-    )
-    sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     @classmethod
     def init_app(cls, venone_app):
