@@ -2,9 +2,7 @@
 Global Flask Application Setting
 See `.flaskenv` for default settings.
  """
-
 import os
-from typing import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -16,6 +14,8 @@ class Config:
 
     DEBUG = False
     DEVELOPMENT = False
+
+    SITE_NAME = "Venone"
 
     SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -40,10 +40,11 @@ class Config:
     ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg"]
     UPLOAD_FOLDER_PATH = os.path.join(BASE_DIR, "upload/")
 
-    @staticmethod
-    def init_app(app):
-        pass
+    WEBSITE_BUILDER = "gestion.venone.app"
 
+    @staticmethod
+    def init_app(venone_app):
+        pass
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -51,42 +52,27 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL"
     ) or "sqlite:///" + os.path.join(BASE_DIR, "dev.sqlite3")
-
     engine = create_engine(
         SQLALCHEMY_DATABASE_URI, connect_args={"check_same_thread": False}
     )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-    def get_db() -> Generator:
-        try:
-            db = SessionLocal()
-            yield db
-        finally:
-            db.close()
+    sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL"
     ) or "sqlite:///" + os.path.join(BASE_DIR, "prod.sqlite3")
-
     engine = create_engine(
         SQLALCHEMY_DATABASE_URI, connect_args={"check_same_thread": False}
     )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-    def get_db() -> Generator:
-        try:
-            db = SessionLocal()
-            yield db
-        finally:
-            db.close()
+    sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     @classmethod
     def init_app(cls, venone_app):
         Config.init_app(venone_app)
         import logging
         from logging.handlers import SysLogHandler
+
         syslog_handler = SysLogHandler()
         syslog_handler.setLevel(logging.WARNING)
         venone_app.logger.addHandler(syslog_handler)
