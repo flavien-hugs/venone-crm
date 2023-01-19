@@ -1,0 +1,167 @@
+{% extends "_base.html" %}
+
+
+{% block body_content %}
+    <section class="p-0 d-flex align-items-center position-relative overflow-hidden">
+        <div class="container-fluid">
+            <div class="row g-4">
+
+            	<div class="col-12 col-lg-4 d-md-flex align-items-center justify-content-center bg-primary bg-opacity-10 min-vh-100 d-sm-none">
+				    <div class="p-3 p-lg-5">
+				        <div class="text-center">
+				            <h2 class="fw-bold">Bienvenu(e)</h2>
+				            <p class="mb-0 h6 fw-light">
+				                {{ config.SITE_NAME }}, votre partenaire de gestion immobilière
+				            </p>
+				        </div>
+
+				        <img loading="lazy" src="{{ url_for('static', filename='img/element/02.svg') }}" class="img-fluid mt-5" alt="venone-login-page">
+
+				        <div class="d-sm-flex mt-5 align-items-center justify-content-center">
+				            <p class="mb-0 h6 fw-light ms-0 ms-sm-3">
+				                +2K Entreprise &amp; Propriétaires nous ont rejoints,
+				                maintenant c'est votre tour.
+				            </p>
+				        </div>
+				    </div>
+				</div>
+
+                <div class="col-12 col-lg-7 m-auto pt-sm-5">
+                    <div class="row my-4">
+                        <div class="col-sm-10 col-xl-8 m-auto">
+
+                            <h1 class="fs-4">
+                                {% block template_user_title %}
+                                    Vous êtes propriétaire de maison ? <br>
+                            		Créez votre compte !
+                                {% endblock template_user_title %}
+                            </h1>
+                            
+                            <p class="mb-5">
+                                {% block template_user_subtitle %}
+                                    Heureux de vous voir ! Veuillez vous inscrire.
+                                {% endblock template_user_subtitle %}
+                            </p>
+
+                            {% include "includes/partials/message.html" %}
+
+                            {% block template_user_content %}
+                                <form class="row g-3" method="POST" action=".">
+                                	
+                                	{{ form.hidden_tag() }}
+
+                                	<div class="col-md-2 bg-light-input">
+		                                {{ form.gender(class="form-select border-0 bg-light shadow-none p-3") }}
+		                            </div>
+
+		                            <div class="col-md-10 bg-light-input">
+		                            	{% if form.fullname.errors %}
+									    {{ form.fullname(class="form-control border-0 bg-light shadow-none p-3") }}
+											<div class="invalid-feedback">
+												{% for error in form.fullname.errors %}
+													<span>{{ error }}</span>
+												{% endfor %}
+											</div>
+										{% else %}
+											{{ form.fullname(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.fullname.label.text) }}
+										{% endif %}
+		                            </div>
+
+									<div class="col-md-12 bg-light-input">
+										{% if form.addr_email.errors %}
+									    	{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3") }}
+											<div class="invalid-feedback">
+												{% for error in form.addr_email.errors %}
+													<span>{{ error }}</span>
+												{% endfor %}
+											</div>
+										{% else %}
+											{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.addr_email.label.text) }}
+										{% endif %}
+									</div>
+
+									<div class="col-md-12 bg-light-input">
+										{% if form.phonenumber_one.errors %}
+									    	{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3") }}
+											<div class="invalid-feedback">
+												{% for error in form.phonenumber_one.errors %}
+													<span>{{ error }}</span>
+												{% endfor %}
+											</div>
+										{% else %}
+											{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.phonenumber_one.label.text) }}
+										{% endif %}
+									</div>
+
+									<div class="col-md-12 bg-light-input">
+										{% if form.cni_number.errors %}
+									    	{{ form.cni_number(class="form-control border-0 bg-light shadow-none p-3") }}
+											<div class="invalid-feedback">
+												{% for error in form.cni_number.errors %}
+													<span>{{ error }}</span>
+												{% endfor %}
+											</div>
+										{% else %}
+											{{ form.cni_number(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.cni_number.label.text) }}
+										{% endif %}
+									</div>
+
+		                            <div class="col-md-12 bg-light-input">
+		                                {{ form.country(class="form-select border-0 bg-light shadow-none p-3") }}
+		                            </div>
+
+		                            <div class="col-md-6 bg-light-input">
+										{% if form.password.errors %}
+									    	{{ form.current_password(class="form-control border-0 bg-light shadow-none p-3") }}
+											<div class="invalid-feedback">
+												{% for error in form.password.errors %}
+													<span>{{ error }}</span>
+												{% endfor %}
+											</div>
+										{% else %}
+											{{ form.password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.password.label.text) }}
+										{% endif %}
+									</div>
+
+		                            <div class="col-md-6 bg-light-input">
+										{% if form.confirm_password.errors %}
+									    	{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3") }}
+											<div class="invalid-feedback">
+												{% for error in form.confirm_password.errors %}
+													<span>{{ error }}</span>
+												{% endfor %}
+											</div>
+										{% else %}
+											{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.confirm_password.label.text) }}
+										{% endif %}
+									</div>
+
+                                    <div class="align-items-center mt-4">
+		                                <div class="d-grid">
+		                                	{{ form.submit(class="btn btn-primary mb-0") }}
+		                                </div>
+		                            </div>
+                                </form>
+
+                                <div class="row">
+                                    <div class="position-relative my-4">
+                                        <hr>
+                                        <p class="small position-absolute top-50 start-50 translate-middle bg-body px-5">
+                                        	Vous avez déjà un compte ?
+                                        </p>
+                                    </div>
+
+                                    <div class="d-grid">
+		                                <a href="/auth/login" class="btn btn-danger mb-2 mb-xxl-0">
+		                                   Connectez-vous
+		                                </a>
+		                            </div>
+                                </div>
+                            {% endblock template_user_content %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock body_content %}
