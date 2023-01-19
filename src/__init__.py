@@ -1,19 +1,18 @@
-import os
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, request, make_response
-
-from flask_cors import CORS
-from flask_mail import Mail
-from flask_bcrypt import Bcrypt
-from flask_moment import Moment
-from flask_migrate import Migrate
-from flask_login import LoginManager
-from flask_flatpages import FlatPages
-from flask_sqlalchemy import SQLAlchemy
-
 from config import config
+from flask import Flask
+from flask import request
+from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+from flask_flatpages import FlatPages
+from flask_login import LoginManager
+from flask_mail import Mail
+from flask_migrate import Migrate
+from flask_moment import Moment
+from flask_sqlalchemy import SQLAlchemy
 
 cors = CORS()
 mail = Mail()
@@ -35,6 +34,9 @@ def create_venone_app(config_name):
     venone_app.config.from_object(config[config_name])
     config[config_name].init_app(venone_app)
 
+    venone_app.url_map.strict_slashes = False
+    venone_app.jinja_env.globals.update(zip=zip)
+
     mail.init_app(venone_app)
     bcrypt.init_app(venone_app)
     moment.init_app(venone_app)
@@ -47,8 +49,10 @@ def create_venone_app(config_name):
 
     with venone_app.app_context():
 
-        from .auth.routes import auth_view
+        from .auth.routes import auth_view, owner_view
+
         venone_app.register_blueprint(auth_view)
+        venone_app.register_blueprint(owner_view)
 
         try:
             if not os.path.exists("upload"):
