@@ -13,7 +13,7 @@ flask-cors==3.0.10
 flask-flatpages==0.8.1
 flask-login==0.6.2
 flask-mail==0.9.1
-flask-migrate==4.0.1
+flask-migrate==4.0.2
 flask-moment==1.0.5
 flask-sqlalchemy==3.0.2
 flask-wtf==1.1.1

@@ -21,6 +21,7 @@ flask-flatpages = "*"
 pillow = "*"
 flask-bcrypt = "*"
 email-validator = "*"
+pyjwt = "*"
 
 [dev-packages]
 pre-commit = "*"
