@@ -1,26 +1,44 @@
-import enum
+CIV = "Côte d'Ivoire"
+SEN = "Sénégal"
+TOG = "Togo"
+BF = "Burkina Faso"
+CMR = "Cameroun"
+RDC = "Congo RDC CDF"
+GUI = "Guinée"
+CON = "Congo RDC USD"
+NIG = "Niger"
+BEN = "Benin"
+MAL = "Mali"
+COM = "Comores"
 
-class Gender(str, enum.Enum):
-    HOMME = "Mr"
-    FEMME = "Mme"
-    MDLLE = "Mlle"
+COUNTRY = (
+    (CIV, "Côte d'Ivoire"), (SEN, "Sénégal"), (TOG, "Togo"),
+    (BF, "Burkina Faso"), (CMR, "Cameroun"), (RDC, "Congo RDC CDF"),
+    (GUI, "Guinée"), (CON, "Congo RDC USD"), (NIG, "Niger"),
+    (BEN, "Benin"), (MAL, "Mali"), (COM, "Comores")
+)
+
+COUNTRY_DEFAULT = CIV
+
+IS_HOUSE_OWNER = "Agence immobilière"
+IS_AGENCIE_COMPANY = "Propriétaire de maison"
+
+ACCOUNT_TYPES = (
+    (IS_AGENCIE_COMPANY, "Agence Immobilière"),
+    (IS_HOUSE_OWNER, "Propriétaire de maison")
+)
+
+ACCOUNT_TYPES_DEFAULT = IS_HOUSE_OWNER
 
 
-class Country(str, enum.Enum):
-    CIV = "Côte d'Ivoire"
-    BEN = "Benin"
-    BF = "Burkina Faso"
-    CMR = "Cameroun"
-    COM = "Comores"
-    RDC = "Congo RDC CDF"
-    CON = "Congo RDC USD"
-    GUI = "Guinée"
-    MAL = "Mali"
-    NIG = "Niger"
-    SEN = "Sénégal"
-    TOG = "Togo"
+HOMME = 'Mr'
+FEMME = 'Mme'
+MDLLE = 'Mlle'
 
+GENDER = (
+    (HOMME, 'Mr'),
+    (FEMME, 'Mme'),
+    (MDLLE, 'Mlle'),
+)
 
-class AccountType(str, enum.Enum):
-    IS_HOUSE_OWNER = "Propriétaire de maison"
-    IS_AGENCIE_COMPANY = "Agence immobilière"
+GENDER_DEFAULT = HOMME
