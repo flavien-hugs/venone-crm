@@ -1,15 +1,21 @@
+from datetime import datetime
 from time import time
-from datetime import date, datetime
 
-from flask import current_app, request
+import jwt
+from flask import current_app
+from flask_login import AnonymousUserMixin
+from flask_login import UserMixin
+from sqlalchemy_utils import EmailType
+from sqlalchemy_utils import PhoneNumberType
+from werkzeug.security import check_password_hash
 
-from sqlalchemy_utils import EmailType, PhoneNumberType, ChoiceType
-from werkzeug.security import generate_password_hash, check_password_hash
-
-from .. import db, login_manager
+from .. import db
+from .. import login_manager
 from ..mixins.models import TimestampMixin
-from .constants import Gender, Country, AccountType
-from flask_login import UserMixin, AnonymousUserMixin
+from .constants import ACCOUNT_TYPES
+from .constants import COUNTRY
+from .constants import GENDER
+
 
 class Permission:
     ADMIN = 5
@@ -32,7 +38,7 @@ class VNRole(db.Model):
             self.role_permissions = 0
 
     def __repr__(self):
-        return f'<User {self.role_name!r}>'
+        return f"<User {self.role_name!r}>"
 
     def has_permission(self, perm):
         return self.role_permissions & perm == perm
@@ -52,7 +58,7 @@ class VNRole(db.Model):
     def insert_roles():
         roles = {
             "Staff": [Permission.STAFF],
-            "Administrateur": (0xff, False),
+            "Administrateur": (0xFF, False),
         }
         default_role = "Administrateur"
         for r in roles:
@@ -98,27 +104,22 @@ class VNUser:
 """
 
 
-class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin, db.Model):
+class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
 
     __tablename__ = "user"
 
-    vn_user_gender = db.Column(ChoiceType(Gender), default=Gender.HOMME)
+    vn_user_gender = db.Column(db.String(4), nullable=False)
     vn_user_fullname = db.Column(db.String(80), nullable=False)
     vn_user_addr_email = db.Column(EmailType(), unique=True, nullable=False)
     vn_user_profession = db.Column(db.String(100), nullable=True)
     vn_user_parent_name = db.Column(db.String(80), nullable=True)
-    vn_user_phonenumber_one = db.Column(
-        PhoneNumberType(), unique=True, nullable=True)
-    vn_user_phonenumber_two = db.Column(
-        PhoneNumberType(), unique=True, nullable=True)
+    vn_user_phonenumber_one = db.Column(PhoneNumberType(), unique=True, nullable=True)
+    vn_user_phonenumber_two = db.Column(PhoneNumberType(), unique=True, nullable=True)
     vn_user_cni_number = db.Column(db.String(11), unique=True, nullable=True)
     vn_user_location = db.Column(db.String(180), nullable=True)
-    vn_user_country = db.Column(ChoiceType(Country), default=Country.CIV)
+    vn_user_country = db.Column(db.String(25), nullable=False)
     vn_user_avatar = db.Column(db.String(32), nullable=True)
-    vn_user_account_type = db.Column(
-        ChoiceType(AccountType),
-        default=AccountType.IS_HOUSE_OWNER
-    )
+    vn_user_account_type = db.Column(db.String(32), nullable=False)
     vn_user_activated = db.Column(db.Boolean, default=False)
     vn_user_password = db.Column(db.String(180), nullable=False)
     vn_user_birthdate = db.Column(db.Date, nullable=True)
@@ -126,39 +127,32 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin, db.Model):
     vn_role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=True)
 
     def __repr__(self):
-        return '<VNUser %r>' % self.vn_user_fullname
+        return "<VNUser %r>" % self.vn_user_fullname
 
     @property
     def password(self):
-        raise AttributeError('password is not a readable attribute')
-
-    @password.setter
-    def password(self, password):
-        self.vn_user_password = generate_password_hash(password)
+        raise AttributeError("password is not a readable attribute")
 
     def verify_password(self, password):
         return check_password_hash(self.vn_user_password, password)
 
-    def reset_password_token(self, expires_in=3600):
+    def generate_reset_token(self, expires_in=3600):
+        key_current_app_config = current_app.config["SECRET_KEY"]
         return jwt.encode(
             {"auth.reset_password_page": self.id, "exp": time() + expires_in},
-            current_app.config["SECRET_KEY"],
-            algorithm="HS256",
+            key_current_app_config, algorithm="HS256",
         )
 
     @staticmethod
-    def verify_reset_password_token(token):
+    def reset_password_token(token):
         key_current_app_config = current_app.config["SECRET_KEY"]
-        id = jwt.decode(token, key_current_app_config, algorithms=["HS256"])[
+        user_id = jwt.decode(token, key_current_app_config, algorithms=["HS256"])[
             "auth.reset_passwordage"
         ]
-        return User.query.get(id)
+        return VNUser.query.get(int(user_id))
 
     def can(self, perm):
-        return (
-            self.role is not None
-            and self.role.has_permission(perm)
-        )
+        return self.role is not None and self.role.has_permission(perm)
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
