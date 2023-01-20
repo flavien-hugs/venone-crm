@@ -1,26 +1,21 @@
 from flask_wtf import FlaskForm
-from wtforms.validators import ValidationError
-from wtforms import SelectField, SubmitField
+from wtforms import SelectField
+from wtforms import StringField
+from wtforms import SubmitField
+from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 
-from ..models import VNUser
+from ..constants import GENDER
 from .form import FormMixin
-from ..constants import GENDER, COUNTRY
+
 
 class OwnerHouseSignupForm(FormMixin, FlaskForm):
 
     gender = SelectField("Genre", choices=GENDER, coerce=str)
+    fullname = StringField(
+        "Nom et prénom", validators=[DataRequired(), InputRequired()]
+    )
+    cni_number = StringField(
+        "N° de votre CNI", validators=[DataRequired(), InputRequired()]
+    )
     submit = SubmitField("Créer votre compte")
-
-    def validate_vn_user_addr_email(self, field):
-        user = VNUser.query.filter_by(vn_user_addr_email=field.data.lower()).one_or_none()
-        if user:
-            raise ValidationError(
-                f"""
-                Cet email '{field.data.lower()}' est déjà utilisé.
-                Veuillez choisir un autre nom !
-                """
-            )
-
-    def validate_vn_user_phonenumber_one(self, field):
-        if VNUser.query.filter_by(vn_user_phonenumber_one=field.data).one_or_none():
-            raise ValidationError("Ce numéro est déjà utilisé.")
