@@ -1,7 +1,6 @@
 from flask import Blueprint
 
-auth_view = Blueprint("auth_view", __name__, url_prefix="/auth/")
-owner_view = Blueprint("owner_view", __name__, url_prefix="/dashboard/owner/")
+auth_view = Blueprint("auth_view", __name__, url_prefix="/auth/customer/")
 
 from . import auth  # noqa
-from .dashboard import owner  # noqa
+from . import owner  # noqa
