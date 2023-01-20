@@ -4,17 +4,16 @@ See `.flaskenv` for default settings.
  """
 import os
 from typing import Generator
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-DATABASE_URI = os.environ.get(
-    "DATABASE_URL"
-) or "sqlite:///" + os.path.join(BASE_DIR, "dev.sqlite3")
-engine = create_engine(
-    DATABASE_URI, connect_args={"check_same_thread": False}
+DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///" + os.path.join(
+    BASE_DIR, "dev.sqlite3"
 )
+engine = create_engine(DATABASE_URI, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -24,6 +23,7 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
+
 
 class Config:
 
@@ -39,13 +39,14 @@ class Config:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SLOW_DB_QUERY_TIME = 0.5
 
-    MAIL_POST = os.environ.get("MAIL_SERVER")
-    MAIL_SERVER = os.environ.get("MAIL_SERVER")
-    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "true")
-    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_SUBJECT_PREFIX = "[Venone]"
+    MAIL_POST = os.environ.get("MAIL_POST")
+    MAIL_SERVER = os.environ.get("MAIL_SERVER")
+    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS")
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_SENDER = "Venone <noreply@venone.app>"
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = MAIL_SENDER
 
     FLATPAGES_EXTENSION = ".md"
     FLATPAGES_MARKDOWN_EXTENSIONS = ["codehilite"]
@@ -55,13 +56,18 @@ class Config:
     ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg"]
     UPLOAD_FOLDER_PATH = os.path.join(BASE_DIR, "upload/")
 
+    MINIFY_HTML = True
+
     WEBSITE_BUILDER = "gestion.venone.app"
+
+    SCHEDULER_API_ENABLED = True
 
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
 
     @staticmethod
     def init_app(venone_app):
         pass
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -70,7 +76,6 @@ class DevelopmentConfig(Config):
 
 
 class ProductionConfig(Config):
-
     @classmethod
     def init_app(cls, venone_app):
         Config.init_app(venone_app)
