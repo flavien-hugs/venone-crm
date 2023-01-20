@@ -1,0 +1,11 @@
+Hello {{ user.vn_user_fullname }},
+
+Pour confirmer votre nouvelle adresse électronique, cliquez sur le lien suivant :
+
+{{ url_for('auth_view.change_email', token=token, _external=True) }}
+
+Cordialement,
+
+L'équipe Venone
+
+Remarque : les réponses à cette adresse électronique ne sont pas contrôlées.

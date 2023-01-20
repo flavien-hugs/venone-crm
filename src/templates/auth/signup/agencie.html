@@ -1,0 +1,158 @@
+{% extends "auth/signup/owner.html" %}
+
+{% block template_user_title %}
+	Vous êtes une agence immobilière ? <br>
+	Créez votre compte !
+{% endblock template_user_title %}
+
+{% block template_user_content %}
+	<form class="row g-4" method="POST" action=".">
+
+		{{ form.hidden_tag() }}
+
+		<div class="col-md-2 bg-light-input">
+			{{ form.gender(class="form-select border-0 bg-light shadow-none p-3") }}
+		</div>
+
+		<div class="col-md-10 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="far fa-user"></i>
+				</span>
+				{% if form.fullname.errors %}
+					{{ form.fullname(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+					<div class="invalid-feedback">
+						{% for error in form.fullname.errors %}
+						<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% else %}
+					{{ form.fullname(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.fullname.label.text) }}
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-12 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="far fa-envelope"></i>
+				</span>
+				{% if form.addr_email.errors %}
+					{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+					<div class="invalid-feedback">
+						{% for error in form.addr_email.errors %}
+							<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% else %}
+					{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.addr_email.label.text) }}
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-12 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="fa fa-phone-square"></i>
+				</span>
+				{% if form.phonenumber_one.errors %}
+					{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+					<div class="invalid-feedback">
+						{% for error in form.phonenumber_one.errors %}
+							<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% else %}
+					{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.phonenumber_one.label.text) }}
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-6 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="fa fa-home"></i>
+				</span>
+				{% if form.agencie_name.errors %}
+					{{ form.agencie_name(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+					<div class="invalid-feedback">
+						{% for error in form.agencie_name.errors %}
+							<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% else %}
+					{{ form.agencie_name(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.agencie_name.label.text) }}
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-6 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="fa fa-id-card"></i>
+				</span>
+				{% if form.business_number.errors %}
+					{{ form.business_number(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+					<div class="invalid-feedback">
+						{% for error in form.business_number.errors %}
+							<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% else %}
+					{{ form.business_number(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.business_number.label.text) }}
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-12 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="fa fa-globe-africa"></i>
+				</span>
+				{{ form.country(class="form-select border-0 bg-light shadow-none p-3") }}
+			</div>
+		</div>
+
+		<div class="col-md-6 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="fa fa-user-lock"></i>
+				</span>
+				{% if form.password.errors %}
+					{{ form.password(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+					<div class="invalid-feedback">
+						{% for error in form.password.errors %}
+						<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% else %}
+					{{ form.password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.password.label.text) }}
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-6 bg-light-input">
+			<div class="input-group input-group-lg">
+				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+					<i class="fa fa-user-lock"></i>
+				</span>
+				{% if form.confirm_password.errors %}
+					{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+					<div class="invalid-feedback">
+						{% for error in form.confirm_password.errors %}
+						<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% else %}
+					{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.confirm_password.label.text) }}
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="align-items-center mt-4">
+			<div class="d-grid">
+				{{ form.submit(class="btn btn-primary mb-0") }}
+			</div>
+		</div>
+	</form>
+{% endblock template_user_content %}

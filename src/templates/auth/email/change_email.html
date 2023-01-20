@@ -1,0 +1,12 @@
+<p> Hello {{ user.vn_user_fullname }},</p>
+<br>
+<p>Bienvenue chez <b>Venone</b>!</p>
+<p>Pour confirmer votre nouvelle adresse électronique, veuillez <a href="{{ url_for('auth_view.change_email', token=token, _external=True) }}">cliquer ici</a>.</p>
+<br>
+<p>Sinon, vous pouvez coller le lien suivant dans la barre d'adresse de votre navigateur:</p>
+<p>{{url_for('auth_view.change_email', token=token, _external=True)}}</p>
+<p>Cordialement,</p>
+<br>
+<p>L'équipe Venonem</p>
+<br>
+<p><small>Remarque: les réponses à cette adresse électronique ne sont pas contrôlées.</small></p>

@@ -1,0 +1,11 @@
+Hello {{ user }},
+
+Un utilisateur s'est connecté à votre compte.
+
+Adresse IP: {{ ip_address }}
+
+Cordialement,
+
+L'équipe Venone
+
+Remarque : les réponses à cette adresse électronique ne sont pas contrôlées.

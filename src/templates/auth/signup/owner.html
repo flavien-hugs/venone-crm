@@ -30,16 +30,23 @@
                     <div class="row my-4">
                         <div class="col-sm-10 col-xl-8 m-auto">
 
+                        	<div class="mb-4">
+							   <picture>
+							      <source srcset="{{ url_for('static', filename='img/logo/logo.png') }}" type="image/png"/>
+							      <img loading="lazy" src="{{ url_for('static', filename='img/logo/logo.png') }}" height="180" width="150" alt="venone-logo">
+							   </picture>
+							</div>
+
                             <h1 class="fs-4">
                                 {% block template_user_title %}
                                     Vous êtes propriétaire de maison ? <br>
                             		Créez votre compte !
                                 {% endblock template_user_title %}
                             </h1>
-                            
+
                             <p class="mb-5">
                                 {% block template_user_subtitle %}
-                                    Heureux de vous voir ! Veuillez vous inscrire.
+                                   Heureux de vous voir ! Veuillez vous inscrire.
                                 {% endblock template_user_subtitle %}
                             </p>
 
@@ -47,93 +54,128 @@
 
                             {% block template_user_content %}
                                 <form class="row g-3" method="POST" action=".">
-                                	
+
                                 	{{ form.hidden_tag() }}
 
                                 	<div class="col-md-2 bg-light-input">
-		                                {{ form.gender(class="form-select border-0 bg-light shadow-none p-3") }}
-		                            </div>
+										{{ form.gender(class="form-select border-0 bg-light shadow-none p-3") }}
+									</div>
 
-		                            <div class="col-md-10 bg-light-input">
-		                            	{% if form.fullname.errors %}
-									    {{ form.fullname(class="form-control border-0 bg-light shadow-none p-3") }}
-											<div class="invalid-feedback">
-												{% for error in form.fullname.errors %}
-													<span>{{ error }}</span>
-												{% endfor %}
-											</div>
-										{% else %}
-											{{ form.fullname(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.fullname.label.text) }}
-										{% endif %}
-		                            </div>
-
-									<div class="col-md-12 bg-light-input">
-										{% if form.addr_email.errors %}
-									    	{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3") }}
-											<div class="invalid-feedback">
-												{% for error in form.addr_email.errors %}
-													<span>{{ error }}</span>
-												{% endfor %}
-											</div>
-										{% else %}
-											{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.addr_email.label.text) }}
-										{% endif %}
+									<div class="col-md-10 bg-light-input">
+										<div class="input-group input-group-lg">
+											<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+												<i class="far fa-user"></i>
+											</span>
+											{% if form.fullname.errors %}
+										    	{{ form.fullname(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+												<div class="invalid-feedback">
+													{% for error in form.fullname.errors %}
+														<span>{{ error }}</span>
+													{% endfor %}
+												</div>
+											{% else %}
+												{{ form.fullname(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.fullname.label.text) }}
+											{% endif %}
+										</div>
 									</div>
 
 									<div class="col-md-12 bg-light-input">
-										{% if form.phonenumber_one.errors %}
-									    	{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3") }}
-											<div class="invalid-feedback">
-												{% for error in form.phonenumber_one.errors %}
-													<span>{{ error }}</span>
-												{% endfor %}
-											</div>
-										{% else %}
-											{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.phonenumber_one.label.text) }}
-										{% endif %}
+										<div class="input-group input-group-lg">
+											<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+												<i class="far fa-envelope"></i>
+											</span>
+											{% if form.addr_email.errors %}
+										    	{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+												<div class="invalid-feedback">
+													{% for error in form.addr_email.errors %}
+														<span>{{ error }}</span>
+													{% endfor %}
+												</div>
+											{% else %}
+												{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.addr_email.label.text) }}
+											{% endif %}
+										</div>
 									</div>
 
 									<div class="col-md-12 bg-light-input">
-										{% if form.cni_number.errors %}
-									    	{{ form.cni_number(class="form-control border-0 bg-light shadow-none p-3") }}
-											<div class="invalid-feedback">
-												{% for error in form.cni_number.errors %}
-													<span>{{ error }}</span>
-												{% endfor %}
-											</div>
-										{% else %}
-											{{ form.cni_number(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.cni_number.label.text) }}
-										{% endif %}
+										<div class="input-group input-group-lg">
+											<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+												<i class="fa fa-phone-square"></i>
+											</span>
+											{% if form.phonenumber_one.errors %}
+										    	{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+												<div class="invalid-feedback">
+													{% for error in form.phonenumber_one.errors %}
+														<span>{{ error }}</span>
+													{% endfor %}
+												</div>
+											{% else %}
+												{{ form.phonenumber_one(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.phonenumber_one.label.text) }}
+											{% endif %}
+										</div>
 									</div>
 
-		                            <div class="col-md-12 bg-light-input">
-		                                {{ form.country(class="form-select border-0 bg-light shadow-none p-3") }}
-		                            </div>
-
-		                            <div class="col-md-6 bg-light-input">
-										{% if form.password.errors %}
-									    	{{ form.current_password(class="form-control border-0 bg-light shadow-none p-3") }}
-											<div class="invalid-feedback">
-												{% for error in form.password.errors %}
-													<span>{{ error }}</span>
-												{% endfor %}
-											</div>
-										{% else %}
-											{{ form.password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.password.label.text) }}
-										{% endif %}
+									<div class="col-md-12 bg-light-input">
+										<div class="input-group input-group-lg">
+											<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+												<i class="fa fa-id-card"></i>
+											</span>
+											{% if form.cni_number.errors %}
+									    		{{ form.cni_number(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+												<div class="invalid-feedback">
+													{% for error in form.cni_number.errors %}
+														<span>{{ error }}</span>
+													{% endfor %}
+												</div>
+											{% else %}
+												{{ form.cni_number(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.cni_number.label.text) }}
+											{% endif %}
+										</div>
 									</div>
 
-		                            <div class="col-md-6 bg-light-input">
-										{% if form.confirm_password.errors %}
-									    	{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3") }}
-											<div class="invalid-feedback">
-												{% for error in form.confirm_password.errors %}
-													<span>{{ error }}</span>
-												{% endfor %}
-											</div>
-										{% else %}
-											{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.confirm_password.label.text) }}
-										{% endif %}
+									<div class="col-md-12 bg-light-input">
+										<div class="input-group input-group-lg">
+											<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+												<i class="fa fa-globe-africa"></i>
+											</span>
+											{{ form.country(class="form-select border-0 bg-light shadow-none p-3") }}
+										</div>
+									</div>
+
+									<div class="col-md-6 bg-light-input">
+										<div class="input-group input-group-lg">
+											<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+												<i class="fa fa-user-lock"></i>
+											</span>
+											{% if form.password.errors %}
+										    	{{ form.password(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+												<div class="invalid-feedback">
+													{% for error in form.password.errors %}
+														<span>{{ error }}</span>
+													{% endfor %}
+												</div>
+											{% else %}
+												{{ form.password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.password.label.text) }}
+											{% endif %}
+										</div>
+									</div>
+
+									<div class="col-md-6 bg-light-input">
+										<div class="input-group input-group-lg">
+											<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+												<i class="fa fa-user-lock"></i>
+											</span>
+											{% if form.confirm_password.errors %}
+										    	{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+												<div class="invalid-feedback">
+													{% for error in form.confirm_password.errors %}
+														<span>{{ error }}</span>
+													{% endfor %}
+												</div>
+											{% else %}
+												{{ form.confirm_password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.confirm_password.label.text) }}
+											{% endif %}
+										</div>
 									</div>
 
                                     <div class="align-items-center mt-4">
@@ -142,22 +184,11 @@
 		                                </div>
 		                            </div>
                                 </form>
-
-                                <div class="row">
-                                    <div class="position-relative my-4">
-                                        <hr>
-                                        <p class="small position-absolute top-50 start-50 translate-middle bg-body px-5">
-                                        	Vous avez déjà un compte ?
-                                        </p>
-                                    </div>
-
-                                    <div class="d-grid">
-		                                <a href="/auth/login" class="btn btn-danger mb-2 mb-xxl-0">
-		                                   Connectez-vous
-		                                </a>
-		                            </div>
-                                </div>
                             {% endblock template_user_content %}
+
+                            {% block template_user_footer %}
+                                {% include "auth/signup/_footer.html" %}
+                            {% endblock template_user_footer %}
                         </div>
                     </div>
                 </div>
