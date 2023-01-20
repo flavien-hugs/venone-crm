@@ -1,20 +1,17 @@
 from datetime import datetime
-from time import time
 
 import jwt
 from flask import current_app
+from flask import request
 from flask_login import AnonymousUserMixin
 from flask_login import UserMixin
 from sqlalchemy_utils import EmailType
 from sqlalchemy_utils import PhoneNumberType
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from .. import db
 from .. import login_manager
 from ..mixins.models import TimestampMixin
-from .constants import ACCOUNT_TYPES
-from .constants import COUNTRY
-from .constants import GENDER
 
 
 class Permission:
@@ -120,11 +117,17 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
     vn_user_country = db.Column(db.String(80), nullable=False)
     vn_user_avatar = db.Column(db.String(80), nullable=True)
     vn_user_account_type = db.Column(db.String(80), nullable=False)
-    vn_user_activated = db.Column(db.Boolean, default=False)
+    vn_user_activated = db.Column(db.Boolean, nullable=False, default=False)
     vn_user_password = db.Column(db.String(180), nullable=False)
     vn_user_birthdate = db.Column(db.Date, nullable=True)
     vn_user_last_seen = db.Column(db.DateTime, onupdate=datetime.utcnow())
-    vn_role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=True)
+    vn_user_ip_address = db.Column(db.String(50), nullable=True)
+    vn_role_id = db.Column(
+        db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
+    )
+
+    def __str__(self):
+        return self.vn_user_fullname
 
     def __repr__(self):
         return "<VNUser %r>" % self.vn_user_fullname
@@ -133,23 +136,67 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
     def password(self):
         raise AttributeError("password is not a readable attribute")
 
+    @password.setter
+    def password(self, password):
+        self.vn_user_password = generate_password_hash(password)
+
     def verify_password(self, password):
         return check_password_hash(self.vn_user_password, password)
 
     def generate_reset_token(self, expires_in=3600):
-        key_current_app_config = current_app.config["SECRET_KEY"]
+        secret_key = current_app.config["SECRET_KEY"]
         return jwt.encode(
-            {"auth.reset_password_page": self.id, "exp": time() + expires_in},
-            key_current_app_config, algorithm="HS256",
+            {"auth_view.reset_password": self.id, "exp": expires_in},
+            secret_key, algorithm="HS256"
         )
 
     @staticmethod
-    def reset_password_token(token):
-        key_current_app_config = current_app.config["SECRET_KEY"]
-        user_id = jwt.decode(token, key_current_app_config, algorithms=["HS256"])[
-            "auth.reset_passwordage"
-        ]
-        return VNUser.query.get(int(user_id))
+    def reset_password(token, new_password):
+        try:
+            secret_key = current_app.config["SECRET_KEY"]
+            user_id = jwt.encode(
+                token, secret_key,
+                algorithm="HS256"
+            )["auth_view.reset_password"]
+        except Exception as e:
+            print(e)
+            return False
+
+        user = VNUser.query.filter_by(int(user_id)).first_or_404()
+        if user is None:
+            return False
+        user.vn_user_password = new_password
+        user.save()
+        return True
+
+    def generate_email_change_token(self, new_email, expiration=3600):
+        secret_key = current_app.config["SECRET_KEY"]
+        return jwt.decode(
+            {"auth_view.change_email": self.id, 'new_email': new_email},
+            secret_key, algorithm=["HS256"]
+        )
+
+    def change_email(self, token):
+        secret_key = current_app.config["SECRET_KEY"]
+        try:
+            data = jwt.decode(token, secret_key, algorithm="HS256")
+        except:
+            return False
+
+        if data.get('change_email') != self.id:
+            return False
+        new_email = data.get('new_email')
+
+        if new_email is None:
+            return False
+
+        if self.query.filter_by(vn_user_addr_email=new_email).first() is not None:
+            return False
+
+        self.email = new_email
+        db.session.add(self)
+
+        return True
 
     def can(self, perm):
         return self.role is not None and self.role.has_permission(perm)
@@ -171,6 +218,7 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
 
     def ping(self):
         self.vn_user_last_seen = datetime.utcnow()
+        self.vn_user_ip_address = request.remote_addr
         db.session.add(self)
 
 
