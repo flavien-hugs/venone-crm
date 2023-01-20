@@ -22,6 +22,8 @@ pillow = "*"
 flask-bcrypt = "*"
 email-validator = "*"
 pyjwt = "*"
+flask-htmlmin = "*"
+flask-apscheduler = "*"
 
 [dev-packages]
 pre-commit = "*"
