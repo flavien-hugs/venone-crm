@@ -53,5 +53,5 @@ class FormMixin:
             )
 
     def validate_phonenumber_one(self, field):
-        if VNUser.query.filter_by(vn_user_phonenumber_one=field.data).first_or_404():
+        if VNUser.query.filter_by(vn_user_phonenumber_one=field.data).first():
             raise ValidationError("Ce numéro est déjà utilisé.")

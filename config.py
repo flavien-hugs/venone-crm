@@ -39,6 +39,11 @@ class Config:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SLOW_DB_QUERY_TIME = 0.5
 
+    BCRYPT_LOG_ROUNDS = 13
+    DEBUG_TB_ENABLED = False
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+    # mail settings
     MAIL_SUBJECT_PREFIX = "[Venone]"
     MAIL_POST = os.environ.get("MAIL_POST")
     MAIL_SERVER = os.environ.get("MAIL_SERVER")

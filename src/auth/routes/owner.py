@@ -9,7 +9,6 @@ from . import auth_view
 @login_required
 def dashboard():
     page_title = "Tableau de board"
-
     return render_template(
         "auth/admin/dashboard.html", page_title=page_title, current_user=current_user
     )

@@ -1,0 +1,5 @@
+{% extends "_base.html" %}
+
+{% block head_title %}
+	{{ current_user.vn_user_fullname }} &smid; {{ super() }}
+{% endblock head_title %}

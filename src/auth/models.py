@@ -7,7 +7,8 @@ from flask_login import AnonymousUserMixin
 from flask_login import UserMixin
 from sqlalchemy_utils import EmailType
 from sqlalchemy_utils import PhoneNumberType
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 from .. import db
 from .. import login_manager
@@ -132,60 +133,50 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
     def __repr__(self):
         return "<VNUser %r>" % self.vn_user_fullname
 
-    @property
-    def password(self):
-        raise AttributeError("password is not a readable attribute")
-
-    @password.setter
-    def password(self, password):
+    def set_password(self, password):
         self.vn_user_password = generate_password_hash(password)
 
     def verify_password(self, password):
         return check_password_hash(self.vn_user_password, password)
 
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(
+                token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
+            )["reset_password"]
+        except Exception as e:
+            print(e)
+            return
+        return VNUser.query.get(id)
+
     def generate_reset_token(self, expires_in=3600):
         secret_key = current_app.config["SECRET_KEY"]
         return jwt.encode(
             {"auth_view.reset_password": self.id, "exp": expires_in},
-            secret_key, algorithm="HS256"
+            secret_key,
+            algorithm="HS256",
         )
-
-    @staticmethod
-    def reset_password(token, new_password):
-        try:
-            secret_key = current_app.config["SECRET_KEY"]
-            user_id = jwt.encode(
-                token, secret_key,
-                algorithm="HS256"
-            )["auth_view.reset_password"]
-        except Exception as e:
-            print(e)
-            return False
-
-        user = VNUser.query.filter_by(int(user_id)).first_or_404()
-        if user is None:
-            return False
-        user.vn_user_password = new_password
-        user.save()
-        return True
 
     def generate_email_change_token(self, new_email, expiration=3600):
         secret_key = current_app.config["SECRET_KEY"]
         return jwt.decode(
-            {"auth_view.change_email": self.id, 'new_email': new_email},
-            secret_key, algorithm=["HS256"]
+            {"auth_view.change_email": self.id, "new_email": new_email},
+            secret_key,
+            algorithm=["HS256"],
         )
 
     def change_email(self, token):
         secret_key = current_app.config["SECRET_KEY"]
         try:
             data = jwt.decode(token, secret_key, algorithm="HS256")
-        except:
+        except Exception as e:
+            print(e)
             return False
 
-        if data.get('change_email') != self.id:
+        if data.get("change_email") != self.id:
             return False
-        new_email = data.get('new_email')
+        new_email = data.get("new_email")
 
         if new_email is None:
             return False
@@ -235,4 +226,4 @@ login_manager.anonymous_user = AnonymousUser
 
 @login_manager.user_loader
 def load_user(user_id):
-    return VNUser.query.get(int(user_id))
+    return VNUser.query.get(str(user_id))

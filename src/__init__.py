@@ -4,18 +4,19 @@ from logging.handlers import RotatingFileHandler
 
 from config import config
 from flask import Flask
+from flask import redirect
 from flask import request
+from flask import url_for
+from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_flatpages import FlatPages
+from flask_htmlmin import HTMLMIN
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_moment import Moment
 from flask_migrate import Migrate
+from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-
-from flask_htmlmin import HTMLMIN
-from flask_apscheduler import APScheduler
 
 cors = CORS()
 mail = Mail()
@@ -64,6 +65,10 @@ def create_venone_app(config_name):
                 os.mkdir("upload")
         except OSError:
             pass
+
+        @venone_app.get("/")
+        def home():
+            return redirect(url_for("auth_view.login"))
 
         if not venone_app.debug:
             if not os.path.exists("logs"):
