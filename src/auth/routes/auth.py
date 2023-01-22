@@ -46,7 +46,9 @@ def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
-        user = VNUser.query.filter_by(vn_user_addr_email=email_lower).first()
+        user = (
+            db.session.query(VNUser).filter_by(vn_user_addr_email=email_lower).first()
+        )
         if user:
             if not user.vn_user_activated:
                 flash(
@@ -115,11 +117,6 @@ def registerowner_page():
             """
         flash(msg_success, "success")
         return redirect(url_for("auth_view.login"))
-    else:
-        flash(
-            "Une erreur s'est produite lors de votre inscription.",
-            category="danger",
-        )
 
     page_title = "Créer un compte particulier"
     return render_template("auth/signup/owner.html", form=form, page_title=page_title)
@@ -152,16 +149,11 @@ def agencieregister_page():
         user_to_create.vn_user_account_type = 6
         user_to_create.save()
         msg_success = f"""
-                Hey {user_to_create.vn_user_fullname},
-                votre compte a été créé ! Connectez-vous maintenant !
-            """
+            Hey {user_to_create.vn_user_fullname},
+            votre compte a été créé ! Connectez-vous maintenant !
+        """
         flash(msg_success, category="success")
         return redirect(url_for("auth_view.login"))
-    else:
-        flash(
-            "Une erreur s'est produite lors de votre inscription.",
-            category="danger",
-        )
 
     page_title = "Créer un compte entreprise"
     return render_template("auth/signup/agencie.html", form=form, page_title=page_title)
@@ -203,7 +195,9 @@ def password_reset_request():
     form = PasswordResetRequestForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
-        user = VNUser.query.filter_by(vn_user_addr_email=email_lower).first()
+        user = (
+            db.session.query(VNUser).filter_by(vn_user_addr_email=email_lower).first()
+        )
         if user:
             token = user.generate_reset_token()
             send_email(
