@@ -38,8 +38,10 @@
         <link rel="canonical" href="{{ config.WEBSITE_BUILDER }}">
         <link rel="preconnect" href="{{ config.WEBSITE_BUILDER }}">
 
+        {% include "includes/assets/css.html" %}
+
         {% block other_css_src %}
-            {% include "includes/assets/css.html" %}
+
         {% endblock other_css_src %}
 
         <title>
@@ -60,8 +62,9 @@
 
         {{ moment.include_moment() }}
         {{ moment.locale(auto_detect=True) }}
+        {% include "includes/assets/js.html" %}
         {% block other_js_src %}
-            {% include "includes/assets/js.html" %}
+
         {% endblock other_js_src %}
     </body>
 </html>
