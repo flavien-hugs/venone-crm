@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
+from ... import db
 from ..constants import GENDER
 from ..models import VNUser
 from .form import FormMixin
@@ -26,7 +27,7 @@ class AgencieSignupForm(FormMixin, FlaskForm):
     submit = SubmitField("Créer votre compte")
 
     def validate_business_number(self, field):
-        if VNUser.query.filter_by(vn_business_number=field.data).first():
+        if db.session.query(VNUser).filter_by(vn_business_number=field.data).first():
             raise ValidationError(
                 "Ce numéro de régistre de commerce est déjà utilisé !"
             )
