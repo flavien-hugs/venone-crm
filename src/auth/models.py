@@ -122,13 +122,15 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
     vn_user_password = db.Column(db.String(180), nullable=False)
     vn_user_birthdate = db.Column(db.Date, nullable=True)
     vn_user_last_seen = db.Column(db.DateTime, onupdate=datetime.utcnow())
+    vn_user_device = db.Column(db.String(80), nullable=True)
+    vn_user_find_us = db.Column(db.String(100), nullable=True)
     vn_user_ip_address = db.Column(db.String(50), nullable=True)
     vn_role_id = db.Column(
         db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
 
     def __str__(self):
-        return self.vn_user_fullname
+        return self.vn_user_fullname or self.vn_agencie_name
 
     def __repr__(self):
         return "<VNUser %r>" % self.vn_user_fullname
@@ -142,13 +144,13 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(
+            user_id = jwt.decode(
                 token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
             )["reset_password"]
         except Exception as e:
             print(e)
             return
-        return VNUser.query.get(id)
+        return db.session(VNUser).query.get(int(user_id))
 
     def generate_reset_token(self, expires_in=3600):
         secret_key = current_app.config["SECRET_KEY"]

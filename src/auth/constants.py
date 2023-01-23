@@ -1,29 +1,36 @@
-CIV = "Côte d'Ivoire"
-SEN = "Sénégal"
-TOG = "Togo"
-BF = "Burkina Faso"
-CMR = "Cameroun"
-RDC = "Congo RDC CDF"
-GUI = "Guinée"
-CON = "Congo RDC USD"
-NIG = "Niger"
-BEN = "Benin"
-MAL = "Mali"
-COM = "Comores"
+CIV = "CI - Côte d'Ivoire"
+SEN = "SN - Sénégal"
+TOG = "TG - Togo"
+BF = "BF - Burkina Faso"
+CMR = "CM - Cameroun"
+RDC = "CG - Congo (Brazzaville)"
+GUI = "GN - Guinée"
+CON = "CD - Congo (Kinshasa)"
+NIG = "NE - Niger"
+BEN = "BN - Benin"
+MAL = "ML - Mali"
+COM = "KM - Comores"
 
 COUNTRY = (
-    (CIV, "Côte d'Ivoire"),
-    (SEN, "Sénégal"),
-    (TOG, "Togo"),
-    (BF, "Burkina Faso"),
-    (CMR, "Cameroun"),
-    (RDC, "Congo RDC CDF"),
-    (GUI, "Guinée"),
-    (CON, "Congo RDC USD"),
-    (NIG, "Niger"),
-    (BEN, "Benin"),
-    (MAL, "Mali"),
-    (COM, "Comores"),
+    (CIV, "CI - Côte d'Ivoire"),
+    (SEN, "SN - Sénégal"),
+    (TOG, "TG - Togo"),
+    (BF, "BF - Burkina Faso"),
+    (CMR, "CM - Cameroun"),
+    (RDC, "CG - Congo (Brazzaville)"),
+    (GUI, "GN - Guinée"),
+    (CON, "CD - Congo (Kinshasa)"),
+    (NIG, "NE - Niger"),
+    (BEN, "BN - Benin"),
+    (MAL, "ML - Mali"),
+    (COM, "KM - Comores"),
+)
+
+
+XOF = "XOF - CFA Franc BCEAO"
+
+DEVICE = (
+    (XOF, "XOF - CFA Franc BCEAO"),
 )
 
 COUNTRY_DEFAULT = CIV
