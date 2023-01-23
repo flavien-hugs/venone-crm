@@ -4,12 +4,12 @@ from flask import render_template
 from flask import request
 from flask import session
 from flask import url_for
+from flask import Blueprint
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
 
-from . import auth_view
 from ... import db
 from ...mixins.email import send_email
 from ..forms.agencie_form import AgencieSignupForm
@@ -20,6 +20,9 @@ from ..forms.auth_form import PasswordResetForm
 from ..forms.auth_form import PasswordResetRequestForm
 from ..forms.owner_form import OwnerHouseSignupForm
 from ..models import VNUser
+
+
+auth_view = Blueprint("auth_view", __name__, url_prefix="/auth/customer/")
 
 
 @auth_view.before_app_request
@@ -41,13 +44,14 @@ def unactivated():
 def login():
 
     if current_user.is_authenticated and current_user.vn_user_activated:
-        return redirect(url_for("auth_view.dashboard"))
+        return redirect(url_for("dashboard_view.dashboard_view"))
 
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
         user = (
-            db.session.query(VNUser).filter_by(vn_user_addr_email=email_lower).first()
+            db.session.query(VNUser).filter_by(
+                vn_user_addr_email=email_lower).first()
         )
         if user:
             if not user.vn_user_activated:
@@ -60,20 +64,20 @@ def login():
                 flash("Le mot de passe invalide.", category="danger")
             else:
                 login_user(user, form.remember_me.data)
-                send_email(
+                """send_email(
                     current_user.vn_user_addr_email,
                     f"Alerte de connexion pour {current_user.vn_user_addr_email}",
                     "auth/email/alert_email",
                     user=current_user,
                     ip_address=request.remote_addr,
-                )
+                )"""
                 next_page = request.args.get("next")
                 flash(
                     f"Succès ! Vous êtes connecté en tant que: {user.vn_user_fullname}",
                     category="success",
                 )
                 if next_page is None or not next_page.startswith("/"):
-                    next_page = url_for("auth_view.dashboard")
+                    next_page = url_for("dashboard_view.dashboard")
                 return redirect(next_page)
         else:
             flash(
@@ -92,10 +96,10 @@ def registerowner_page():
     if current_user.is_authenticated and current_user.vn_user_activated:
         if current_user.vn_user_account_type == 4:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("auth_view.dashboard"))
+            return redirect(url_for("dashboard_view.dashboard"))
         elif current_user.vn_user_account_type == 6:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("auth_view.dashboard"))
+            return redirect(url_for("dashboard_view.dashboard"))
 
     form = OwnerHouseSignupForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -128,10 +132,10 @@ def agencieregister_page():
     if current_user.is_authenticated and current_user.vn_user_activated:
         if current_user.vn_user_account_type == 4:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("auth_view.dashboard"))
+            return redirect(url_for("dashboard_view.dashboard"))
         elif current_user.vn_user_account_type == 6:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("auth_view.dashboard"))
+            return redirect(url_for("dashboard_view.dashboard"))
 
     form = AgencieSignupForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -190,7 +194,7 @@ def change_password():
 @auth_view.route("/resetpassword/", methods=["GET", "POST"])
 def password_reset_request():
     if not current_user.is_anonymous:
-        return redirect(url_for("auth_view.dashboard"))
+        return redirect(url_for("dashboard_view.dashboard"))
 
     form = PasswordResetRequestForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -227,12 +231,12 @@ def password_reset_request():
 @auth_view.route("/resetpassword/<token>/", methods=["GET", "POST"])
 def password_reset(token):
     if current_user.is_authenticated:
-        return redirect(url_for("auth_view.dashboard"))
+        return redirect(url_for("dashboard_view.dashboard"))
 
     user = VNUser.verify_reset_password_token(token)
 
     if not user:
-        return redirect(url_for("auth_view.dashboard"))
+        return redirect(url_for("dashboard_view.dashboard"))
 
     form = PasswordResetForm()
     if form.validate_on_submit():
@@ -267,7 +271,7 @@ def change_email_request():
                     votre nouvelle adresse électronique vous a été envoyé.",
                 category="info",
             )
-            return redirect(url_for("auth_view.dashboard"))
+            return redirect(url_for("dashboard_view.dashboard"))
         else:
             flash("Courriel ou mot de passe non valide.")
 
@@ -283,4 +287,4 @@ def change_email(token):
         flash("Votre adresse e-mail a été mise à jour.")
     else:
         flash("Demande invalide.")
-    return redirect(url_for("auth_view.dashboard"))
+    return redirect(url_for("dashboard_view.dashboard"))
