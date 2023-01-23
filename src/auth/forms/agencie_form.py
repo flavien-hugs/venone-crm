@@ -22,9 +22,9 @@ class AgencieSignupForm(FormMixin, FlaskForm):
         "N° de votre régistre de commerce", validators=[DataRequired(), InputRequired()]
     )
     agencie_name = StringField(
-        "Nom de votre agence", validators=[DataRequired(), InputRequired()]
+        "Nom de l'entreprise", validators=[DataRequired(), InputRequired()]
     )
-    submit = SubmitField("Créer votre compte")
+    submit = SubmitField("Ouvrir mon compte")
 
     def validate_business_number(self, field):
         if db.session.query(VNUser).filter_by(vn_business_number=field.data).first():
