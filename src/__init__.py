@@ -7,6 +7,7 @@ from flask import Flask
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask import Flask, send_from_directory
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -56,9 +57,11 @@ def create_venone_app(config_name):
 
     with venone_app.app_context():
 
-        from .auth.routes import auth_view
-
+        from .auth.routes.auth import auth_view
         venone_app.register_blueprint(auth_view)
+
+        from .auth.routes.dashboard import dashboard_view
+        venone_app.register_blueprint(dashboard_view)
 
         try:
             if not os.path.exists("upload"):
@@ -66,8 +69,18 @@ def create_venone_app(config_name):
         except OSError:
             pass
 
-        @venone_app.get("/")
-        def home():
+        # Path for our main Svelte page
+        @venone_app.route("/dashboard/")
+        def base():
+            return send_from_directory('client/public', 'index.html')
+
+        # Path for all the static files (compiled JS/CSS, etc.)
+        @venone_app.route("/<path:path>")
+        def home(path):
+            return send_from_directory('client/public', path)
+
+        @venone_app.route("/")
+        def entrypoint():
             return redirect(url_for("auth_view.login"))
 
         if not venone_app.debug:
