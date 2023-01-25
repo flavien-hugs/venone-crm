@@ -3,11 +3,10 @@ import os
 from logging.handlers import RotatingFileHandler
 
 from config import config
-from flask import Flask
 from flask import redirect
 from flask import request
 from flask import url_for
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -68,16 +67,6 @@ def create_venone_app(config_name):
                 os.mkdir("upload")
         except OSError:
             pass
-
-        # Path for our main Svelte page
-        @venone_app.route("/dashboard/")
-        def base():
-            return send_from_directory('client/public', 'index.html')
-
-        # Path for all the static files (compiled JS/CSS, etc.)
-        @venone_app.route("/<path:path>")
-        def home(path):
-            return send_from_directory('client/public', path)
 
         @venone_app.route("/")
         def entrypoint():
