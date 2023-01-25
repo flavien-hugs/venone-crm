@@ -1,0 +1,172 @@
+{% set dasboard_url, logout_url = url_for('dashboard_view.dashboard'),
+    url_for('auth_view.logout') %}
+
+<div id="layoutSidenav_nav">
+    <nav class="sidenav shadow-right sidenav-light">
+        <div class="sidenav-menu">
+            <div class="nav accordion" id="accordionSidenav">
+                <div class="sidenav-menu-heading d-sm-none">
+                    Mon Compte
+                </div>
+                <a class="nav-link d-sm-none" href="#!">
+                    <div class="nav-link-icon">
+                        <i data-feather="bell"></i>
+                    </div>
+                    Alertes
+                    <span class="badge bg-warning-soft text-warning ms-auto">4 New!</span>
+                </a>
+                <a class="nav-link d-sm-none" href="#!">
+                    <div class="nav-link-icon">
+                        <i data-feather="mail"></i>
+                    </div>
+                    Messages
+                    <span class="badge bg-success-soft text-success ms-auto">2 New!</span>
+                </a>
+
+                <div class="sidenav-menu-heading">Core</div>
+                
+                <a class="nav-link" href="{{ dasboard_url }}">
+                    <div class="nav-link-icon">
+                        <i data-feather="activity"></i>
+                    </div> Dashboard
+                </a>
+
+                <!-- Sidenav Locataires -->
+                <div class="sidenav-menu-heading">Gestion locataire</div>
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+                    <div class="nav-link-icon">
+                        <i data-feather="users"></i>
+                    </div>
+                    Locataires
+                    <div class="sidenav-collapse-arrow">
+                        <i class="fas fa-angle-down"></i>
+                    </div>
+                </a>
+
+                <div class="collapse" id="collapsePages" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPagesMenu">
+                        <a class="nav-link" href="#!">
+                            Liste
+                        </a>
+                        <a class="nav-link" href="#!">
+                            Ajouter
+                        </a>
+                        <a class="nav-link" href="#!">
+                            Facture
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Sidenav regularity -->
+                <a class="nav-link" href="#!">
+                    <div class="nav-link-icon">
+                        <i data-feather="globe"></i>
+                    </div> Regularités
+                </a>
+
+                <!-- Sidenav Property -->
+                <div class="sidenav-menu-heading">Gestion Propriété</div>
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsProperty" aria-expanded="false" aria-controls="collapseLayoutsProperty">
+                    <div class="nav-link-icon">
+                        <i data-feather="layout"></i>
+                    </div>
+                    Propriété
+                    <div class="sidenav-collapse-arrow">
+                        <i class="fas fa-angle-down"></i>
+                    </div>
+                </a>
+                <div class="collapse" id="collapseLayoutsProperty" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
+                        <a class="nav-link" href="#!">
+                            Liste
+                        </a>
+                        <a class="nav-link" href="#!">
+                            Ajouter
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Sidenav Rental -->
+                <div class="sidenav-menu-heading">Gestion Loyer</div>
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsRental" aria-expanded="false" aria-controls="collapseLayoutsRental">
+                    <div class="nav-link-icon">
+                        <i data-feather="layout"></i>
+                    </div>
+                    Loyers
+                    <div class="sidenav-collapse-arrow">
+                        <i class="fas fa-angle-down"></i>
+                    </div>
+                </a>
+                <div class="collapse" id="collapseLayoutsRental" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
+                        <a class="nav-link" href="#!">
+                            Payer
+                        </a>
+                        <a class="nav-link" href="#!">
+                            Impayer
+                        </a>
+                        <a class="nav-link" href="#!">
+                            Arriérés
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Sidenav owner -->
+                <div class="sidenav-menu-heading">Gestion Propriétaire</div>
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsUser" aria-expanded="false" aria-controls="collapseLayoutsUser">
+                    <div class="nav-link-icon">
+                        <i data-feather="layout"></i>
+                    </div>
+                    Propriétaire
+                    <div class="sidenav-collapse-arrow">
+                        <i class="fas fa-angle-down"></i>
+                    </div>
+                </a>
+                <div class="collapse" id="collapseLayoutsUser" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
+                        <a class="nav-link" href="#!">
+                            Liste
+                        </a>
+                        <a class="nav-link" href="#!">
+                            Ajouter
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Gestion rapports -->
+                <div class="sidenav-menu-heading">Rapports</div>
+                <a class="nav-link" href="#!">
+                    <div class="nav-link-icon">
+                        <i data-feather="bar-chart"></i>
+                    </div>
+                    Rapports
+                </a>
+
+                <div class="sidenav-menu-heading">paramètres</div>
+                <a class="nav-link" href="#!">
+                    <div class="nav-link-icon">
+                        <i data-feather="bar-chart"></i>
+                    </div>
+                    Paramètre du compte
+                </a>
+                <a class="nav-link" href="#!">
+                    <div class="nav-link-icon">
+                        <i data-feather="bar-chart"></i>
+                    </div>
+                    Changer mot de passe
+                </a>
+            </div>
+        </div>
+
+        <!-- Sidenav Footer-->
+        <div class="sidenav-footer">
+            <div class="sidenav-footer-content">
+                <div class="sidenav-footer-subtitle">
+                Connecté en tant que:</div>
+                <div class="sidenav-footer-title">
+                    {{ current_user }}
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>

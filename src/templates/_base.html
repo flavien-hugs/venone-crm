@@ -1,56 +1,57 @@
 <!doctype html>
 <html dir="ltr" lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="robots" content="follow,all">
-        <meta name="distribution" content="Global">
-        <meta name="revisit-after" content="3 days">
-        <meta http-equiv="content-type" content="text/html">
-        <meta name="format-detection" content="telephone=yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="title" content="{{ config.SITE_NAME|safe }}">
-        <meta name="description" content="Venone est une application de gestion immobilière">
-        <meta name="keywords" content="immobilier, application, gestion">
 
-        <meta property="og:type" content="website">
-        <meta property="og:locale" content="fr_CI">
-        <meta property="og:title" content="{{ config.SITE_NAME|safe }}">
-        <meta property="og:site_name" content="{{ config.SITE_NAME|safe }}">
-        <meta property="og:description" content="Venone est une application de gestion immobilière">
-        <meta property="og:image" content="">
-        <meta property="og:image:width" content="1000">
-        <meta property="og:image:height" content="523">
-        <meta property="og:image:alt" content="{{ config.SITE_NAME|safe }}">
-        <meta property="og:url" content="{{ config.WEBSITE_BUILDER }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="follow,all">
+    <meta name="distribution" content="Global">
+    <meta name="revisit-after" content="3 days">
+    <meta http-equiv="content-type" content="text/html">
+    <meta name="format-detection" content="telephone=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="title" content="{{ config.SITE_NAME|safe }}">
+    <meta name="description" content="Venone est une application de gestion immobilière">
+    <meta name="keywords" content="immobilier, application, gestion">
 
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:site" content="@publisher_handle">
-        <meta name="twitter:creator" content="@venone">
-        <meta name="twitter:title" content="{{ config.SITE_NAME|safe }}">
-        <meta name="twitter:description" content="Venone est une application de gestion immobilière">
-        <meta name="twitter:image" content="">
-        <meta name="twitter:url" content="{{ config.WEBSITE_BUILDER }}"/>
-        <meta name="twitter:image:alt" content="{{ config.SITE_NAME|safe }}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_CI">
+    <meta property="og:title" content="{{ config.SITE_NAME|safe }}">
+    <meta property="og:site_name" content="{{ config.SITE_NAME|safe }}">
+    <meta property="og:description" content="Venone est une application de gestion immobilière">
+    <meta property="og:image" content="">
+    <meta property="og:image:width" content="1000">
+    <meta property="og:image:height" content="523">
+    <meta property="og:image:alt" content="{{ config.SITE_NAME|safe }}">
+    <meta property="og:url" content="{{ config.WEBSITE_BUILDER }}">
 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo/favicon.png') }}">
-        <link rel="canonical" href="{{ config.WEBSITE_BUILDER }}">
-        <link rel="preconnect" href="{{ config.WEBSITE_BUILDER }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@publisher_handle">
+    <meta name="twitter:creator" content="@venone">
+    <meta name="twitter:title" content="{{ config.SITE_NAME|safe }}">
+    <meta name="twitter:description" content="Venone est une application de gestion immobilière">
+    <meta name="twitter:image" content="">
+    <meta name="twitter:url" content="{{ config.WEBSITE_BUILDER }}" />
+    <meta name="twitter:image:alt" content="{{ config.SITE_NAME|safe }}">
 
-        {% block other_css_src %}
-            {% include "includes/assets/css.html" %}
-        {% endblock other_css_src %}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo/favicon.png') }}">
+    <link rel="canonical" href="{{ config.WEBSITE_BUILDER }}">
+    <link rel="preconnect" href="{{ config.WEBSITE_BUILDER }}">
 
-        <title>
-            {% block head_title %}
-                {% if page_title %}
-                    {{ page_title|safe }}
-                {% endif %}
-            {% endblock head_title %}
-            &smid; {{ config.SITE_NAME }}
-        </title>
-    </head>
+    {% block other_css_src %}
+        {% include "includes/assets/css.html" %}
+    {% endblock other_css_src %}
+
+    <title>
+        {% block head_title %}
+            {% if page_title %}
+                {{ page_title|safe }}
+            {% endif %}
+        {% endblock head_title %}
+        &smid; {{ config.SITE_NAME }}
+    </title>
+</head>
 
     <body>
         <main>
@@ -64,4 +65,5 @@
             {% include "includes/assets/js.html" %}
         {% endblock other_js_src %}
     </body>
+
 </html>

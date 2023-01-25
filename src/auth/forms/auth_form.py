@@ -3,13 +3,13 @@ from wtforms import BooleanField
 from wtforms import PasswordField
 from wtforms import StringField
 from wtforms import SubmitField
-from wtforms import DateField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import EqualTo
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
 
+from ... import db
 from ..models import VNUser
 
 
@@ -71,5 +71,9 @@ class ChangeEmailForm(FlaskForm):
     submit = SubmitField("Mise à jour de l'adresse e-mail")
 
     def validate_addr_email(self, field):
-        if VNUser.query.filter_by(vn_user_addr_email=field.data.lower()).first():
+        if (
+            db.session.query(VNUser)
+            .filter_by(vn_user_addr_email=field.data.lower())
+            .first()
+        ):
             raise ValidationError("L'adresse électronique est déjà enregistrée.")

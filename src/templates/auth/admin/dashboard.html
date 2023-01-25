@@ -1,0 +1,59 @@
+{% extends "_base.html" %}
+
+{% block other_css_src %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin/admin.css') }}">
+{% endblock other_css_src %}
+
+{% block head_title %}
+	{{ current_user }} &smid; {{ super() }}
+{% endblock head_title %}
+
+{% block body_content %}
+	<section class="nav-fixed">
+		{% include "auth/admin/partials/_sidenav.html" %}
+
+		<section id="layoutSidenav">
+			{% include "auth/admin/partials/_layoutsidenav.html" %}
+
+            <section id="layoutSidenav_content">
+                {% include "includes/partials/message.html" %}
+                <main>
+                    <span v-for="u in user">
+                        { u.addr_email }
+                    </span>
+                </main>
+            </section>
+		</section>
+	</section>
+{% endblock body_content %}
+
+
+{% block other_js_src %}
+	{{ super() }}
+	<script src="{{ url_for('static', filename="js/admin/feather.min.js") }}"></script>
+	<script src="{{ url_for('static', filename="js/admin/all.min.js") }}"></script>
+	<script src="{{ url_for('static', filename="js/admin/admin.js") }}"></script>
+    <script type="module">
+        import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+        createApp({
+            data() {
+                return {
+                    user: []
+                }
+            },
+            methods: {
+                getUser() {
+                    fetch('/customer/dashboard/api/')
+                        .then(response => response.json())
+                        .then(data => {
+                            this.user = data
+                        })
+                }
+            },
+            mounted() {
+                this.getUser()
+            },
+            delimiters: ['{', '}'],
+        }).mount('#layoutSidenav_content')
+    </script>
+{% endblock other_js_src %}

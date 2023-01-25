@@ -18,4 +18,4 @@ class OwnerHouseSignupForm(FormMixin, FlaskForm):
     cni_number = StringField(
         "N° de votre CNI", validators=[DataRequired(), InputRequired()]
     )
-    submit = SubmitField("Créer votre compte")
+    submit = SubmitField("Ouvrir mon compte")
