@@ -15,7 +15,12 @@
 				            </p>
 				        </div>
 
-				        <img loading="lazy" src="{{ url_for('static', filename='img/element/02.svg') }}" class="img-fluid mt-5" alt="venone-login-page">
+				        <div class="mb-4">
+						   	<picture>
+						   		<source srcset="{{ url_for('static', filename='img/element/02.svg') }}" type="image/png"/>
+						   		<img loading="lazy" src="{{ url_for('static', filename='img/element/02.svg') }}" height="50" width="auto" alt="venone-logo">
+						   	</picture>
+						</div>
 
 				        <div class="d-sm-flex mt-5 align-items-center justify-content-center">
 				            <p class="mb-0 h6 fw-light ms-0 ms-sm-3">
