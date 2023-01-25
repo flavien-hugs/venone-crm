@@ -10,7 +10,7 @@
 {% endblock template_user_subtitle %}
 
 {% block template_user_content %}
-	<form class="row g-4" method="POST" action=".">
+	<form action="{{ url_for('auth_view.login') }}" class="row g-4" method="POST">
 
 		{{ form.hidden_tag() }}
 
