@@ -64,16 +64,9 @@ def login():
                 flash("Le mot de passe invalide.", category="danger")
             else:
                 login_user(user, form.remember_me.data)
-                """send_email(
-                    current_user.vn_user_addr_email,
-                    f"Alerte de connexion pour {current_user.vn_user_addr_email}",
-                    "auth/email/alert_email",
-                    user=current_user,
-                    ip_address=request.remote_addr,
-                )"""
                 next_page = request.args.get("next")
                 flash(
-                    f"Succès ! Vous êtes connecté en tant que: {user.vn_user_fullname}",
+                    f"Hello, bienvenu(e) sur votre tableau de bord: {user.vn_user_fullname}",
                     category="success",
                 )
                 if next_page is None or not next_page.startswith("/"):
