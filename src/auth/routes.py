@@ -10,41 +10,44 @@ from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
 
-from ... import db
-from ...mixins.email import send_email
-from ..forms.agencie_form import AgencieSignupForm
-from ..forms.auth_form import ChangeEmailForm
-from ..forms.auth_form import ChangePasswordForm
-from ..forms.auth_form import LoginForm
-from ..forms.auth_form import PasswordResetForm
-from ..forms.auth_form import PasswordResetRequestForm
-from ..forms.owner_form import OwnerHouseSignupForm
-from ..models import VNUser
+from src import db
+from src.mixins.email import send_email
+from src.auth.forms.agencie_form import AgencieSignupForm
+from src.auth.forms.auth_form import ChangeEmailForm
+from src.auth.forms.auth_form import LoginForm
+from src.auth.forms.auth_form import PasswordResetForm
+from src.auth.forms.auth_form import PasswordResetRequestForm
+from src.auth.forms.owner_form import OwnerHouseSignupForm
+from src.auth.models import VNUser
+
+auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/customer/")
 
 
-auth_view = Blueprint("auth_view", __name__, url_prefix="/auth/customer/")
-
-
-@auth_view.before_app_request
+@auth_bp.before_app_request
 def before_request():
     if current_user.is_authenticated:
         current_user.ping()
-        if not current_user.vn_user_activated and request.blueprint != "auth_view":
-            return redirect(url_for("auth_view.unactivated"))
+        if not current_user.vn_user_activated and request.blueprint != "auth_bp":
+            return redirect(url_for("auth_bp.unactivated"))
 
 
-@auth_view.route("/unactivated/")
+@auth_bp.route("/unactivated/")
 def unactivated():
     if current_user.is_anonymous or current_user.vn_user_activated:
-        return redirect(url_for("auth_view.login"))
+        return redirect(url_for("auth_bp.login"))
     return render_template("auth/unconfirmed.html")
 
 
-@auth_view.route("/login/", methods=["GET", "POST"])
+@auth_bp.route("/login/", methods=["GET", "POST"])
 def login():
 
     if current_user.is_authenticated and current_user.vn_user_activated:
-        return redirect(url_for("dashboard_view.dashboard_view"))
+        if current_user.vn_user_house_owner:
+            flash("Vous êtes déjà inscrit(e).", category="info")
+            return redirect(url_for("owner_bp.dashboard"))
+        elif current_user.vn_user_company:
+            flash("Vous êtes déjà inscrit(e).", category="info")
+            return redirect(url_for("agency_bp.dashboard"))
 
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -69,9 +72,12 @@ def login():
                     f"Hello, bienvenu(e) sur votre tableau de bord: {user.vn_user_fullname}",
                     category="success",
                 )
-                if next_page is None or not next_page.startswith("/"):
-                    next_page = url_for("dashboard_view.dashboard")
-                return redirect(next_page)
+                if user.vn_user_house_owner and next_page is None:
+                    next_page = url_for("owner_bp.dashboard")
+                    return redirect(next_page)
+                elif user.vn_user_house_owner and next_page is None:
+                    next_page = url_for("agency_bp.dashboard")
+                    return redirect(next_page)
         else:
             flash(
                 "L'utilisateur n'existe pas ou le compte à été désactivé ! \
@@ -83,16 +89,16 @@ def login():
     return render_template("auth/login.html", page_title=page_title, form=form)
 
 
-@auth_view.route("/owner/signup/", methods=["POST", "GET"])
+@auth_bp.route("/owner/signup/", methods=["POST", "GET"])
 def registerowner_page():
 
     if current_user.is_authenticated and current_user.vn_user_activated:
-        if current_user.vn_user_account_type == 4:
+        if current_user.vn_user_house_owner:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("dashboard_view.dashboard"))
-        elif current_user.vn_user_account_type == 6:
+            return redirect(url_for("owner_bp.dashboard"))
+        elif current_user.vn_user_company:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("dashboard_view.dashboard"))
+            return redirect(url_for("agency_bp.dashboard"))
 
     form = OwnerHouseSignupForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -106,29 +112,29 @@ def registerowner_page():
         )
         user_to_create.set_password(form.password.data)
         user_to_create.vn_user_activated = True
-        user_to_create.vn_user_account_type = 4
+        user_to_create.vn_user_house_owner = True
         user_to_create.save()
         msg_success = f"""
-                Hey {user_to_create.vn_user_fullname},
-                votre compte a été créé ! Connectez-vous maintenant !
-            """
+            Hey {user_to_create.vn_user_fullname},
+            votre compte a été créé ! Connectez-vous maintenant !
+        """
         flash(msg_success, "success")
-        return redirect(url_for("auth_view.login"))
+        return redirect(url_for("auth_bp.login"))
 
     page_title = "Créer un compte particulier"
     return render_template("auth/signup/owner.html", form=form, page_title=page_title)
 
 
-@auth_view.route("/agencie/signup/", methods=["POST", "GET"])
+@auth_bp.route("/agencie/signup/", methods=["POST", "GET"])
 def agencieregister_page():
 
     if current_user.is_authenticated and current_user.vn_user_activated:
-        if current_user.vn_user_account_type == 4:
+        if current_user.vn_user_house_owner:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("dashboard_view.dashboard"))
-        elif current_user.vn_user_account_type == 6:
+            return redirect(url_for("owner_bp.dashboard"))
+        elif current_user.vn_user_company:
             flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("dashboard_view.dashboard"))
+            return redirect(url_for("agency_bp.dashboard"))
 
     form = AgencieSignupForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -143,51 +149,21 @@ def agencieregister_page():
         )
         user_to_create.set_password(form.password.data)
         user_to_create.vn_user_activated = True
-        user_to_create.vn_user_account_type = 6
+        user_to_create.vn_user_company = True
         user_to_create.save()
         msg_success = f"""
             Hey {user_to_create.vn_user_fullname},
             votre compte a été créé ! Connectez-vous maintenant !
         """
         flash(msg_success, category="success")
-        return redirect(url_for("auth_view.login"))
+        return redirect(url_for("auth_bp.login"))
 
     page_title = "Créer un compte entreprise"
     return render_template("auth/signup/agencie.html", form=form, page_title=page_title)
 
 
-@auth_view.route("/logout/")
-@login_required
-def logout():
-    logout_user()
-    flash("Vous avez été déconnecté(e).", category="info")
-    session.clear()
-    return redirect(url_for("auth_view.login"))
-
-
-@auth_view.route("/changepassword/", methods=["GET", "POST"])
-@login_required
-def change_password():
-    form = ChangePasswordForm()
-    if request.method == "POST" and form.validate_on_submit():
-        if current_user.verify_password(form.old_password.data):
-            current_user.vn_user_password = form.password_one.data
-            current_user.save()
-            flash("Votre mot de passe a été mis à jour.", category="success")
-            return redirect(url_for("auth_view.change_password"))
-        else:
-            flash("Le mot de passe est invalide.", category="danger")
-
-    page_title = "Changer votre mot de passe."
-    return render_template(
-        "auth/change_password.html", page_title=page_title, form=form
-    )
-
-
-@auth_view.route("/resetpassword/", methods=["GET", "POST"])
+@auth_bp.route("/resetpassword/", methods=["GET", "POST"])
 def password_reset_request():
-    if not current_user.is_anonymous:
-        return redirect(url_for("dashboard_view.dashboard"))
 
     form = PasswordResetRequestForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -209,7 +185,7 @@ def password_reset_request():
                 réinitialiser votre mot de passe vous a été envoyé.""",
                 category="info",
             )
-            return redirect(url_for("auth_view.login"))
+            return redirect(url_for("auth_bp.login"))
         flash(
             f"""L'utilisateur avec l'adresse e-mail '{email_lower}!r'
             n'existe pas ou le compte a été désactivé !
@@ -221,22 +197,27 @@ def password_reset_request():
     return render_template("auth/reset_password.html", page_title=page_title, form=form)
 
 
-@auth_view.route("/resetpassword/<token>/", methods=["GET", "POST"])
+@auth_bp.route("/resetpassword/<token>/", methods=["GET", "POST"])
 def password_reset(token):
     if current_user.is_authenticated:
-        return redirect(url_for("dashboard_view.dashboard"))
+        if current_user.vn_user_house_owner:
+            flash("Vous êtes déjà inscrit(e).", category="info")
+            return redirect(url_for("owner_bp.dashboard"))
+        elif current_user.vn_user_company:
+            flash("Vous êtes déjà inscrit(e).", category="info")
+            return redirect(url_for("agency_bp.dashboard"))
 
     user = VNUser.verify_reset_password_token(token)
 
     if not user:
-        return redirect(url_for("dashboard_view.dashboard"))
+        return redirect(url_for("auth_bp.login"))
 
     form = PasswordResetForm()
     if form.validate_on_submit():
-        user.password(form.password_one.data)
+        user.password(form.new_password.data)
         db.session.commit()
         flash("Votre mot de passe a été mis à jour.", category="success")
-        return redirect(url_for("auth_view.login"))
+        return redirect(url_for("auth_bp.login"))
 
     page_title = "Réinitialiser votre mot de passe"
     return render_template(
@@ -244,7 +225,7 @@ def password_reset(token):
     )
 
 
-@auth_view.route("/changeemail/", methods=["GET", "POST"])
+@auth_bp.route("/changeemail/", methods=["GET", "POST"])
 @login_required
 def change_email_request():
     form = ChangeEmailForm()
@@ -264,7 +245,8 @@ def change_email_request():
                     votre nouvelle adresse électronique vous a été envoyé.",
                 category="info",
             )
-            return redirect(url_for("dashboard_view.dashboard"))
+            next_url = request.args.get("next")
+            return redirect(next_url)
         else:
             flash("Courriel ou mot de passe non valide.")
 
@@ -272,7 +254,7 @@ def change_email_request():
     return render_template("auth/change_email.html", page_title=page_title, form=form)
 
 
-@auth_view.route("/changeemail/<token>/", methods=["GET"])
+@auth_bp.route("/changeemail/<token>/", methods=["GET"])
 @login_required
 def change_email(token):
     if current_user.change_email(token):
@@ -280,4 +262,14 @@ def change_email(token):
         flash("Votre adresse e-mail a été mise à jour.")
     else:
         flash("Demande invalide.")
-    return redirect(url_for("dashboard_view.dashboard"))
+    next_url = request.args.get("next")
+    return redirect(next_url)
+
+
+@auth_bp.route("/logout/")
+@login_required
+def logout():
+    logout_user()
+    flash("Vous avez été déconnecté(e).", category="info")
+    session.clear()
+    return redirect(url_for("auth_bp.login"))

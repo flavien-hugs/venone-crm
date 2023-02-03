@@ -9,7 +9,7 @@ from wtforms.validators import ValidationError
 from ... import db
 from ..constants import GENDER
 from ..models import VNUser
-from .form import FormMixin
+from .default_form import FormMixin
 
 
 class AgencieSignupForm(FormMixin, FlaskForm):

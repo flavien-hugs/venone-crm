@@ -29,21 +29,9 @@ COUNTRY = (
 
 XOF = "XOF - CFA Franc BCEAO"
 
-DEVICE = (
-    (XOF, "XOF - CFA Franc BCEAO"),
-)
+DEVICE = ((XOF, "XOF - CFA Franc BCEAO"),)
 
 COUNTRY_DEFAULT = CIV
-
-IS_HOUSE_OWNER = 4
-IS_AGENCIE_COMPANY = 6
-
-ACCOUNT_TYPES = (
-    (IS_AGENCIE_COMPANY, "Agence Immobilière"),
-    (IS_HOUSE_OWNER, "Propriétaire de maison"),
-)
-
-ACCOUNT_TYPES_DEFAULT = IS_HOUSE_OWNER
 
 
 HOMME = "Mr"

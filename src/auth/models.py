@@ -4,6 +4,7 @@ import jwt
 from flask import current_app
 from flask import request
 from flask_login import AnonymousUserMixin
+from flask_login import current_user
 from flask_login import UserMixin
 from sqlalchemy_utils import EmailType
 from sqlalchemy_utils import PhoneNumberType
@@ -75,56 +76,48 @@ class VNAgencieInfoModelMixin(db.Model):
 
     __abstract__ = True
 
-    vn_agencie_name = db.Column(db.String(80), unique=True, nullable=True)
-    vn_business_number = db.Column(db.String(80), unique=True, nullable=True)
-
-
-"""
-class VNUser:
-    id: int primary key
-    vn_user_gender: str
-    vn_user_fullname: str
-    vn_user_addr_email: str
-    vn_user_cni_number: str
-    vn_user_profession: str
-    vn_user_parent_name: str
-    vn_user_phonenumber_one: str
-    vn_user_phonenumber_two: str
-    vn_user_avatar: str
-    vn_agencie_name: str
-    vn_business_number: str
-    vn_user_account_type: str
-    vn_user_password: str
-    vn_user_activated: bool
-    vn_user_birthdate: date
-    vn_user_last_seen: date
-    vn_ip_address: str
-"""
+    vn_agencie_name = db.Column(
+        db.String(80), name="nom de votre agence", unique=True, nullable=True
+    )
+    vn_business_number = db.Column(
+        db.String(80), name="N° Registre de commerce", unique=True, nullable=True
+    )
 
 
 class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
 
     __tablename__ = "user"
 
-    vn_user_gender = db.Column(db.String(4), nullable=False)
-    vn_user_fullname = db.Column(db.String(80), nullable=False)
+    vn_user_gender = db.Column(db.String(4), name="gender", nullable=False)
+    vn_user_fullname = db.Column(db.String(80), name="name & surname", nullable=False)
     vn_user_addr_email = db.Column(EmailType(), unique=True, nullable=False)
-    vn_user_profession = db.Column(db.String(100), nullable=True)
-    vn_user_parent_name = db.Column(db.String(80), nullable=True)
+    vn_user_profession = db.Column(db.String(100), name="profession", nullable=True)
+    vn_user_parent_name = db.Column(db.String(80), name="parent's name", nullable=True)
     vn_user_phonenumber_one = db.Column(PhoneNumberType(), unique=True, nullable=True)
     vn_user_phonenumber_two = db.Column(PhoneNumberType(), unique=True, nullable=True)
-    vn_user_cni_number = db.Column(db.String(11), unique=True, nullable=True)
-    vn_user_location = db.Column(db.String(180), nullable=True)
-    vn_user_country = db.Column(db.String(80), nullable=False)
-    vn_user_avatar = db.Column(db.String(80), nullable=True)
-    vn_user_account_type = db.Column(db.String(80), nullable=False)
-    vn_user_activated = db.Column(db.Boolean, nullable=False, default=False)
-    vn_user_password = db.Column(db.String(180), nullable=False)
-    vn_user_birthdate = db.Column(db.Date, nullable=True)
-    vn_user_last_seen = db.Column(db.DateTime, onupdate=datetime.utcnow())
-    vn_user_device = db.Column(db.String(80), nullable=True)
-    vn_user_find_us = db.Column(db.String(100), nullable=True)
-    vn_user_ip_address = db.Column(db.String(50), nullable=True)
+    vn_user_cni_number = db.Column(
+        db.String(11), name="national ID card number", unique=True, nullable=True
+    )
+    vn_user_location = db.Column(
+        db.String(180), name="location of residence", nullable=True
+    )
+    vn_user_country = db.Column(db.String(80), name="country", nullable=False)
+    vn_user_avatar = db.Column(db.String(80), name="avatar", nullable=True)
+    vn_user_activated = db.Column(
+        db.Boolean, name="account status", nullable=False, default=False
+    )
+    vn_user_password = db.Column(db.String(180), name="password", nullable=False)
+    vn_user_birthdate = db.Column(db.Date, name="user birth date", nullable=True)
+    vn_user_last_seen = db.Column(
+        db.DateTime, name="user last seen", onupdate=datetime.utcnow()
+    )
+
+    vn_user_house_owner = db.Column(db.Boolean(), name="house owner", default=False)
+    vn_user_company = db.Column(db.Boolean(), name="company", default=False)
+
+    vn_user_device = db.Column(db.String(80), name="devise", nullable=True)
+    vn_user_find_us = db.Column(db.String(100), name="user find us", nullable=True)
+    vn_user_ip_address = db.Column(db.String(50), name="user ip address", nullable=True)
     vn_role_id = db.Column(
         db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
@@ -201,10 +194,6 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
         db.session.add(self)
         db.session.commit()
 
-    def update(self, vn_user_fullname):
-        self.vn_user_fullname = vn_user_fullname
-        db.session.commit()
-
     def delete(self):
         db.session.delete(self)
         db.session.commit()
@@ -213,6 +202,20 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
         self.vn_user_last_seen = datetime.utcnow()
         self.vn_user_ip_address = request.remote_addr
         db.session.add(self)
+
+    @staticmethod
+    def get_current_user():
+        return VNUser.query.filter_by(id=current_user.id).first()
+
+    @staticmethod
+    def get_label(user):
+        return user.get_name()
+
+    def get_name(self):
+        if self.vn_user_house_owner:
+            return self.vn_user_fullname
+        if self.vn_user_company:
+            return self.vn_agencie_name
 
 
 class AnonymousUser(AnonymousUserMixin):

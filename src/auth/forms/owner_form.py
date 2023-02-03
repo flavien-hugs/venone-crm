@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 
 from ..constants import GENDER
-from .form import FormMixin
+from .default_form import FormMixin
 
 
 class OwnerHouseSignupForm(FormMixin, FlaskForm):

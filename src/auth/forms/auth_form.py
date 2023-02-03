@@ -29,17 +29,16 @@ class LoginForm(FlaskForm):
 
 class ChangePasswordForm(FlaskForm):
     old_password = PasswordField("Ancien mot de passe", validators=[DataRequired()])
-    password_one = PasswordField("Nouveau mot de passe", validators=[DataRequired()])
-    password_two = PasswordField(
+    new_password = PasswordField("Nouveau mot de passe", validators=[DataRequired()])
+    confirm_password = PasswordField(
         "Confirmer le mot de passe",
         validators=[
             DataRequired(),
             EqualTo(
-                "password_two", message="Les deux mots de passe ne correspondent pas."
+                "new_password", message="Les deux mots de passe ne correspondent pas."
             ),
         ],
     )
-    submit = SubmitField("Mettre à jour votre mot de passe")
 
 
 class PasswordResetRequestForm(FlaskForm):
@@ -50,13 +49,14 @@ class PasswordResetRequestForm(FlaskForm):
 
 
 class PasswordResetForm(FlaskForm):
-    password_one = PasswordField("Nouveau mot de passe", validators=[DataRequired()])
-    password_two = PasswordField(
+    new_password = PasswordField("Nouveau mot de passe", validators=[DataRequired()])
+    confirm_password = PasswordField(
         "Confirmer le mot de passe",
         validators=[
             DataRequired(),
             EqualTo(
-                "password_two", message="Les deux mots de passe ne correspondent pas."
+                "confirm_password",
+                message="Les deux mots de passe ne correspondent pas.",
             ),
         ],
     )
