@@ -3,10 +3,10 @@ import os
 from logging.handlers import RotatingFileHandler
 
 from config import config
+from flask import Flask
 from flask import redirect
 from flask import request
 from flask import url_for
-from flask import Flask
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -29,10 +29,9 @@ scheduler = APScheduler()
 login_manager = LoginManager()
 htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
 
-login_manager.login_view = "auth_view.login"
+login_manager.login_view = "auth_bp.login"
 login_manager.session_protection = "strong"
 login_manager.login_message_category = "info"
-login_manager.needs_refresh_message_category = "danger"
 
 
 def create_venone_app(config_name):
@@ -47,20 +46,24 @@ def create_venone_app(config_name):
     bcrypt.init_app(venone_app)
     moment.init_app(venone_app)
     pages.init_app(venone_app)
-    login_manager.init_app(venone_app)
     htmlmin.init_app(venone_app)
     migrate.init_app(venone_app, db)
     db.init_app(venone_app)
 
     scheduler.init_app(venone_app)
+    login_manager.init_app(venone_app)
 
     with venone_app.app_context():
 
-        from .auth.routes.auth import auth_view
-        venone_app.register_blueprint(auth_view)
+        from src.auth import auth_bp
 
-        from .auth.routes.dashboard import dashboard_view
-        venone_app.register_blueprint(dashboard_view)
+        venone_app.register_blueprint(auth_bp)
+
+        from src.dashboard.routes import owner_bp, agency_bp, admin_bp
+
+        venone_app.register_blueprint(owner_bp)
+        venone_app.register_blueprint(agency_bp)
+        venone_app.register_blueprint(admin_bp)
 
         try:
             if not os.path.exists("upload"):
@@ -70,7 +73,7 @@ def create_venone_app(config_name):
 
         @venone_app.route("/")
         def entrypoint():
-            return redirect(url_for("auth_view.login"))
+            return redirect(url_for("auth_bp.login"))
 
         if not venone_app.debug:
             if not os.path.exists("logs"):
