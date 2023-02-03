@@ -4,7 +4,7 @@ Bienvenue chez Venone !
 
 Pour confirmer votre compte, veuillez cliquer sur le lien suivant :
 
-{{ url_for('auth_view.confirm', token=token, _external=True) }}
+{{ url_for('auth_bp.confirm', token=token, _external=True) }}
 
 Cordialement,
 

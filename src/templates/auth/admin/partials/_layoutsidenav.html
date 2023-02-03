@@ -1,5 +1,4 @@
-{% set dasboard_url, logout_url = url_for('dashboard_view.dashboard'),
-    url_for('auth_view.logout') %}
+{% set logout_url = url_for('auth_bp.logout') %}
 
 <div id="layoutSidenav_nav">
     <nav class="sidenav shadow-right sidenav-light">
@@ -24,8 +23,8 @@
                 </a>
 
                 <div class="sidenav-menu-heading">Core</div>
-                
-                <a class="nav-link" href="{{ dasboard_url }}">
+
+                <a class="nav-link" href="/">
                     <div class="nav-link-icon">
                         <i data-feather="activity"></i>
                     </div> Dashboard
@@ -145,15 +144,9 @@
                 <div class="sidenav-menu-heading">paramètres</div>
                 <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
-                        <i data-feather="bar-chart"></i>
+                        <i data-feather="settings"></i>
                     </div>
                     Paramètre du compte
-                </a>
-                <a class="nav-link" href="#!">
-                    <div class="nav-link-icon">
-                        <i data-feather="bar-chart"></i>
-                    </div>
-                    Changer mot de passe
                 </a>
             </div>
         </div>
@@ -164,7 +157,7 @@
                 <div class="sidenav-footer-subtitle">
                 Connecté en tant que:</div>
                 <div class="sidenav-footer-title">
-                    {{ current_user }}
+                    {{ username }}
                 </div>
             </div>
         </div>

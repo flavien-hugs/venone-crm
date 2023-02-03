@@ -1,8 +1,7 @@
 {% extends "auth/signup/owner.html" %}
 
 {% block template_user_title %}
-	Connectez-vous à <br>
-	votre compte {{ site_name|upper }}
+	Connectez-vous à votre compte {{ site_name|upper }}
 {% endblock template_user_title %}
 
 {% block template_user_subtitle %}
@@ -10,7 +9,7 @@
 {% endblock template_user_subtitle %}
 
 {% block template_user_content %}
-	<form action="{{ url_for('auth_view.login') }}" class="row g-4" method="POST">
+	<form action="{{ url_for('auth_bp.login') }}" class="row g-4" method="POST">
 
 		{{ form.hidden_tag() }}
 
@@ -57,7 +56,7 @@
 			</div>
 
 			<div class="text-primary-hover">
-				<a href="{{ url_for('auth_view.password_reset_request') }}" class="text-secondary">
+				<a href="{{ url_for('auth_bp.password_reset_request') }}" class="text-secondary">
 					<u>Mot de passe oublié ?</u>
 				</a>
 			</div>
@@ -81,13 +80,13 @@
 		</div>
 
 		<div class="col-xxl-6 d-grid">
-			<a href="{{ url_for('auth_view.registerowner_page') }}" class="btn bg-google mb-2 mb-xxl-0">
+			<a href="{{ url_for('auth_bp.registerowner_page') }}" class="btn bg-google mb-2 mb-xxl-0">
 				Créer un compte particulier
 			</a>
 		</div>
 
 		<div class="col-xxl-6 d-grid">
-			<a href="{{ url_for('auth_view.agencieregister_page') }}" class="btn bg-google mb-0">
+			<a href="{{ url_for('auth_bp.agencieregister_page') }}" class="btn bg-google mb-0">
 				Créer un compte entreprise
 			</a>
 		</div>
