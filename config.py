@@ -6,8 +6,8 @@ import os
 from typing import Generator
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -17,6 +17,7 @@ DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///" + os.path.join(
 engine = create_engine(DATABASE_URI, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = scoped_session(SessionLocal)
+
 
 def get_db() -> Generator:
     try:
