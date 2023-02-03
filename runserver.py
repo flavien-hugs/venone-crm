@@ -36,4 +36,4 @@ def init_db():
 
 
 if __name__ == "__main__":
-    venone_app.run()
+    venone_app.run(use_reloader=True)
