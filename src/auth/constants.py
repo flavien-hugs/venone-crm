@@ -34,12 +34,12 @@ DEVICE = ((XOF, "XOF - CFA Franc BCEAO"),)
 COUNTRY_DEFAULT = CIV
 
 
-HOMME = "Mr"
+HOMME = "M."
 FEMME = "Mme"
 MDLLE = "Mlle"
 
 GENDER = (
-    (HOMME, "Mr"),
+    (HOMME, "M."),
     (FEMME, "Mme"),
     (MDLLE, "Mlle"),
 )
