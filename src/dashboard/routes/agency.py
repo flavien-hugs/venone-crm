@@ -22,7 +22,7 @@ def api():
 
 @agency_bp.route("/index/", methods=["GET"])
 @login_required
-def dashboard():
+def agency_dashboard():
     page_title = "Tableau de board"
     return render_template(
         "auth/admin/dashboard.html",
@@ -33,7 +33,7 @@ def dashboard():
 
 @agency_bp.route("/settings/", methods=["GET"])
 @login_required
-def setting():
+def agency_setting():
     page_title = "Paramètres"
     return render_template(
         "auth/admin/pages/company/settings.html",
