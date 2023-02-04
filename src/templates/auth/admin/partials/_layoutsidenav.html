@@ -140,14 +140,29 @@
                     </div>
                     Rapports
                 </a>
-
-                <div class="sidenav-menu-heading">paramètres</div>
                 <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
-                        <i data-feather="settings"></i>
+                        <i data-feather="bell"></i>
                     </div>
-                    Paramètre du compte
+                    Notifications
                 </a>
+
+                <div class="sidenav-menu-heading">paramètres</div>
+                {% if current_user.vn_user_house_owner %}
+                    <a class="nav-link" href="{{ url_for('owner_bp.owner_setting') }}">
+                        <div class="nav-link-icon">
+                            <i data-feather="settings"></i>
+                        </div>
+                        Paramètre du compte
+                    </a>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('agency_bp.agency_setting') }}">
+                        <div class="nav-link-icon">
+                            <i data-feather="settings"></i>
+                        </div>
+                        Paramètre du compte
+                    </a>
+                {% endif %}
             </div>
         </div>
 
