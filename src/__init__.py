@@ -14,6 +14,7 @@ from flask_flatpages import FlatPages
 from flask_htmlmin import HTMLMIN
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_caching import Cache
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -27,6 +28,7 @@ migrate = Migrate()
 pages = FlatPages()
 scheduler = APScheduler()
 login_manager = LoginManager()
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
 
 login_manager.login_view = "auth_bp.login"
@@ -42,6 +44,7 @@ def create_venone_app(config_name):
     venone_app.url_map.strict_slashes = False
     venone_app.jinja_env.globals.update(zip=zip)
 
+    cache.init_app(venone_app)
     mail.init_app(venone_app)
     bcrypt.init_app(venone_app)
     moment.init_app(venone_app)
