@@ -24,6 +24,7 @@ email-validator = "*"
 pyjwt = "*"
 flask-htmlmin = "*"
 flask-apscheduler = "*"
+flask-caching = "*"
 
 [dev-packages]
 pre-commit = "*"
