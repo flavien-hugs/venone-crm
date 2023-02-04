@@ -32,23 +32,15 @@ def before_request():
 
 
 @auth_bp.route("/unactivated/")
+@login_required
 def unactivated():
-    if current_user.is_anonymous or current_user.vn_user_activated:
+    if current_user.vn_user_activated:
         return redirect(url_for("auth_bp.login"))
     return render_template("auth/unconfirmed.html")
 
 
 @auth_bp.route("/login/", methods=["GET", "POST"])
 def login():
-
-    if current_user.is_authenticated and current_user.vn_user_activated:
-        if current_user.vn_user_house_owner:
-            flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("owner_bp.dashboard"))
-        elif current_user.vn_user_company:
-            flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("agency_bp.dashboard"))
-
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
@@ -66,18 +58,17 @@ def login():
             elif not user.verify_password(form.password.data):
                 flash("Le mot de passe invalide.", category="danger")
             else:
+
                 login_user(user, form.remember_me.data)
-                next_page = request.args.get("next")
+                if user.vn_user_house_owner:
+                    return redirect(request.args.get('next') or url_for("owner_bp.dashboard"))
+                elif user.vn_user_company:
+                    return redirect(request.args.get('next') or url_for("agency_bp.dashboard"))
+
                 flash(
                     f"Hello, bienvenu(e) sur votre tableau de bord: {user.vn_user_fullname}",
                     category="success",
                 )
-                if user.vn_user_house_owner and next_page is None:
-                    next_page = url_for("owner_bp.dashboard")
-                    return redirect(next_page)
-                elif user.vn_user_house_owner and next_page is None:
-                    next_page = url_for("agency_bp.dashboard")
-                    return redirect(next_page)
         else:
             flash(
                 "L'utilisateur n'existe pas ou le compte à été désactivé ! \
@@ -105,7 +96,7 @@ def registerowner_page():
         user_to_create = VNUser(
             vn_user_gender=form.gender.data,
             vn_user_fullname=form.fullname.data,
-            vn_user_addr_email=form.addr_email.data,
+            vn_user_addr_email=form.addr_email.data.lower(),
             vn_user_phonenumber_one=form.phonenumber_one.data,
             vn_user_cni_number=form.cni_number.data,
             vn_user_country=form.country.data,
@@ -169,7 +160,8 @@ def password_reset_request():
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
         user = (
-            db.session.query(VNUser).filter_by(vn_user_addr_email=email_lower).first()
+            db.session.query(VNUser).filter_by(
+                vn_user_addr_email=email_lower).first()
         )
         if user:
             token = user.generate_reset_token()
