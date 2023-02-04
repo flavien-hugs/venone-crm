@@ -5,7 +5,7 @@
 {% endblock other_css_src %}
 
 {% block head_title %}
-	{{ username }} &smid; {{ super() }}
+	{{ current_user.get_name() }} &smid; {{ super() }}
 {% endblock head_title %}
 
 {% block body_content %}
@@ -19,7 +19,6 @@
                 <main>
                     {% block dashboard_content %}
                         {% include "includes/partials/message.html" %}
-
                     {% endblock dashboard_content %}
                 </main>
 
