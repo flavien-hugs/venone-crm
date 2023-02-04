@@ -6,10 +6,12 @@ from flask_login import login_required
 
 from src import db
 from src.auth.models import VNUser
+
+from src.mixins.decorators import check_activated, owner_required
 from src.dashboard.forms import OwnerSettingForm
 from src.auth.forms.auth_form import ChangePasswordForm
 
-owner_bp = Blueprint("owner_bp", __name__, url_prefix="/customer/dashboard/")
+owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/owner/")
 
 
 @owner_bp.route("/api/", methods=["GET"])
@@ -25,17 +27,21 @@ def api():
 
 @owner_bp.route("/index/", methods=["GET"])
 @login_required
+@owner_required
+@check_activated
 def dashboard():
     page_title = "Tableau de board"
     return render_template(
         "auth/admin/dashboard.html",
         page_title=page_title,
-        username=current_user.get_name()
+        current_user=current_user
     )
 
 
 @owner_bp.route("/settings/", methods=["GET", "POST"])
 @login_required
+@owner_required
+@check_activated
 def owner_setting():
     page_title = "Paramètres"
     form = OwnerSettingForm()
@@ -73,15 +79,15 @@ def owner_setting():
         "auth/admin/pages/owner/settings.html",
         page_title=page_title,
         form=form,
-        current_user=current_user,
-        username=current_user.get_name()
+        current_user=current_user
     )
 
 
 @owner_bp.route("/changepaswword/", methods=["GET", "POST"])
 @login_required
+@check_activated
 def change_password():
-    page_title = "Changer votre mot de passe."
+    page_title = "Changer votre mot de passe"
     form = ChangePasswordForm()
     if request.method == "POST" and form.validate_on_submit():
         if current_user.verify_password(form.old_password.data):
@@ -97,6 +103,5 @@ def change_password():
         "auth/admin/pages/password.html",
         page_title=page_title,
         form=form,
-        current_user=current_user,
-        username=current_user.get_name()
+        current_user=current_user
     )
