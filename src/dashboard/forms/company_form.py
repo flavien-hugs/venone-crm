@@ -7,7 +7,6 @@ from wtforms.validators import InputRequired
 
 from .default_form import DefaultForm
 
-
 class CompanySettingForm(DefaultForm, FlaskForm):
 
     fullname = StringField(
