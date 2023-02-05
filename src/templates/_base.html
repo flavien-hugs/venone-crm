@@ -45,9 +45,7 @@
 
     <title>
         {% block head_title %}
-            {% if page_title %}
-                {{ page_title|safe }}
-            {% endif %}
+            {{ page_title|safe }}
         {% endblock head_title %}
         &smid; {{ config.SITE_NAME }}
     </title>
