@@ -152,14 +152,14 @@
                 </a>
 
                 <div class="sidenav-menu-heading">paramètres</div>
-                {% if current_user.vn_user_house_owner %}
+                {% if current_user.vn_house_owner %}
                     <a class="nav-link" href="{{ setting_owner_url }}">
                         <div class="nav-link-icon">
                             <i data-feather="settings"></i>
                         </div>
                         Paramètre du compte
                     </a>
-                {% else %}
+                {% elif current_user.vn_company  %}
                     <a class="nav-link" href="{{ setting_agency_url }}">
                         <div class="nav-link-icon">
                             <i data-feather="settings"></i>

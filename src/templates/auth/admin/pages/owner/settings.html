@@ -14,9 +14,9 @@
 		{% include "includes/partials/message.html" %}
 
 		<nav class="nav nav-borders">
-			{% if current_user.vn_user_house_owner %}
+			{% if current_user.vn_house_owner %}
             	<a class="nav-link ms-0" href="{{ setting_owner_url }}">Paramètres</a>
-	        {% elif current_user.vn_user_company %}
+	        {% elif current_user.vn_company %}
 	            <a class="nav-link ms-0" href="{{ setting_agency_url }}">Paramètres</a>
 	        {% endif %}
 			<a class="nav-link" href="{{ change_password_url }}">Sécurité</a>

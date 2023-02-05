@@ -1,4 +1,4 @@
-<p>Hello {{ user.vn_user_fullname }},</p>
+<p>Hello {{ user.vn_fullname }},</p>
 <br>
 <p>Bienvenue chez <b>Venone</b>!</p>
 <p>Pour confirmer votre compte, veuillez <a href="{{ url_for('auth_bp.confirm', token=token, _external=True) }}">cliquer ici</a>.</p>

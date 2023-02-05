@@ -35,7 +35,7 @@
 
 <div class="mb-3">
     <label>Votre adresse e-mail</label>
-    <span class="form-control bg-light">{{ current_user.vn_user_addr_email }}</span>
+    <span class="form-control bg-light">{{ current_user.vn_addr_email }}</span>
     <small>Pour changer votre adresse e-mail cliquer <a href="~">ici</a></small>
 </div>
 
@@ -71,7 +71,7 @@
 <div class="row gx-3 mb-3">
     <div class="col-md-6">
         <label>Numéro de téléphone 1</label>
-        <span class="form-control bg-light">{{ current_user.vn_user_phonenumber_one }}</span>
+        <span class="form-control bg-light">{{ current_user.vn_phonenumber_one }}</span>
     </div>
     <div class="col-md-6">
         {{ form.phonenumber_two.label(class="small mb-1") }}
@@ -82,7 +82,7 @@
 <div class="row gx-3 mb-3">
     <div class="col-md-6">
         <label>Pays/Région</label>
-        <span class="form-control bg-light">{{ current_user.vn_user_country }}</span>
+        <span class="form-control bg-light">{{ current_user.vn_country }}</span>
     </div>
     <div class="col-md-6">
         {{ form.location.label(class="small mb-1") }}
