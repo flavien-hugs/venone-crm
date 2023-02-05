@@ -1,8 +1,6 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy_utils import PhoneNumberType
-
 from .. import db
 from ..utils import Updateable
 
@@ -32,9 +30,10 @@ class DefaultUserInfoModel(Updateable):
     vn_addr_email = db.Column(db.String(80), unique=True, nullable=False)
     vn_profession = db.Column(db.String(100), name="profession", nullable=True)
     vn_parent_name = db.Column(db.String(80), name="parent's name", nullable=True)
-    vn_phonenumber_one = db.Column(PhoneNumberType(), unique=True, nullable=True)
-    vn_phonenumber_two = db.Column(PhoneNumberType(), unique=True, nullable=True)
+    vn_phonenumber_one = db.Column(db.String(20), unique=True, nullable=True)
+    vn_phonenumber_two = db.Column(db.String(20), unique=True, nullable=True)
     vn_cni_number = db.Column(
         db.String(11), name="national ID card number", unique=True, nullable=True
     )
     vn_location = db.Column(db.String(180), name="location of residence", nullable=True)
+    vn_activated = db.Column(db.Boolean, name="status", nullable=False, default=True)
