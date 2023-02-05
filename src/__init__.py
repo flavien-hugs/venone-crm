@@ -5,7 +5,6 @@ from logging.handlers import RotatingFileHandler
 from config import config
 from flask import Flask
 from flask import redirect
-from flask import request
 from flask import url_for
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
@@ -39,7 +38,12 @@ login_manager.login_message_category = "info"
 
 
 def create_venone_app(config_name):
-    venone_app = Flask(__name__, static_folder="static", template_folder="templates", instance_relative_config=True)
+    venone_app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates",
+        instance_relative_config=True,
+    )
     venone_app.config.from_object(config[config_name])
     config[config_name].init_app(venone_app)
 
