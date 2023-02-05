@@ -39,7 +39,7 @@ login_manager.login_message_category = "info"
 
 
 def create_venone_app(config_name):
-    venone_app = Flask(__name__, static_folder="static", instance_relative_config=True)
+    venone_app = Flask(__name__, static_folder="static", template_folder="templates", instance_relative_config=True)
     venone_app.config.from_object(config[config_name])
     config[config_name].init_app(venone_app)
 
@@ -105,10 +105,5 @@ def create_venone_app(config_name):
         @venone_app.teardown_request
         def log_exit(exc):
             venone_app.logger.debug("Traitement de la demande terminé", exc_info=exc)
-
-        @venone_app.after_request
-        def after_request(response):
-            request.get_data()
-            return response
 
         return venone_app
