@@ -33,7 +33,7 @@ def admin_required(func):
 def check_activated(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if current_user.vn_user_activated is False:
+        if current_user.vn_activated is False:
             flash("Désolé, votre compte a été désactivé !", category="warning")
             return redirect(url_for("auth_bp.unactivated"))
         return func(*args, **kwargs)
@@ -44,7 +44,7 @@ def check_activated(func):
 def owner_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if current_user.vn_user_house_owner and current_user.vn_user_activated:
+        if current_user.vn_house_owner and current_user.vn_activated:
             return func(*args, **kwargs)
         return render_template("pages/no_access.html", page_title="Accès non autorisé")
 
@@ -54,7 +54,7 @@ def owner_required(func):
 def agency_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
-        if current_user.vn_user_company and current_user.vn_user_activated:
+        if current_user.vn_company and current_user.vn_activated:
             return function(*args, **kwargs)
         return render_template("pages/no_access.html", page_title="Accès non autorisé")
 
