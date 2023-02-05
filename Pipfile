@@ -25,6 +25,7 @@ pyjwt = "*"
 flask-htmlmin = "*"
 flask-apscheduler = "*"
 flask-caching = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 pre-commit = "*"
