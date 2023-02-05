@@ -40,7 +40,6 @@ def dashboard(uuid):
 @owner_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
 @login_required
 @owner_required
-@check_activated
 @csrf.exempt
 def owner_setting(uuid):
     page_title = "Paramètres"

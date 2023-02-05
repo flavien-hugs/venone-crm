@@ -8,9 +8,6 @@ from flask_login import current_user
 from flask_login import login_required
 from src.dashboard.forms import CompanySettingForm
 from src.mixins.decorators import agency_required
-from src.mixins.decorators import check_activated
-
-from src import csrf
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 
@@ -23,11 +20,9 @@ def api():
     data = {"id": current_user.id, "addr_email": current_user.vn_user_addr_email}
     return jsonify({"data": data}), 200
 
-@agency_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
+@agency_bp.route("/<string:uuid>/settings/", methods=["GET", "POST"])
 @login_required
 @agency_required
-@check_activated
-@csrf.exempt
 def agency_setting(uuid):
     page_title = "Paramètres"
     form = CompanySettingForm()
