@@ -12,7 +12,5 @@ admin_bp = Blueprint("admin_bp", __name__, url_prefix="/admin/dashboard/")
 def dashboard():
     page_title = "Tableau de board"
     return render_template(
-        "auth/admin/dashboard.html",
-        page_title=page_title,
-        current_user=current_user
+        "auth/admin/dashboard.html", page_title=page_title, current_user=current_user
     )
