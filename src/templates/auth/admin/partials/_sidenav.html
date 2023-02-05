@@ -1,6 +1,8 @@
-{% set avatar, dasboard_url, logout_url =
+{% set avatar, dasboard_url, setting_owner_url, setting_agency_url, logout_url =
     url_for('static', filename="img/element/avatar.png"),
-    url_for('owner_bp.dashboard'),
+    url_for('owner_bp.dashboard', uuid=current_user.uuid),
+    url_for("owner_bp.owner_setting", uuid=current_user.uuid),
+    url_for("agency_bp.agency_setting", uuid=current_user.uuid),
     url_for('auth_bp.logout') %}
 
 <nav class="topnav navbar navbar-expand shadow justify-content-between justify-content-sm-start navbar-light bg-white" id="sidenavAccordion">
@@ -8,7 +10,7 @@
     <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 me-2 ms-lg-2 me-lg-0 shadow-none" id="sidebarToggle"><i data-feather="menu"></i></button>
 
     <a class="navbar-brand pe-3 ps-4 ps-lg-2" href="{{ dasboard_url }}">
-    {{ username }}</a>
+    {{ current_user.get_name() }}</a>
 
     <ul class="navbar-nav align-items-center ms-auto">
 
@@ -62,7 +64,7 @@
                     <img class="dropdown-user-img" src="{{ avatar }}" />
                     <div class="dropdown-user-details">
                         <div class="dropdown-user-details-name">
-                            {{ current_user }}
+                            {{ current_user.get_name() }}
                         </div>
                         <div class="dropdown-user-details-email">
                             {{ current_user.vn_user_addr_email }}
@@ -73,18 +75,19 @@
                 <div class="dropdown-divider"></div>
 
                 {% if current_user.vn_user_house_owner %}
-                    <a class="dropdown-item" href="{{ url_for("owner_bp.owner_setting") }}">
+                    <a class="dropdown-item" href="{{ setting_owner_url }}">
                         <div class="dropdown-item-icon">
                         <i data-feather="settings"></i></div>
                         Paramètre du compte
                     </a>
-                {% else %}
-                    <a class="dropdown-item" href="{{ url_for("agency_bp.agency_setting") }}">
+                {% elif current_user.vn_user_company %}
+                    <a class="dropdown-item" href="{{ setting_agency_url }}">
                         <div class="dropdown-item-icon">
                         <i data-feather="settings"></i></div>
                         Paramètre du compte
                     </a>
                 {% endif %}
+
                 <a class="dropdown-item" href="#!">
                     <div class="dropdown-item-icon">
                     <i data-feather="help-circle"></i></div>
