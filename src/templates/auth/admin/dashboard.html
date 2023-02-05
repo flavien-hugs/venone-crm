@@ -5,7 +5,7 @@
 {% endblock other_css_src %}
 
 {% block head_title %}
-	{{ username }} &smid; {{ super() }}
+	{{ current_user.get_name() }} &smid; {{ super() }}
 {% endblock head_title %}
 
 {% block body_content %}
@@ -19,7 +19,6 @@
                 <main>
                     {% block dashboard_content %}
                         {% include "includes/partials/message.html" %}
-
                     {% endblock dashboard_content %}
                 </main>
 
@@ -29,7 +28,6 @@
                             <div class="col-md-6 small">&copy; {{ moment().format('YYYY') }} Venone, filiale CGIC GROUP</div>
                             <div class="col-md-6 text-md-end small">
                                 <a href="#!">Politique de confidentialité</a>
-                                ·
                                 <a href="#!">Conditions générales d'utilisation</a>
                             </div>
                         </div>
@@ -46,27 +44,4 @@
 	<script src="{{ url_for('static', filename="js/admin/feather.min.js") }}"></script>
 	<script src="{{ url_for('static', filename="js/admin/all.min.js") }}"></script>
 	<script src="{{ url_for('static', filename="js/admin/admin.js") }}"></script>
-    <script type="module">
-        import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
-        createApp({
-            data() {
-                return {
-                    user: []
-                }
-            },
-            methods: {
-                getUser() {
-                    fetch('/customer/dashboard/api/')
-                        .then(response => response.json())
-                        .then(data => {
-                            this.user = data
-                        })
-                }
-            },
-            mounted() {
-                this.getUser()
-            },
-            delimiters: ['{', '}'],
-        }).mount('#layoutSidenav_content')
-    </script>
 {% endblock other_js_src %}

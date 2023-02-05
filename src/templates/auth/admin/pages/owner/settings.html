@@ -1,18 +1,25 @@
 {% extends "auth/admin/dashboard.html" %}
 
+{% set setting_owner_url, setting_agency_url, change_password_url =
+    url_for("owner_bp.owner_setting", uuid=current_user.uuid),
+    url_for("agency_bp.agency_setting", uuid=current_user.uuid),
+    url_for('owner_bp.change_password', uuid=current_user.uuid) %}
+
 {% block dashboard_content %}
-	
+
 	{% include "auth/admin/partials/_breadcrumb.html" %}
-	
+
 	<div class="container-xl px-4 mt-4">
-		
+
 		{% include "includes/partials/message.html" %}
 
 		<nav class="nav nav-borders">
-			<a class="nav-link ms-0" href="#">Paramètres</a>
-			<a class="nav-link" href="#">Paiement</a>
-			<a class="nav-link" href="{{ url_for('owner_bp.change_password') }}">Sécurité</a>
-			<a class="nav-link" href="#">Notifications</a>
+			{% if current_user.vn_user_house_owner %}
+            	<a class="nav-link ms-0" href="{{ setting_owner_url }}">Paramètres</a>
+	        {% elif current_user.vn_user_company %}
+	            <a class="nav-link ms-0" href="{{ setting_agency_url }}">Paramètres</a>
+	        {% endif %}
+			<a class="nav-link" href="{{ change_password_url }}">Sécurité</a>
 		</nav>
 		<hr class="mt-0 mb-4" />
 
@@ -33,7 +40,7 @@
 					<div class="card mb-4">
 						<div class="card-header">Informations sur votre compte</div>
 						<div class="card-body">
-							<form action="{{ url_for('owner_bp.owner_setting') }}" method="POST">
+							<form action="{{ setting_owner_url }}" method="POST">
 								{{ form.hidden_tag() }}
 								{% include "auth/admin/pages/owner/paths/form.html" %}
 							</form>
@@ -44,4 +51,3 @@
 		</div>
 	</div>
 {% endblock dashboard_content %}
-

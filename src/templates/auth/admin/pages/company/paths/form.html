@@ -41,29 +41,29 @@
 
 <div class="row gx-3 mb-3">
     <div class="col-md-6">
-        {{ form.parent_name.label(class="small mb-1") }}
-        {% if form.parent_name.errors %}
-            {{ form.parent_name(class="form-control", placeholder=form.parent_name.label.text) }}
+        {{ form.agencie_name.label(class="small mb-1") }}
+        {% if form.agencie_name.errors %}
+            {{ form.agencie_name(class="form-control", placeholder=form.agencie_name.label.text) }}
             <div class="invalid-feedback">
-                {% for error in form.parent_name.errors %}
+                {% for error in form.agencie_name.errors %}
                     <span>{{ error }}</span>
                 {% endfor %}
             </div>
         {% else %}
-            {{ form.parent_name(class="form-control", placeholder=form.parent_name.label.text) }}
+            {{ form.agencie_name(class="form-control", placeholder=form.agencie_name.label.text) }}
         {% endif %}
     </div>
     <div class="col-md-6">
-        {{ form.profession.label(class="small mb-1") }}
-        {% if form.profession.errors %}
-            {{ form.profession(class="form-control", placeholder=form.profession.label.text) }}
+        {{ form.business_number.label(class="small mb-1") }}
+        {% if form.business_number.errors %}
+            {{ form.business_number(class="form-control", placeholder=form.business_number.label.text) }}
             <div class="invalid-feedback">
-                {% for error in form.profession.errors %}
+                {% for error in form.business_number.errors %}
                     <span>{{ error }}</span>
                 {% endfor %}
             </div>
         {% else %}
-            {{ form.profession(class="form-control", placeholder=form.profession.label.text) }}
+            {{ form.business_number(class="form-control", placeholder=form.business_number.label.text) }}
         {% endif %}
     </div>
 </div>
@@ -88,11 +88,6 @@
         {{ form.location.label(class="small mb-1") }}
         {{ form.location(class="form-control", placeholder=form.location.label.text) }}
     </div>
-</div>
-
-<div class="mb-3">
-    {{ form.birthdate.label(class="small mb-1") }}
-    {{ form.birthdate(class="form-control", placeholder=form.birthdate.label.text) }}
 </div>
 
 {{ form.submit(class="btn btn-primary shadow-none") }}

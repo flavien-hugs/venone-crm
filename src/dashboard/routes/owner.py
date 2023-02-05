@@ -1,42 +1,47 @@
 from flask import Blueprint
-from flask import request, redirect, url_for, flash
+from flask import flash
+from flask import redirect
 from flask import render_template
+from flask import request
+from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-
-from src import db
-from src.auth.models import VNUser
-from src.dashboard.forms import OwnerSettingForm
 from src.auth.forms.auth_form import ChangePasswordForm
+from src.dashboard.forms import OwnerSettingForm
+from src.mixins.decorators import check_activated
+from src.mixins.decorators import owner_required
 
-owner_bp = Blueprint("owner_bp", __name__, url_prefix="/customer/dashboard/")
+from src import csrf
+
+owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 
 
 @owner_bp.route("/api/", methods=["GET"])
 @login_required
 def api():
     from flask import jsonify
-    data = {
-        "id": current_user.id,
-        "addr_email": current_user.vn_user_addr_email
-    }
+
+    data = {"id": current_user.id, "addr_email": current_user.vn_user_addr_email}
     return jsonify({"data": data}), 200
 
 
-@owner_bp.route("/index/", methods=["GET"])
+@owner_bp.route("/<string:uuid>/index/", methods=["GET"])
 @login_required
-def dashboard():
+@check_activated
+def dashboard(uuid):
     page_title = "Tableau de board"
     return render_template(
         "auth/admin/dashboard.html",
         page_title=page_title,
-        username=current_user.get_name()
+        current_user=current_user
     )
 
 
-@owner_bp.route("/settings/", methods=["GET", "POST"])
+@owner_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
 @login_required
-def owner_setting():
+@owner_required
+@csrf.exempt
+def owner_setting(uuid):
     page_title = "Paramètres"
     form = OwnerSettingForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -54,8 +59,8 @@ def owner_setting():
 
         current_user.save()
         flash("Votre compte a été mise à jour avec succès.", "success")
-        return redirect(url_for('owner_bp.owner_setting'))
-    elif request.method == 'GET':
+        return redirect(url_for("owner_bp.owner_setting", uuid=current_user.uuid))
+    elif request.method == "GET":
 
         form.gender.data = current_user.vn_user_gender
         form.fullname.data = current_user.vn_user_fullname
@@ -73,15 +78,15 @@ def owner_setting():
         "auth/admin/pages/owner/settings.html",
         page_title=page_title,
         form=form,
-        current_user=current_user,
-        username=current_user.get_name()
+        current_user=current_user
     )
 
 
-@owner_bp.route("/changepaswword/", methods=["GET", "POST"])
+@owner_bp.route("/<string:uuid>/change_paswword/", methods=["GET", "POST"])
 @login_required
-def change_password():
-    page_title = "Changer votre mot de passe."
+@check_activated
+def change_password(uuid):
+    page_title = "Changer votre mot de passe"
     form = ChangePasswordForm()
     if request.method == "POST" and form.validate_on_submit():
         if current_user.verify_password(form.old_password.data):
@@ -89,7 +94,7 @@ def change_password():
             current_user.set_password(form.new_password.data)
             current_user.save()
             flash("Votre mot de passe a été mise à jour avec succès.", "success")
-            return redirect(request.path)
+            return redirect(url_for("owner_bp.change_password", uuid=current_user.uuid))
         else:
             flash("Le mot de passe est invalide.", category="danger")
 
@@ -97,6 +102,5 @@ def change_password():
         "auth/admin/pages/password.html",
         page_title=page_title,
         form=form,
-        current_user=current_user,
-        username=current_user.get_name()
+        current_user=current_user
     )

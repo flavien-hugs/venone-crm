@@ -4,7 +4,6 @@ from wtforms import StringField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import EqualTo
-from wtforms.validators import InputRequired
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
 
@@ -18,19 +17,15 @@ class FormMixin:
         "Adresse email",
         validators=[
             DataRequired(),
-            InputRequired(),
             Email(message="Entrer une adresse email valide."),
         ],
     )
-    phonenumber_one = StringField(
-        "Numéro de téléphone", validators=[DataRequired(), InputRequired()]
-    )
+    phonenumber_one = StringField("Numéro de téléphone", validators=[DataRequired()])
     country = SelectField("Pays/Région", choices=COUNTRY, coerce=str)
     password = PasswordField(
         "Mot de passe",
         validators=[
             DataRequired(),
-            InputRequired(),
             Length(min=6, max=20, message="Choisissez un mot de passe plus fort."),
         ],
     )
@@ -38,7 +33,6 @@ class FormMixin:
         "Confirmer le mot de passe",
         validators=[
             DataRequired(),
-            InputRequired(),
             EqualTo("password", message="Les deux mots de passe ne correspondent pas."),
         ],
     )
