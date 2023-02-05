@@ -44,18 +44,18 @@ def check_activated(func):
 def owner_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if current_user.vn_user_house_owner:
+        if current_user.vn_user_house_owner and current_user.vn_user_activated:
             return func(*args, **kwargs)
         return render_template("pages/no_access.html", page_title="Accès non autorisé")
 
     return decorated_function
 
 
-def agency_required(func):
-    @wraps(func)
+def agency_required(function):
+    @wraps(function)
     def decorated_function(*args, **kwargs):
-        if current_user.vn_user_company:
-            return func(*args, **kwargs)
+        if current_user.vn_user_company and current_user.vn_user_activated:
+            return function(*args, **kwargs)
         return render_template("pages/no_access.html", page_title="Accès non autorisé")
 
     return decorated_function
