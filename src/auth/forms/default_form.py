@@ -20,9 +20,7 @@ class FormMixin:
             Email(message="Entrer une adresse email valide."),
         ],
     )
-    phonenumber_one = StringField(
-        "Numéro de téléphone", validators=[DataRequired()]
-    )
+    phonenumber_one = StringField("Numéro de téléphone", validators=[DataRequired()])
     country = SelectField("Pays/Région", choices=COUNTRY, coerce=str)
     password = PasswordField(
         "Mot de passe",
