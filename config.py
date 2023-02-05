@@ -69,8 +69,6 @@ class Config:
 
     SCHEDULER_API_ENABLED = True
 
-    SQLALCHEMY_DATABASE_URI = DATABASE_URI
-
     @staticmethod
     def init_app(venone_app):
         pass
@@ -81,8 +79,14 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     WTF_CSRF_ENABLED = False
 
+    SQLALCHEMY_DATABASE_URI = DATABASE_URI
+
 
 class ProductionConfig(Config):
+
+    DATABASE_URI = os.environ.get("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = DATABASE_URI
+
     @classmethod
     def init_app(cls, venone_app):
         Config.init_app(venone_app)
