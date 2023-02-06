@@ -110,7 +110,7 @@ def registerowner_page():
     return render_template("auth/signup/owner.html", form=form, page_title=page_title)
 
 
-@auth_bp.route("/agencie/signup/", methods=["POST", "GET"])
+@auth_bp.route("/company/signup/", methods=["POST", "GET"])
 @csrf.exempt
 def agencieregister_page():
 
