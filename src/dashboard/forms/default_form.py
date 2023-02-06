@@ -1,6 +1,7 @@
-from src.auth.constants import GENDER
 from wtforms import SelectField
 from wtforms import StringField
+
+from src.constants import GENDER
 
 
 class DefaultForm:

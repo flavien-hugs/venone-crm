@@ -7,9 +7,9 @@ from wtforms.validators import EqualTo
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
 
-from ... import db
-from ..constants import COUNTRY
-from ..models import VNUser
+from src import db
+from src.constants import COUNTRY
+from src.auth.models import VNUser
 
 
 class FormMixin:
