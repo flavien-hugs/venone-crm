@@ -1,0 +1,117 @@
+{% extends "tenant/_base.html" %}
+
+{% block other_css_src %}
+{{ super() }}
+<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+{% endblock other_css_src %}
+
+
+{% block breadcrmub_plus %}
+    <div class="col-12 col-xl-auto mb-3">
+        <button class="btn btn-sm btn-light text-primary" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+            <i class="me-1" data-feather="user-plus"></i>
+            Enregistrer un locataire
+        </button>
+    </div>
+{% endblock breadcrmub_plus %}
+
+{% block dashboard_content %}
+    {{ super() }}
+    <div class="card">
+        <div class="card-body">
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom &amp; prénoms</th>
+                        <th>Téléphone</th>
+                        <th>Lieu d'habitation</th>
+                        <th>Date d'ajout</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom &amp; prénoms</th>
+                        <th>Téléphone</th>
+                        <th>Lieu d'habitation</th>
+                        <th>Date d'ajout</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% for owner in houseowners %}
+                        <tr>
+                            <td>
+                                <a href="#!" class="badge bg-green-soft text-green">#{{ owner.vn_owner_id|safe}}</a>
+                            </td>
+                            <td>{{ owner.vn_fullname|safe }}</td>
+                            <td>{{ owner.vn_phonenumber_one|safe }} {% if owner.vn_phonenumber_two %}/{{ owner.vn_phonenumber_two }}{% endif %}</td>
+                            <td>{{ owner.vn_location|safe }}</td>
+                            <td>{{ owner.vn_created_at.date() }}</td>
+                            <td>
+                                <a class="btn btn-datatable btn-icon btn-transparent-dark me-2" href="#"><i data-feather="edit"></i></a>
+
+                                <a class="btn btn-datatable btn-icon btn-transparent-dark" type="button" data-bs-toggle="modal" data-bs-target="#removeTenantModal"><i data-feather="trash-2"></i></a>
+
+                                <div class="modal fade" id="removeTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="tenantModal">Retirer ce propritaire de maison ?</h5>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                Êtes-vous sur ?
+                                            </div>
+                                            
+                                            <div class="modal-footer">
+                                                <div class="row">
+                                                    <div class="col-xxl-6 d-grid">
+                                                        <button class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
+                                                        Annuler</button>
+                                                    </div>
+
+                                                    <div class="col-xxl-6 d-grid">
+                                                        <a class="btn btn-success text-uppercase shadow-none" href="{{ url_for("agency_bp.delete_house_owner", owner_uuid=owner.uuid) }}">Valider</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tenantModal">Ajouter un propriétaire de maison</h5>
+                </div>
+
+                {% include "tenant/paths/_form.html" %}
+            </div>
+        </div>
+    </div>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', event => {
+        const datatablesSimple = document.getElementById('datatablesSimple');
+        if (datatablesSimple) {
+            new simpleDatatables.DataTable(datatablesSimple);
+        }
+    });
+</script>
+{% endblock other_js_src %}
