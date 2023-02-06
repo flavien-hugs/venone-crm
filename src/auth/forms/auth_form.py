@@ -1,4 +1,6 @@
 from flask_wtf import FlaskForm
+from src import db
+from src.auth.models import VNUser
 from wtforms import BooleanField
 from wtforms import PasswordField
 from wtforms import StringField
@@ -8,9 +10,6 @@ from wtforms.validators import Email
 from wtforms.validators import EqualTo
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
-
-from ... import db
-from ..models import VNUser
 
 
 class LoginForm(FlaskForm):

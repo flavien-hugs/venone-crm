@@ -57,7 +57,6 @@ class Config:
 
     FLATPAGES_EXTENSION = ".md"
     FLATPAGES_MARKDOWN_EXTENSIONS = ["codehilite"]
-    SLOW_DB_QUERY_TIME = 0.5
 
     MAX_CONTENT_LENGTH = 16 * 1000 * 1000
     ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg"]

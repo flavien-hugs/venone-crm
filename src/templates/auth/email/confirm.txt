@@ -1,4 +1,4 @@
-Hello {{ user.vn_user_fullname }},
+Hello {{ user.vn_fullname }},
 
 Bienvenue chez Venone !
 

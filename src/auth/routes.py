@@ -27,14 +27,14 @@ auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/customer/")
 def before_request():
     if current_user.is_authenticated:
         current_user.ping()
-        if not current_user.vn_user_activated and request.blueprint != "auth_bp":
+        if not current_user.vn_activated and request.blueprint != "auth_bp":
             return redirect(url_for("auth_bp.unactivated"))
 
 
 @auth_bp.route("/unactivated/")
 @login_required
 def unactivated():
-    if current_user.vn_user_activated:
+    if current_user.vn_activated:
         return redirect(url_for("auth_bp.login"))
     return render_template("auth/unconfirmed.html")
 
@@ -44,11 +44,9 @@ def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
-        user = (
-            db.session.query(VNUser).filter_by(vn_user_addr_email=email_lower).first()
-        )
+        user = db.session.query(VNUser).filter_by(vn_addr_email=email_lower).first()
         if user:
-            if not user.vn_user_activated:
+            if not user.vn_activated:
                 flash(
                     """Vous n'êtes autorisé à accéder au système !
                     Veuillez contacter l'administrateur du système.""",
@@ -60,11 +58,12 @@ def login():
 
                 login_user(user, form.remember_me.data)
                 return redirect(
-                    request.args.get("next") or url_for("owner_bp.dashboard", uuid=user.uuid)
+                    request.args.get("next")
+                    or url_for("owner_bp.dashboard", uuid=user.uuid)
                 )
 
                 flash(
-                    f"Hello, bienvenu(e) sur votre tableau de bord: {user.vn_user_fullname}",
+                    f"Hello, bienvenu(e) sur votre tableau de bord: {user.vn_fullname}",
                     category="success",
                 )
         else:
@@ -82,26 +81,26 @@ def login():
 @csrf.exempt
 def registerowner_page():
 
-    if current_user.is_authenticated and current_user.vn_user_activated:    
+    if current_user.is_authenticated and current_user.vn_activated:
         flash("Vous êtes déjà inscrit(e).", category="info")
         return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
-    
+
     form = OwnerHouseSignupForm()
     if request.method == "POST" and form.validate_on_submit():
         user_to_create = VNUser(
-            vn_user_gender=form.gender.data,
-            vn_user_fullname=form.fullname.data,
-            vn_user_addr_email=form.addr_email.data.lower(),
-            vn_user_phonenumber_one=form.phonenumber_one.data,
-            vn_user_cni_number=form.cni_number.data,
-            vn_user_country=form.country.data,
+            vn_gender=form.gender.data,
+            vn_fullname=form.fullname.data,
+            vn_addr_email=form.addr_email.data.lower(),
+            vn_phonenumber_one=form.phonenumber_one.data,
+            vn_cni_number=form.cni_number.data,
+            vn_country=form.country.data,
         )
         user_to_create.set_password(form.password.data)
-        user_to_create.vn_user_activated = True
-        user_to_create.vn_user_house_owner = True
+        user_to_create.vn_activated = True
+        user_to_create.vn_house_owner = True
         user_to_create.save()
         msg_success = f"""
-            Hey {user_to_create.vn_user_fullname},
+            Hey {user_to_create.vn_fullname},
             votre compte a été créé ! Connectez-vous maintenant !
         """
         flash(msg_success, "success")
@@ -115,27 +114,27 @@ def registerowner_page():
 @csrf.exempt
 def agencieregister_page():
 
-    if current_user.is_authenticated and current_user.vn_user_activated:    
+    if current_user.is_authenticated and current_user.vn_activated:
         flash("Vous êtes déjà inscrit(e).", category="info")
         return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
 
     form = AgencieSignupForm()
     if request.method == "POST" and form.validate_on_submit():
         user_to_create = VNUser(
-            vn_user_gender=form.gender.data,
-            vn_user_fullname=form.fullname.data,
-            vn_user_addr_email=form.addr_email.data,
-            vn_user_phonenumber_one=form.phonenumber_one.data,
+            vn_gender=form.gender.data,
+            vn_fullname=form.fullname.data,
+            vn_addr_email=form.addr_email.data,
+            vn_phonenumber_one=form.phonenumber_one.data,
             vn_business_number=form.business_number.data,
             vn_agencie_name=form.agencie_name.data,
-            vn_user_country=form.country.data,
+            vn_country=form.country.data,
         )
         user_to_create.set_password(form.password.data)
-        user_to_create.vn_user_activated = True
-        user_to_create.vn_user_company = True
+        user_to_create.vn_activated = True
+        user_to_create.vn_company = True
         user_to_create.save()
         msg_success = f"""
-            Hey {user_to_create.vn_user_fullname},
+            Hey {user_to_create.vn_fullname},
             votre compte a été créé ! Connectez-vous maintenant !
         """
         flash(msg_success, category="success")
@@ -151,13 +150,11 @@ def password_reset_request():
     form = PasswordResetRequestForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
-        user = (
-            db.session.query(VNUser).filter_by(vn_user_addr_email=email_lower).first()
-        )
+        user = db.session.query(VNUser).filter_by(vn_addr_email=email_lower).first()
         if user:
             token = user.generate_reset_token()
             send_email(
-                user.vn_user_addr_email,
+                user.vn_addr_email,
                 "Réinitialiser votre mot de passe",
                 "auth/email/reset_password",
                 user=user,
@@ -183,10 +180,10 @@ def password_reset_request():
 @auth_bp.route("/resetpassword/<token>/", methods=["GET", "POST"])
 def password_reset(token):
     if current_user.is_authenticated:
-        if current_user.vn_user_house_owner:
+        if current_user.vn_house_owner:
             flash("Vous êtes déjà inscrit(e).", category="info")
             return redirect(url_for("owner_bp.dashboard"))
-        elif current_user.vn_user_company:
+        elif current_user.vn_company:
             flash("Vous êtes déjà inscrit(e).", category="info")
             return redirect(url_for("agency_bp.dashboard"))
 

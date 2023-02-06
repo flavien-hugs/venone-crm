@@ -1,7 +1,9 @@
-{% set dasboard_url, setting_owner_url, setting_agency_url =
+{% set dasboard_url, setting_owner_url, setting_agency_url, list_houseowner_url, create_houseowner_url =
     url_for('owner_bp.dashboard', uuid=current_user.uuid),
     url_for("owner_bp.owner_setting", uuid=current_user.uuid),
     url_for("agency_bp.agency_setting", uuid=current_user.uuid),
+    url_for("agency_bp.house_owner_list", uuid=current_user.uuid),
+    url_for("agency_bp.create_house_owner", uuid=current_user.uuid),
 %}
 
 <div id="layoutSidenav_nav">
@@ -34,109 +36,60 @@
                     </div> Dashboard
                 </a>
 
-                <!-- Sidenav Locataires -->
-                <div class="sidenav-menu-heading">Gestion locataire</div>
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+                <div class="sidenav-menu-heading">Gestion locataires</div>
+                <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
                         <i data-feather="users"></i>
                     </div>
                     Locataires
-                    <div class="sidenav-collapse-arrow">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
                 </a>
-
-                <div class="collapse" id="collapsePages" data-bs-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPagesMenu">
-                        <a class="nav-link" href="#!">
-                            Liste
-                        </a>
-                        <a class="nav-link" href="#!">
-                            Ajouter
-                        </a>
-                        <a class="nav-link" href="#!">
-                            Facture
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Sidenav regularity -->
                 <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
-                        <i data-feather="globe"></i>
+                        <i data-feather="grid"></i>
                     </div> Regularités
                 </a>
 
-                <!-- Sidenav Property -->
-                <div class="sidenav-menu-heading">Gestion Propriété</div>
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsProperty" aria-expanded="false" aria-controls="collapseLayoutsProperty">
+                <div class="sidenav-menu-heading">Gestion Loyers</div>
+                <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
-                        <i data-feather="layout"></i>
+                        <i data-feather="user-plus"></i>
                     </div>
-                    Propriété
-                    <div class="sidenav-collapse-arrow">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
+                    Payés
                 </a>
-                <div class="collapse" id="collapseLayoutsProperty" data-bs-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
-                        <a class="nav-link" href="#!">
-                            Liste
-                        </a>
-                        <a class="nav-link" href="#!">
-                            Ajouter
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Sidenav Rental -->
-                <div class="sidenav-menu-heading">Gestion Loyer</div>
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsRental" aria-expanded="false" aria-controls="collapseLayoutsRental">
+                <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
-                        <i data-feather="layout"></i>
-                    </div>
-                    Loyers
-                    <div class="sidenav-collapse-arrow">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
+                        <i data-feather="repeat"></i>
+                    </div> Impayés
                 </a>
-                <div class="collapse" id="collapseLayoutsRental" data-bs-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
-                        <a class="nav-link" href="#!">
-                            Payer
-                        </a>
-                        <a class="nav-link" href="#!">
-                            Impayer
-                        </a>
-                        <a class="nav-link" href="#!">
-                            Arriérés
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Sidenav owner -->
-                <div class="sidenav-menu-heading">Gestion Propriétaire</div>
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsUser" aria-expanded="false" aria-controls="collapseLayoutsUser">
+                <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
-                        <i data-feather="layout"></i>
-                    </div>
-                    Propriétaire
-                    <div class="sidenav-collapse-arrow">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
+                        <i data-feather="book"></i>
+                    </div> Arriérés
                 </a>
-                <div class="collapse" id="collapseLayoutsUser" data-bs-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
-                        <a class="nav-link" href="#!">
-                            Liste
-                        </a>
-                        <a class="nav-link" href="#!">
-                            Ajouter
-                        </a>
-                    </nav>
-                </div>
 
-                <!-- Gestion rapports -->
+                {% if current_user.vn_company %}
+                    <div class="sidenav-menu-heading">Gestion Propriétaires</div>
+                    <a class="nav-link" href="{{ list_houseowner_url }}">
+                        <div class="nav-link-icon">
+                            <i data-feather="users"></i>
+                        </div>
+                        Propriétaires
+                    </a>
+                    <a class="nav-link" href="#!">
+                        <div class="nav-link-icon">
+                            <i data-feather="package"></i>
+                        </div>
+                        Contrats
+                    </a>
+                {% endif %}
+
+                <div class="sidenav-menu-heading">Gestion Propriétés</div>
+                <a class="nav-link" href="#">
+                    <div class="nav-link-icon">
+                        <i data-feather="home"></i>
+                    </div> Propriétés
+                </a>
+
                 <div class="sidenav-menu-heading">Rapports</div>
                 <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
@@ -152,14 +105,14 @@
                 </a>
 
                 <div class="sidenav-menu-heading">paramètres</div>
-                {% if current_user.vn_user_house_owner %}
+                {% if current_user.vn_house_owner %}
                     <a class="nav-link" href="{{ setting_owner_url }}">
                         <div class="nav-link-icon">
                             <i data-feather="settings"></i>
                         </div>
                         Paramètre du compte
                     </a>
-                {% else %}
+                {% elif current_user.vn_company %}
                     <a class="nav-link" href="{{ setting_agency_url }}">
                         <div class="nav-link-icon">
                             <i data-feather="settings"></i>

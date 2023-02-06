@@ -7,9 +7,9 @@ from wtforms.validators import EqualTo
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
 
-from ... import db
-from ..constants import COUNTRY
-from ..models import VNUser
+from src import db
+from src.constants import COUNTRY
+from src.auth.models import VNUser
 
 
 class FormMixin:
@@ -39,9 +39,7 @@ class FormMixin:
 
     def validate_addr_email(self, field):
         user = (
-            db.session.query(VNUser)
-            .filter_by(vn_user_addr_email=field.data.lower())
-            .first()
+            db.session.query(VNUser).filter_by(vn_addr_email=field.data.lower()).first()
         )
         if user:
             raise ValidationError(
@@ -52,9 +50,5 @@ class FormMixin:
             )
 
     def validate_phonenumber_one(self, field):
-        if (
-            db.session.query(VNUser)
-            .filter_by(vn_user_phonenumber_one=field.data)
-            .first()
-        ):
+        if db.session.query(VNUser).filter_by(vn_phonenumber_one=field.data).first():
             raise ValidationError("Ce numéro est déjà utilisé.")

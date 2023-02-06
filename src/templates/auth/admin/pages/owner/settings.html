@@ -7,47 +7,42 @@
 
 {% block dashboard_content %}
 
-	{% include "auth/admin/partials/_breadcrumb.html" %}
+	{{ super() }}
 
-	<div class="container-xl px-4 mt-4">
+	<nav class="nav nav-borders">
+		{% if current_user.vn_house_owner %}
+			<a class="nav-link ms-0" href="{{ setting_owner_url }}">Paramètres</a>
+		{% elif current_user.vn_company %}
+			<a class="nav-link ms-0" href="{{ setting_agency_url }}">Paramètres</a>
+		{% endif %}
+		<a class="nav-link" href="{{ change_password_url }}">Sécurité</a>
+	</nav>
+	<hr class="mt-0 mb-4" />
 
-		{% include "includes/partials/message.html" %}
-
-		<nav class="nav nav-borders">
-			{% if current_user.vn_user_house_owner %}
-            	<a class="nav-link ms-0" href="{{ setting_owner_url }}">Paramètres</a>
-	        {% elif current_user.vn_user_company %}
-	            <a class="nav-link ms-0" href="{{ setting_agency_url }}">Paramètres</a>
-	        {% endif %}
-			<a class="nav-link" href="{{ change_password_url }}">Sécurité</a>
-		</nav>
-		<hr class="mt-0 mb-4" />
-
-		<div class="row">
-			{% block settings_content %}
-				<div class="col-xl-4">
-					<div class="card mb-4 mb-xl-0">
-						<div class="card-header">Photo de profil</div>
-						<div class="card-body text-center">
-							<img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png") }}" alt="user-avatar"/>
-							<div class="small font-italic text-muted mb-4">JPG ou PNG ne dépassant pas 5 MB</div>
-							<button class="btn btn-primary" type="button">Charger une nouvelle image</button>
-						</div>
-					</div>
+	<div class="row">
+		{% block settings_content %}
+		<div class="col-xl-4">
+			<div class="card mb-4 mb-xl-0">
+				<div class="card-header">Photo de profil</div>
+				<div class="card-body text-center">
+					<img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png") }}" alt="user-avatar"/>
+					<div class="small font-italic text-muted mb-4">JPG ou PNG ne dépassant pas 5 MB</div>
+					<button class="btn btn-primary" type="button">Charger une nouvelle image</button>
 				</div>
-
-				<div class="col-xl-8">
-					<div class="card mb-4">
-						<div class="card-header">Informations sur votre compte</div>
-						<div class="card-body">
-							<form action="{{ setting_owner_url }}" method="POST">
-								{{ form.hidden_tag() }}
-								{% include "auth/admin/pages/owner/paths/form.html" %}
-							</form>
-						</div>
-					</div>
-				</div>
-			{% endblock settings_content %}
+			</div>
 		</div>
+
+		<div class="col-xl-8">
+			<div class="card mb-4">
+				<div class="card-header">Informations sur votre compte</div>
+				<div class="card-body">
+					<form action="{{ setting_owner_url }}" method="POST">
+						{{ form.hidden_tag() }}
+						{% include "auth/admin/pages/owner/paths/form.html" %}
+					</form>
+				</div>
+			</div>
+		</div>
+		{% endblock settings_content %}
 	</div>
 {% endblock dashboard_content %}

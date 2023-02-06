@@ -6,14 +6,12 @@ from flask import request
 from flask_login import AnonymousUserMixin
 from flask_login import current_user
 from flask_login import UserMixin
-from sqlalchemy_utils import EmailType
-from sqlalchemy_utils import PhoneNumberType
+from src import db
+from src import login_manager
+from src.mixins.models import DefaultUserInfoModel
+from src.mixins.models import TimestampMixin
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
-
-from .. import db
-from .. import login_manager
-from ..mixins.models import TimestampMixin
 
 
 class Permission:
@@ -84,55 +82,44 @@ class VNAgencieInfoModelMixin(db.Model):
     )
 
 
-class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
+class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, TimestampMixin):
 
     __tablename__ = "user"
 
-    vn_user_gender = db.Column(db.String(4), name="gender", nullable=False)
-    vn_user_fullname = db.Column(db.String(80), name="name & surname", nullable=False)
-    vn_user_addr_email = db.Column(EmailType(), unique=True, nullable=False)
-    vn_user_profession = db.Column(db.String(100), name="profession", nullable=True)
-    vn_user_parent_name = db.Column(db.String(80), name="parent's name", nullable=True)
-    vn_user_phonenumber_one = db.Column(PhoneNumberType(), unique=True, nullable=True)
-    vn_user_phonenumber_two = db.Column(PhoneNumberType(), unique=True, nullable=True)
-    vn_user_cni_number = db.Column(
-        db.String(11), name="national ID card number", unique=True, nullable=True
-    )
-    vn_user_location = db.Column(
-        db.String(180), name="location of residence", nullable=True
-    )
-    vn_user_country = db.Column(db.String(80), name="country", nullable=False)
-    vn_user_avatar = db.Column(db.String(80), name="avatar", nullable=True)
-    vn_user_activated = db.Column(
+    vn_country = db.Column(db.String(80), name="country", nullable=False)
+    vn_avatar = db.Column(db.String(80), name="avatar", nullable=True)
+    vn_activated = db.Column(
         db.Boolean, name="account status", nullable=False, default=False
     )
-    vn_user_password = db.Column(db.String(180), name="password", nullable=False)
-    vn_user_birthdate = db.Column(db.Date, name="user birth date", nullable=True)
-    vn_user_last_seen = db.Column(
+    vn_password = db.Column(db.String(180), name="password", nullable=False)
+    vn_birthdate = db.Column(db.Date, name="user birth date", nullable=True)
+    vn_last_seen = db.Column(
         db.DateTime, name="user last seen", onupdate=datetime.utcnow()
     )
 
-    vn_user_house_owner = db.Column(db.Boolean(), name="house owner", default=False)
-    vn_user_company = db.Column(db.Boolean(), name="company", default=False)
+    vn_house_owner = db.Column(db.Boolean(), name="house owner", default=False)
+    vn_company = db.Column(db.Boolean(), name="company", default=False)
 
-    vn_user_device = db.Column(db.String(80), name="devise", nullable=True)
-    vn_user_find_us = db.Column(db.String(100), name="user find us", nullable=True)
-    vn_user_ip_address = db.Column(db.String(50), name="user ip address", nullable=True)
+    vn_device = db.Column(db.String(80), name="devise", nullable=True)
+    vn_find_us = db.Column(db.String(100), name="user find us", nullable=True)
+    vn_ip_address = db.Column(db.String(50), name="user ip address", nullable=True)
     vn_role_id = db.Column(
         db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
+    houseowners = db.relationship("VNHouseOwner", backref="house_owner", lazy=True)
+    tenants = db.relationship("VNTenant", backref="tenants", lazy=True)
 
     def __str__(self):
-        return self.vn_user_fullname or self.vn_agencie_name
+        return self.vn_fullname or self.vn_agencie_name
 
     def __repr__(self):
-        return "<VNUser %r>" % self.vn_user_fullname
+        return "<VNUser %r>" % self.vn_fullname
 
     def set_password(self, password):
-        self.vn_user_password = generate_password_hash(password)
+        self.vn_password = generate_password_hash(password)
 
     def verify_password(self, password):
-        return check_password_hash(self.vn_user_password, password)
+        return check_password_hash(self.vn_password, password)
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -176,7 +163,7 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
         if new_email is None:
             return False
 
-        if self.query.filter_by(vn_user_addr_email=new_email).first() is not None:
+        if self.query.filter_by(vn_addr_email=new_email).first() is not None:
             return False
 
         self.email = new_email
@@ -199,8 +186,8 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
         db.session.commit()
 
     def ping(self):
-        self.vn_user_last_seen = datetime.utcnow()
-        self.vn_user_ip_address = request.remote_addr
+        self.vn_last_seen = datetime.utcnow()
+        self.vn_ip_address = request.remote_addr
         db.session.add(self)
 
     @staticmethod
@@ -212,9 +199,9 @@ class VNUser(UserMixin, VNAgencieInfoModelMixin, TimestampMixin):
         return user.get_name()
 
     def get_name(self):
-        if self.vn_user_house_owner:
-            return self.vn_user_fullname
-        if self.vn_user_company:
+        if self.vn_house_owner:
+            return self.vn_fullname
+        if self.vn_company:
             return self.vn_agencie_name
 
 
