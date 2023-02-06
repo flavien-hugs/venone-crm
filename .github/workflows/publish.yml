@@ -7,17 +7,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      ANSIBLE_HOST_KEY_CHECKING: False
+
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v1
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
           python-version: "3.10.9"
-
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install -r requirements.txt
 
       - name: Get pip cache dir
         id: pip-cache
@@ -31,3 +40,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
