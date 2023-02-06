@@ -1,10 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField
+from src.dashboard.forms.default_form import DefaultForm
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
-
-from src.dashboard.forms.default_form import DefaultForm
 
 
 class HouseOwnerForm(DefaultForm, FlaskForm):

@@ -10,9 +10,7 @@ from src.dashboard.forms import CompanySettingForm
 from src.mixins.decorators import agency_required
 from src.mixins.decorators import check_activated
 from src.tenant import HouseOwnerForm
-from src.tenant import VNHouse
 from src.tenant import VNHouseOwner
-from src.tenant import VNTenant
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 

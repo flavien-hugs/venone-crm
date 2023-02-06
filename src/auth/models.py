@@ -6,13 +6,12 @@ from flask import request
 from flask_login import AnonymousUserMixin
 from flask_login import current_user
 from flask_login import UserMixin
+from src import db
+from src import login_manager
+from src.mixins.models import DefaultUserInfoModel
+from src.mixins.models import TimestampMixin
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
-
-from .. import db
-from .. import login_manager
-from ..mixins.models import DefaultUserInfoModel
-from ..mixins.models import TimestampMixin
 
 
 class Permission:

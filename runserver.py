@@ -8,6 +8,10 @@ from src import create_venone_app
 from src import db
 from src.auth.models import VNRole
 from src.auth.models import VNUser
+from src.tenant.models import VNHouse
+from src.tenant.models import VNHouseOwner
+from src.tenant.models import VNTenant
+
 
 dotenv_path = os.path.join(os.path.dirname(__file__), ".flaskenv")
 if os.path.exists(dotenv_path):
@@ -21,8 +25,7 @@ migrate = Migrate(venone_app, db, render_as_batch=True)
 @venone_app.shell_context_processor
 def make_shell_context():
     return dict(
-        db=db,
-        user=VNUser,
+        db=db, user=VNUser, tenant=VNTenant, house=VNHouse, houseowner=VNHouseOwner
     )
 
 

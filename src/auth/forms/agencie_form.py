@@ -1,15 +1,14 @@
 from flask_wtf import FlaskForm
+from src import db
+from src.auth.forms.default_form import FormMixin
+from src.auth.models import VNUser
+from src.constants import GENDER
 from wtforms import SelectField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
-
-from ... import db
-from ..constants import GENDER
-from ..models import VNUser
-from .default_form import FormMixin
 
 
 class AgencieSignupForm(FormMixin, FlaskForm):

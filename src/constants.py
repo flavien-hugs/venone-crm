@@ -45,3 +45,11 @@ GENDER = (
 )
 
 GENDER_DEFAULT = HOMME
+
+STUDIO = "Studio"
+VILLA = "Villa"
+MAGASIN = "Magasin"
+
+HOUSE_TYPES = ((STUDIO, "Studio"), (VILLA, "Villa"), (MAGASIN, "Magasin"))
+
+DEFAULT_HOUSE_TYPES = VILLA

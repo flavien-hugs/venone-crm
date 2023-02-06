@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
 
-from .. import db
-from ..utils import Updateable
+from src import db
+from src.utils import Updateable
 
 
 class TimestampMixin(Updateable, db.Model):
