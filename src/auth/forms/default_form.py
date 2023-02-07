@@ -44,7 +44,7 @@ class FormMixin:
         if user:
             raise ValidationError(
                 f"""
-                Cet email '{field.datar}!r' est déjà utilisé.
+                Cet email '{field.data}!r' est déjà utilisé.
                 Veuillez choisir un autre nom !
                 """
             )

@@ -103,7 +103,7 @@ def registerowner_page():
             Hey {user_to_create.vn_fullname},
             votre compte a été créé ! Connectez-vous maintenant !
         """
-        flash(msg_success, "success")
+        flash(msg_success, category="success")
         return redirect(url_for("auth_bp.login"))
 
     page_title = "Créer un compte particulier"
