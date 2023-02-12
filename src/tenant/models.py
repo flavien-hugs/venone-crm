@@ -27,7 +27,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         cascade="all,delete",
         backref="house",
         passive_deletes=True,
-        lazy=True,
+        lazy='dynamic',
     )
 
     def __str__(self):
@@ -78,11 +78,14 @@ class VNHouse(TimestampMixin):
         db.Integer, name="security deposit", nullable=False, default=10000
     )
     vn_house_month = db.Column(
-        db.Integer, name="number of months", nullable=False, default=3
+        db.Integer, name="number of months", nullable=False, default=1
+    )
+    vn_number_or_room = db.Column(
+        db.Integer, name="number of room", nullable=False, default=1
     )
     vn_house_address = db.Column(db.String(120), name="house address", nullable=False)
     vn_house_is_open = db.Column(
-        db.Integer, name="house is open", nullable=False, default=3
+        db.Boolean, name="house is open", nullable=False, default=True
     )
     vn_houseowner_id = db.Column(
         db.Integer, db.ForeignKey("houseowner.id", ondelete="SET NULL"), nullable=False
@@ -93,7 +96,7 @@ class VNHouse(TimestampMixin):
         cascade="all,delete",
         backref="tenant",
         passive_deletes=True,
-        lazy=True,
+        lazy='dynamic',
     )
 
     def __str__(self):
@@ -138,6 +141,19 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     vn_user_id = db.Column(
         db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"), nullable=False
     )
+
+    @staticmethod
+    def tenant_list_query():
+        return VNTenant.query.filter_by(
+            vn_user_id=current_user.id,
+            vn_activated=True
+        )
+
+    @property
+    def data_json(self):
+        data = dict((name, f.data) for name, f in iteritems(self._fields))
+        print(data)
+        return data
 
     def __str__(self):
         return self.vn_fullname

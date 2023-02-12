@@ -1,6 +1,4 @@
-from .forms import HouseOwnerForm  # noqa
-from .models import VNHouse
-from .models import VNHouseOwner
-from .models import VNTenant
+from src.tenant.forms import HouseOwnerForm, HouseForm, TenantForm  # noqa
+from src.tenant.models import VNHouseOwner, VNHouse, VNTenant # noqa
 
-__all__ = ("VNHouseOwner", "VNHouse", "VNTenant", "HouseOwnerForm")
+__all__ = ("VNHouseOwner", "VNHouse", "VNTenant", "HouseOwnerForm", "HouseForm", "TenantForm")
