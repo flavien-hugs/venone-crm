@@ -57,14 +57,13 @@ def login():
             else:
 
                 login_user(user, form.remember_me.data)
+                flash(
+                    f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
+                    category="success",
+                )
                 return redirect(
                     request.args.get("next")
                     or url_for("owner_bp.dashboard", uuid=user.uuid)
-                )
-
-                flash(
-                    f"Hello, bienvenu(e) sur votre tableau de bord: {user.vn_fullname}",
-                    category="success",
                 )
         else:
             flash(
