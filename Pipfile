@@ -25,6 +25,8 @@ flask-htmlmin = "*"
 flask-apscheduler = "*"
 flask-caching = "*"
 psycopg2-binary = "*"
+flask-session = "*"
+redis = "*"
 
 [dev-packages]
 pre-commit = "*"
