@@ -9,6 +9,7 @@ from flask import url_for
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
+from flask_session import Session
 from flask_cors import CORS
 from flask_flatpages import FlatPages
 from flask_htmlmin import HTMLMIN
@@ -28,6 +29,7 @@ migrate = Migrate()
 pages = FlatPages()
 csrf = CSRFProtect()
 scheduler = APScheduler()
+session = Session()
 login_manager = LoginManager()
 cache = Cache(config={"CACHE_TYPE": "simple"})
 htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
@@ -59,7 +61,8 @@ def create_venone_app(config_name):
     migrate.init_app(venone_app, db)
     db.init_app(venone_app)
     csrf.init_app(venone_app)
-
+    session.init_app(venone_app)
+    
     scheduler.init_app(venone_app)
     login_manager.init_app(venone_app)
 

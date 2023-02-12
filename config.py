@@ -9,6 +9,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
+import redis
+
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///" + os.path.join(
@@ -67,6 +69,12 @@ class Config:
     WEBSITE_BUILDER = "gestion.venone.app"
 
     SCHEDULER_API_ENABLED = True
+
+    # Flask-Session
+    SESSION_PERMANENT = False
+    SESSION_USE_SIGNER = True
+    SESSION_TYPE = "redis"
+    SESSION_REDIS = redis.from_url('redis://localhost:6379')
 
     @staticmethod
     def init_app(venone_app):
