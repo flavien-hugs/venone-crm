@@ -134,7 +134,6 @@ def agency_create_tenant(uuid):
 
 
 @agency_bp.route("/<string:uuid>/houseowners/", methods=["GET", "POST"])
-@login_required
 @agency_required
 def agency_owner_list(uuid):
     page_title = "Vos bailleurs"
@@ -147,7 +146,6 @@ def agency_owner_list(uuid):
 
 
 @agency_bp.route("/<string:uuid>/create_house_owner/", methods=["GET", "POST"])
-@login_required
 @agency_required
 def create_house_owner(uuid):
     page_title = "Enregistrer un propriétaire de maison"
@@ -180,7 +178,6 @@ def create_house_owner(uuid):
 
 
 @agency_bp.route("/<string:owner_uuid>/delete_house_owner/")
-@login_required
 @agency_required
 def agency_delete_tenant(owner_uuid):
     owner = VNHouseOwner.get_houseowner(owner_uuid)

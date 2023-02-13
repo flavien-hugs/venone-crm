@@ -6,6 +6,7 @@ from config import config
 from flask import Flask
 from flask import redirect
 from flask import url_for
+from flask import send_from_directory
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
@@ -16,6 +17,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_moment import Moment
+from flask_wtf.csrf import CSRFError
 from flask_sqlalchemy import SQLAlchemy
 
 cors = CORS()
@@ -59,14 +61,80 @@ def create_venone_app(config_name):
     with venone_app.app_context():
 
         from src.auth import auth_bp
-        from src.main import error_bp
         from src.dashboard.routes import owner_bp, agency_bp, admin_bp
 
         venone_app.register_blueprint(auth_bp)
         venone_app.register_blueprint(owner_bp)
         venone_app.register_blueprint(agency_bp)
         venone_app.register_blueprint(admin_bp)
-        venone_app.register_blueprint(error_bp)
+
+        @venone_app.errorhandler(CSRFError)
+        def handle_csrf_error(e):
+            page_title = e.name
+            image_path = url_for("static", filename="img/error/404.svg")
+            return (
+                render_template(
+                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                ),
+                400,
+            )
+
+        @venone_app.errorhandler(400)
+        def key_error(e):
+            page_title = e.name
+            current_app.logger.warning(page_title, exc_info=e)
+            image_path = url_for("static", filename="img/error/404.svg")
+            return make_response(
+                render_template(
+                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                ),
+                400,
+            )
+
+        @venone_app.errorhandler(403)
+        def forbidden(e):
+            page_title = f"erreur {e}"
+            current_app.logger.warning(page_title, exc_info=e)
+            image_path = url_for("static", filename="img/error/403.svg")
+            return make_response(
+                render_template(
+                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                ),
+                403,
+            )
+
+        @venone_app.errorhandler(404)
+        def page_not_found(e):
+            page_title = e.name
+            current_app.logger.warning(page_title, exc_info=e)
+            image_path = url_for("static", filename="img/error/404.svg")
+            return make_response(
+                render_template(
+                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                ),
+                404,
+            )
+
+        @venone_app.errorhandler(500)
+        def internal_server_error(e):
+            page_title = e.name
+            current_app.logger.warning(page_title, exc_info=e)
+            image_path = url_for("static", filename="img/error/500.svg")
+            return make_response(
+                render_template(
+                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                ),
+                500,
+            )
+
+        @venone_app.route("/favicon.ico")
+        def favicon():
+            return send_from_directory(
+                os.path.join(current_app.root_path, "static"),
+                "img/logo/favicon.png",
+                mimetype="img/logo/favicon.png",
+            )
+
 
         try:
             if not os.path.exists("upload"):

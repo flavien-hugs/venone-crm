@@ -1,94 +1,94 @@
 {% extends "auth/signup/owner.html" %}
 
 {% block template_user_title %}
-	Connectez-vous à votre compte {{ site_name|upper }}
+Connectez-vous à votre compte {{ site_name|upper }}
 {% endblock template_user_title %}
 
 {% block template_user_subtitle %}
-	Heureux de vous revoir ! Veuillez vous connecter avec votre compte.
+Heureux de vous revoir ! Veuillez vous connecter avec votre compte.
 {% endblock template_user_subtitle %}
 
 {% block template_user_content %}
-	<form action="." class="row g-4" method="POST">
+<form action="." class="row g-4" method="POST">
 
-		{{ form.hidden_tag() }}
+    {{ form.hidden_tag() }}
 
-		<div class="col-md-12 bg-light-input">
-			<div class="input-group input-group-lg">
-				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
-					<i class="far fa-envelope"></i>
-				</span>
-				{% if form.addr_email.errors %}
-					{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
-					<div class="invalid-feedback">
-						{% for error in form.addr_email.errors %}
-							<span>{{ error }}</span>
-						{% endfor %}
-					</div>
-				{% else %}
-					{{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.addr_email.label.text) }}
-				{% endif %}
-			</div>
-		</div>
+    <div class="col-md-12 bg-light-input">
+        <div class="input-group input-group-lg">
+            <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+                <i class="far fa-envelope"></i>
+            </span>
+            {% if form.addr_email.errors %}
+            {{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.addr_email.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.addr_email.label.text) }}
+            {% endif %}
+        </div>
+    </div>
 
-		<div class="mb-4 col-md-12 bg-light-input">
-			<div class="input-group input-group-lg">
-				<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
-					<i class="fa fa-user-lock"></i>
-				</span>
-				{% if form.password.errors %}
-					{{ form.password(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
-					<div class="invalid-feedback">
-						{% for error in form.password.errors %}
-						<span>{{ error }}</span>
-						{% endfor %}
-					</div>
-				{% else %}
-					{{ form.password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.password.label.text) }}
-				{% endif %}
-			</div>
-		</div>
+    <div class="mb-4 col-md-12 bg-light-input">
+        <div class="input-group input-group-lg">
+            <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
+                <i class="fa fa-user-lock"></i>
+            </span>
+            {% if form.password.errors %}
+            {{ form.password(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.password.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.password(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.password.label.text) }}
+            {% endif %}
+        </div>
+    </div>
 
-		<div class="mb-4 d-flex justify-content-between">
-			<div class="form-check">
-				{{ form.remember_me(class="form-check-input") }}
-				{{ form.remember_me.label(class="form-check-label") }}
-			</div>
+    <div class="mb-4 d-flex justify-content-between">
+        <div class="form-check">
+            {{ form.remember_me(class="form-check-input") }}
+            {{ form.remember_me.label(class="form-check-label") }}
+        </div>
 
-			<div class="text-primary-hover">
-				<a href="{{ url_for('auth_bp.password_reset_request') }}" class="text-secondary">
-					<u>Mot de passe oublié ?</u>
-				</a>
-			</div>
-		</div>
+        <div class="text-primary-hover">
+            <a href="{{ url_for('auth_bp.password_reset_request') }}" class="text-secondary">
+                <u>Mot de passe oublié ?</u>
+            </a>
+        </div>
+    </div>
 
-		<div class="align-items-center mt-4">
-			<div class="d-grid">
-				{{ form.submit(class="btn btn-primary mb-0") }}
-			</div>
-		</div>
-	</form>
+    <div class="align-items-center mt-4">
+        <div class="d-grid">
+            {{ form.submit(class="btn btn-primary mb-0") }}
+        </div>
+    </div>
+</form>
 {% endblock template_user_content %}
 
 {% block template_user_footer %}
-	<div class="row">
-		<div class="position-relative my-4">
-			<hr>
-			<p class="small position-absolute top-50 start-50 translate-middle bg-body px-5">
-				Vous n'avez pas de compte ?
-			</p>
-		</div>
+<div class="row">
+    <div class="position-relative my-4">
+        <hr>
+        <p class="small position-absolute top-50 start-50 translate-middle bg-body px-5">
+            Vous n'avez pas de compte ?
+        </p>
+    </div>
 
-		<div class="col-xxl-6 d-grid">
-			<a href="{{ url_for('auth_bp.registerowner_page') }}" class="btn bg-google mb-2 mb-xxl-0">
-				Créer un compte particulier
-			</a>
-		</div>
+    <div class="col-xxl-6 d-grid">
+        <a href="{{ url_for('auth_bp.registerowner_page') }}" class="btn bg-google mb-2 mb-xxl-0">
+            Créer un compte particulier
+        </a>
+    </div>
 
-		<div class="col-xxl-6 d-grid">
-			<a href="{{ url_for('auth_bp.agencieregister_page') }}" class="btn bg-google mb-0">
-				Créer un compte entreprise
-			</a>
-		</div>
-	</div>
+    <div class="col-xxl-6 d-grid">
+        <a href="{{ url_for('auth_bp.agencieregister_page') }}" class="btn bg-google mb-0">
+            Créer un compte entreprise
+        </a>
+    </div>
+</div>
 {% endblock template_user_footer %}
