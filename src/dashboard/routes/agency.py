@@ -66,7 +66,7 @@ def agency_setting(uuid):
     )
 
 
-@agency_bp.route("/<string:uuid>/create_tenant/", methods=["GET", "POST"])
+@agency_bp.route("/<string:uuid>/create-tenant/", methods=["GET", "POST"])
 @login_required
 @check_activated
 @agency_required
@@ -140,11 +140,10 @@ def agency_create_tenant(uuid):
 @agency_required
 def agency_owner_list(uuid):
     page_title = "Vos bailleurs"
-    houseowners = VNHouseOwner.houseowner_list_query()
+
     return render_template(
         "tenant/owner.html",
         page_title=page_title,
-        houseowners=houseowners,
         current_user=current_user,
     )
 
@@ -155,7 +154,7 @@ def agency_owner_list(uuid):
 @agency_required
 def create_house_owner(uuid):
     page_title = "Enregistrer un propriétaire de maison"
-    
+
     form = HouseOwnerForm(request.form)
 
     if request.method == "POST" and form.validate_on_submit():
