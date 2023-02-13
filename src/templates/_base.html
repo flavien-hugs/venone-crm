@@ -58,6 +58,7 @@
         </main>
 
         {{ moment.include_moment() }}
+        {{ moment.locale(auto_detect=True) }}
         {% block other_js_src %}
             {% include "includes/assets/js.html" %}
         {% endblock other_js_src %}

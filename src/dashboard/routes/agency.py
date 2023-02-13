@@ -6,6 +6,7 @@ from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
+from src import csrf
 from src.dashboard.forms import CompanySettingForm
 from src.mixins.decorators import agency_required
 from src.tenant import HouseForm
@@ -16,6 +17,7 @@ from src.tenant import VNHouseOwner
 from src.tenant import VNTenant
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
+csrf.exempt(agency_bp)
 
 
 @agency_bp.route("/api/", methods=["GET"])

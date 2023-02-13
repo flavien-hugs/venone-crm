@@ -38,12 +38,6 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    SLOW_DB_QUERY_TIME = 0.5
-
-    BCRYPT_LOG_ROUNDS = 13
-    DEBUG_TB_ENABLED = False
-    DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     # mail settings
     MAIL_SUBJECT_PREFIX = "[Venone]"
@@ -67,6 +61,7 @@ class Config:
     WEBSITE_BUILDER = "gestion.venone.app"
 
     SCHEDULER_API_ENABLED = True
+    WTF_CSRF_ENABLED = False
 
     @staticmethod
     def init_app(venone_app):

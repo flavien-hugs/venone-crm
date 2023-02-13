@@ -3,10 +3,12 @@ import os
 from logging.handlers import RotatingFileHandler
 
 from config import config
+from flask import current_app
 from flask import Flask
 from flask import redirect
-from flask import url_for
+from flask import render_template
 from flask import send_from_directory
+from flask import url_for
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
@@ -17,8 +19,9 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_moment import Moment
-from flask_wtf.csrf import CSRFError
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFError
+from flask_wtf.csrf import CSRFProtect
 
 cors = CORS()
 mail = Mail()
@@ -27,6 +30,7 @@ db = SQLAlchemy()
 moment = Moment()
 migrate = Migrate()
 pages = FlatPages()
+csrf = CSRFProtect()
 scheduler = APScheduler()
 login_manager = LoginManager()
 cache = Cache(config={"CACHE_TYPE": "simple"})
@@ -51,12 +55,14 @@ def create_venone_app(config_name):
     moment.init_app(venone_app)
     pages.init_app(venone_app)
     htmlmin.init_app(venone_app)
-    migrate.init_app(venone_app, db)
-    db.init_app(venone_app)
+    csrf.init_app(venone_app)
 
     cache.init_app(venone_app)
     scheduler.init_app(venone_app)
     login_manager.init_app(venone_app)
+
+    migrate.init_app(venone_app, db)
+    db.init_app(venone_app)
 
     with venone_app.app_context():
 
@@ -74,7 +80,10 @@ def create_venone_app(config_name):
             image_path = url_for("static", filename="img/error/404.svg")
             return (
                 render_template(
-                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                    "pages/error.html",
+                    page_title=page_title,
+                    image_path=image_path,
+                    error=e,
                 ),
                 400,
             )
@@ -84,9 +93,12 @@ def create_venone_app(config_name):
             page_title = e.name
             current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/404.svg")
-            return make_response(
+            return (
                 render_template(
-                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                    "pages/error.html",
+                    page_title=page_title,
+                    image_path=image_path,
+                    error=e,
                 ),
                 400,
             )
@@ -96,9 +108,12 @@ def create_venone_app(config_name):
             page_title = f"erreur {e}"
             current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/403.svg")
-            return make_response(
+            return (
                 render_template(
-                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                    "pages/error.html",
+                    page_title=page_title,
+                    image_path=image_path,
+                    error=e,
                 ),
                 403,
             )
@@ -108,9 +123,12 @@ def create_venone_app(config_name):
             page_title = e.name
             current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/404.svg")
-            return make_response(
+            return (
                 render_template(
-                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                    "pages/error.html",
+                    page_title=page_title,
+                    image_path=image_path,
+                    error=e,
                 ),
                 404,
             )
@@ -120,9 +138,12 @@ def create_venone_app(config_name):
             page_title = e.name
             current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/500.svg")
-            return make_response(
+            return (
                 render_template(
-                    "pages/error.html", page_title=page_title, image_path=image_path, error=e
+                    "pages/error.html",
+                    page_title=page_title,
+                    image_path=image_path,
+                    error=e,
                 ),
                 500,
             )
@@ -134,7 +155,6 @@ def create_venone_app(config_name):
                 "img/logo/favicon.png",
                 mimetype="img/logo/favicon.png",
             )
-
 
         try:
             if not os.path.exists("upload"):

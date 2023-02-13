@@ -2,9 +2,7 @@ from functools import wraps
 
 from flask import abort
 from flask import flash
-from flask import redirect
 from flask import render_template
-from flask import url_for
 from flask_login import current_user
 from src.auth.models import Permission
 
@@ -33,7 +31,11 @@ def admin_required(func):
 def owner_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if current_user.is_authenticated and current_user.vn_house_owner and current_user.vn_activated:
+        if (
+            current_user.is_authenticated
+            and current_user.vn_house_owner
+            and current_user.vn_activated
+        ):
             return func(*args, **kwargs)
         return render_template("pages/no_access.html", page_title="Accès non autorisé")
 
@@ -43,7 +45,11 @@ def owner_required(func):
 def agency_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
-        if current_user.is_authenticated and current_user.vn_company and current_user.vn_activated:
+        if (
+            current_user.is_authenticated
+            and current_user.vn_company
+            and current_user.vn_activated
+        ):
             return function(*args, **kwargs)
         return render_template("pages/no_access.html", page_title="Accès non autorisé")
 
