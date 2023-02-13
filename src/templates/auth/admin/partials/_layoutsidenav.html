@@ -1,9 +1,10 @@
-{% set dasboard_url, setting_owner_url, setting_agency_url, list_houseowner_url, create_houseowner_url =
+{% set dasboard_url, setting_owner_url, setting_agency_url, list_houseowner_url, create_houseowner_url, agency_create_tenant =
     url_for('owner_bp.dashboard', uuid=current_user.uuid),
     url_for("owner_bp.owner_setting", uuid=current_user.uuid),
     url_for("agency_bp.agency_setting", uuid=current_user.uuid),
-    url_for("agency_bp.house_owner_list", uuid=current_user.uuid),
+    url_for("agency_bp.agency_owner_list", uuid=current_user.uuid),
     url_for("agency_bp.create_house_owner", uuid=current_user.uuid),
+    url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid)
 %}
 
 <div id="layoutSidenav_nav">
@@ -36,19 +37,6 @@
                     </div> Dashboard
                 </a>
 
-                <div class="sidenav-menu-heading">Gestion locataires</div>
-                <a class="nav-link" href="#!">
-                    <div class="nav-link-icon">
-                        <i data-feather="users"></i>
-                    </div>
-                    Locataires
-                </a>
-                <a class="nav-link" href="#!">
-                    <div class="nav-link-icon">
-                        <i data-feather="grid"></i>
-                    </div> Regularités
-                </a>
-
                 <div class="sidenav-menu-heading">Gestion Loyers</div>
                 <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
@@ -68,18 +56,48 @@
                 </a>
 
                 {% if current_user.vn_company %}
-                    <div class="sidenav-menu-heading">Gestion Propriétaires</div>
+                    <div class="sidenav-menu-heading">Gestion locataires</div>
+                    <a class="nav-link" href="{{ agency_create_tenant }}">
+                        <div class="nav-link-icon">
+                            <i data-feather="users"></i>
+                        </div>
+                        Locataires
+                    </a>
+                    
+                    <a class="nav-link" href="#!">
+                        <div class="nav-link-icon">
+                            <i data-feather="grid"></i>
+                        </div> Regularités
+                    </a>
+
+                    <div class="sidenav-menu-heading">Gestion Bailleurs</div>
                     <a class="nav-link" href="{{ list_houseowner_url }}">
                         <div class="nav-link-icon">
                             <i data-feather="users"></i>
                         </div>
-                        Propriétaires
+                        Bailleurs
                     </a>
                     <a class="nav-link" href="#!">
                         <div class="nav-link-icon">
                             <i data-feather="package"></i>
                         </div>
                         Contrats
+                    </a>
+                {% endif %}
+
+                {% if current_user.vn_house_owner %}
+                    <div class="sidenav-menu-heading">Gestion locataires</div>
+                    <a class="nav-link" href="#">
+                        <div class="nav-link-icon">
+                            <i data-feather="users"></i>
+                        </div>
+                        Locataires
+                    </a>
+
+                    <a class="nav-link" href="#!">
+                        <div class="nav-link-icon">
+                            <i data-feather="grid"></i>
+                        </div> Regularités
                     </a>
                 {% endif %}
 

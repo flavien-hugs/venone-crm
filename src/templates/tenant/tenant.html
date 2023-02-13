@@ -1,0 +1,104 @@
+{% extends "tenant/_base.html" %}
+
+{% block other_css_src %}
+{{ super() }}
+<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+{% endblock other_css_src %}
+
+
+{% block breadcrmub_plus %}
+    <div class="col-12 col-xl-auto mb-3">
+        <button class="btn btn-sm btn-success text-white" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+            <i class="me-2" data-feather="user-plus"></i>
+            Enregistrer un locataire
+        </button>
+    </div>
+{% endblock breadcrmub_plus %}
+
+{% block dashboard_content %}
+    <div class="card">
+        <div class="card-body">
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom &amp; prénoms</th>
+                        <th>Téléphone</th>
+                        <th>Type, loyer/mois</th>
+                        <th>Status paiement</th>
+                         <th>Date d'ajout</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom &amp; prénoms</th>
+                        <th>Téléphone</th>
+                        <th>Type, loyer/mois</th>
+                        <th>Status paiement</th>
+                         <th>Date d'ajout</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% include "tenant/paths/_tenant.html" %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="card-header">
+                    <div class="nav nav-pills nav-justified nav-wizard" id="cardTab tenantModal" role="tablist">
+                        <a class="nav-item nav-link active p-3" id="wizard1-tab" href="#wizard1" data-bs-toggle="tab" role="tab" aria-controls="wizard1" aria-selected="true">
+                            <div class="wizard-step-icon">1</div>
+                            <div class="wizard-step-text">
+                                <div class="modal-title wizard-step-text-name">
+                                    Enregistrer le propriétaire
+                                </div>
+                            </div>
+                        </a>
+
+                        <a class="nav-item nav-link p-3" id="wizard2-tab" href="#wizard2" data-bs-toggle="tab" role="tab" aria-controls="wizard2" aria-selected="true">
+                            <div class="wizard-step-icon">2</div>
+                            <div class="wizard-step-text">
+                                <div class="modal-title wizard-step-text-name">
+                                    Enregistrer la propriété
+                                </div>
+                            </div>
+                        </a>
+
+                         <a class="nav-item nav-link p-3" id="wizard2-tab" href="#wizard3" data-bs-toggle="tab" role="tab" aria-controls="wizard3" aria-selected="true">
+                            <div class="wizard-step-icon">3</div>
+                            <div class="wizard-step-text">
+                                <div class="modal-title wizard-step-text-name">
+                                   Enregistrer le locataire
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% include "tenant/paths/_form.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', event => {
+            const datatablesSimple = document.getElementById('datatablesSimple');
+            if (datatablesSimple) {
+                new simpleDatatables.DataTable(datatablesSimple);
+            }
+        });
+    </script>
+{% endblock other_js_src %}
