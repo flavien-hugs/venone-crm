@@ -40,10 +40,13 @@ def unactivated():
 
 @auth_bp.route("/login/", methods=["GET", "POST"])
 def login():
+
+    if current_user.is_authenticated:
+        return redirect(url_for("owner_bp.dashboard"))
+
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
-        email_lower = form.addr_email.data.lower()
-        user = VNUser.query.filter_by(vn_addr_email=email_lower).first()
+        user = VNUser.query.filter_by(vn_addr_email=form.addr_email.data.lower()).first()
         if user:
             if not user.vn_activated:
                 flash(
@@ -54,16 +57,15 @@ def login():
             elif not user.verify_password(form.password.data):
                 flash("Le mot de passe invalide.", category="danger")
             else:
-
                 login_user(user, form.remember_me.data)
+                next_page = request.args.get("next")
                 flash(
                     f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
                     category="success",
                 )
-                return redirect(
-                    request.args.get("next")
-                    or url_for("owner_bp.dashboard", uuid=user.uuid)
-                )
+                if next_page is None or not next_page.startswith("/dashboard/"):
+                    next_page = url_for("owner_bp.dashboard", uuid=user.uuid)
+                return redirect(next_page)
         else:
             flash(
                 "L'utilisateur n'existe pas ou le compte à été désactivé ! \

@@ -8,7 +8,6 @@ from flask_login import current_user
 from flask_login import login_required
 from src.auth.forms.auth_form import ChangePasswordForm
 from src.dashboard.forms import OwnerSettingForm
-from src.mixins.decorators import check_activated
 from src.mixins.decorators import owner_required
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
@@ -25,7 +24,6 @@ def api():
 
 @owner_bp.route("/<string:uuid>/index/", methods=["GET"])
 @login_required
-@check_activated
 def dashboard(uuid):
     page_title = "Tableau de board"
     return render_template(
@@ -79,7 +77,6 @@ def owner_setting(uuid):
 
 @owner_bp.route("/<string:uuid>/change_paswword/", methods=["GET", "POST"])
 @login_required
-@check_activated
 def change_password(uuid):
     page_title = "Changer votre mot de passe"
     form = ChangePasswordForm()
