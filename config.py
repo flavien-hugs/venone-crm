@@ -84,7 +84,6 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
-    WTF_CSRF_ENABLED = False
 
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
 

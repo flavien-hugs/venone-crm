@@ -18,7 +18,6 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect
 
 cors = CORS()
 mail = Mail()
@@ -27,7 +26,6 @@ db = SQLAlchemy()
 moment = Moment()
 migrate = Migrate()
 pages = FlatPages()
-csrf = CSRFProtect()
 scheduler = APScheduler()
 session = Session()
 login_manager = LoginManager()
@@ -60,9 +58,8 @@ def create_venone_app(config_name):
     htmlmin.init_app(venone_app)
     migrate.init_app(venone_app, db)
     db.init_app(venone_app)
-    csrf.init_app(venone_app)
     session.init_app(venone_app)
-    
+
     scheduler.init_app(venone_app)
     login_manager.init_app(venone_app)
 
