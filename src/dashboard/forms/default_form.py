@@ -6,5 +6,5 @@ from src.constants import GENDER
 
 class DefaultForm:
 
-    gender = SelectField("Genre", choices=GENDER, coerce=str)
-    phonenumber_two = StringField("Numéro de téléphone 2")
+    gender = SelectField(label="Genre", choices=GENDER, coerce=str)
+    phonenumber_two = StringField(label="Numéro de téléphone 2")

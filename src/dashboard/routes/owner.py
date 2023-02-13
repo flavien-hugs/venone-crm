@@ -6,7 +6,6 @@ from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-from src import csrf
 from src.auth.forms.auth_form import ChangePasswordForm
 from src.dashboard.forms import OwnerSettingForm
 from src.mixins.decorators import check_activated
@@ -37,7 +36,6 @@ def dashboard(uuid):
 @owner_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
 @login_required
 @owner_required
-@csrf.exempt
 def owner_setting(uuid):
     page_title = "Paramètres"
     form = OwnerSettingForm()
