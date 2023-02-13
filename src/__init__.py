@@ -39,9 +39,9 @@ htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
 login_manager.login_view = "auth_bp.login"
 login_manager.session_protection = "strong"
 login_manager.login_message_category = "info"
-login_manager.needs_refresh_message = "Pour protéger votre compte, veuillez vous réauthentifier pour accéder à cette page."
 login_manager.needs_refresh_message_category = "info"
-
+login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
+login_manager.needs_refresh_message = "Pour protéger votre compte, veuillez vous réauthentifier pour accéder à cette page."
 
 def create_venone_app(config_name):
     venone_app = Flask(__name__)
@@ -167,6 +167,14 @@ def create_venone_app(config_name):
         def entrypoint():
             return redirect(url_for("auth_bp.login"))
 
+        @venone_app.before_request
+        def log_entry():
+            venone_app.logger.debug("Demande de traitement")
+
+        @venone_app.teardown_request
+        def log_exit(exc):
+            venone_app.logger.debug("Traitement de la demande terminé", exc_info=exc)
+
         if not venone_app.debug:
             if not os.path.exists("logs"):
                 os.mkdir("logs")
@@ -183,13 +191,5 @@ def create_venone_app(config_name):
             venone_app.logger.addHandler(file_handler)
             venone_app.logger.setLevel(logging.INFO)
             venone_app.logger.info("running venone app")
-
-        @venone_app.before_request
-        def log_entry():
-            venone_app.logger.debug("Demande de traitement")
-
-        @venone_app.teardown_request
-        def log_exit(exc):
-            venone_app.logger.debug("Traitement de la demande terminé", exc_info=exc)
 
         return venone_app
