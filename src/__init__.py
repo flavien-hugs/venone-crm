@@ -39,7 +39,8 @@ htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
 login_manager.login_view = "auth_bp.login"
 login_manager.session_protection = "strong"
 login_manager.login_message_category = "info"
-login_manager.needs_refresh_message_category = "danger"
+login_manager.needs_refresh_message = "Pour protéger votre compte, veuillez vous réauthentifier pour accéder à cette page."
+login_manager.needs_refresh_message_category = "info"
 
 
 def create_venone_app(config_name):

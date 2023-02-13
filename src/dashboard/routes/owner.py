@@ -32,8 +32,8 @@ def dashboard(uuid):
 
 
 @owner_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
-@owner_required
 @login_required
+@owner_required
 def owner_setting(uuid):
     page_title = "Paramètres"
     form = OwnerSettingForm()
