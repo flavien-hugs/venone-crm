@@ -46,7 +46,7 @@ def login():
 
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
-        user = VNUser.query.filter_by(vn_addr_email=form.addr_email.data.lower()).first()
+        user = VNUser.query.filter_by(vn_addr_email=form.addr_email.data).first()
         if user:
             if not user.vn_activated:
                 flash(
@@ -54,18 +54,19 @@ def login():
                     Veuillez contacter l'administrateur du système.""",
                     category="danger",
                 )
-            elif not user.verify_password(form.password.data):
+            if not user.verify_password(form.password.data):
                 flash("Le mot de passe invalide.", category="danger")
-            else:
-                login_user(user, form.remember_me.data)
-                next_page = request.args.get("next")
-                flash(
-                    f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
-                    category="success",
-                )
-                if next_page is None or not next_page.startswith("/dashboard/"):
-                    next_page = url_for("owner_bp.dashboard", uuid=user.uuid)
-                return redirect(next_page)
+
+            login_user(user, form.remember_me.data)
+            next_page = request.args.get("next")
+            flash(
+                f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
+                category="success",
+            )
+            if next_page is None or not next_page.startswith("/dashboard/"):
+                next_page = url_for("owner_bp.dashboard", uuid=user.uuid)
+            return redirect(next_page)
+
         else:
             flash(
                 "L'utilisateur n'existe pas ou le compte à été désactivé ! \

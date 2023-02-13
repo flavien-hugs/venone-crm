@@ -16,7 +16,6 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_moment import Moment
-from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
 cors = CORS()
@@ -27,7 +26,6 @@ moment = Moment()
 migrate = Migrate()
 pages = FlatPages()
 scheduler = APScheduler()
-session = Session()
 login_manager = LoginManager()
 cache = Cache(config={"CACHE_TYPE": "simple"})
 htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
@@ -35,22 +33,17 @@ htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
 login_manager.login_view = "auth_bp.login"
 login_manager.session_protection = "strong"
 login_manager.login_message_category = "info"
+login_manager.needs_refresh_message_category = "danger"
 
 
 def create_venone_app(config_name):
-    venone_app = Flask(
-        __name__,
-        static_folder="static",
-        template_folder="templates",
-        instance_relative_config=True,
-    )
+    venone_app = Flask(__name__)
     venone_app.config.from_object(config[config_name])
     config[config_name].init_app(venone_app)
 
     venone_app.url_map.strict_slashes = False
     venone_app.jinja_env.globals.update(zip=zip)
 
-    cache.init_app(venone_app)
     mail.init_app(venone_app)
     bcrypt.init_app(venone_app)
     moment.init_app(venone_app)
@@ -58,8 +51,8 @@ def create_venone_app(config_name):
     htmlmin.init_app(venone_app)
     migrate.init_app(venone_app, db)
     db.init_app(venone_app)
-    session.init_app(venone_app)
 
+    cache.init_app(venone_app)
     scheduler.init_app(venone_app)
     login_manager.init_app(venone_app)
 

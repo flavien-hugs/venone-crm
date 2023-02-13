@@ -32,7 +32,6 @@ def dashboard(uuid):
 
 
 @owner_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
-@login_required
 @owner_required
 def owner_setting(uuid):
     page_title = "Paramètres"

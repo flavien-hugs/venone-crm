@@ -48,7 +48,6 @@ def forbidden(e):
         403,
     )
 
-
 @error_bp.app_errorhandler(404)
 def page_not_found(e):
     page_title = e.name

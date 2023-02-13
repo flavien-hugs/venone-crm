@@ -28,7 +28,6 @@ def api():
 
 
 @agency_bp.route("/<string:uuid>/settings/", methods=["GET", "POST"])
-@login_required
 @agency_required
 def agency_setting(uuid):
     page_title = "Paramètres"
@@ -69,7 +68,6 @@ def agency_setting(uuid):
 
 
 @agency_bp.route("/<string:uuid>/create_tenant/", methods=["GET", "POST"])
-@login_required
 @agency_required
 def agency_create_tenant(uuid):
     page_title = "Vos locataires"
@@ -137,7 +135,6 @@ def agency_create_tenant(uuid):
 
 @agency_bp.route("/<string:uuid>/houseowners/", methods=["GET", "POST"])
 @login_required
-
 @agency_required
 def agency_owner_list(uuid):
     page_title = "Vos bailleurs"
