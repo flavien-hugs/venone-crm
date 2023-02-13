@@ -224,5 +224,5 @@ login_manager.anonymous_user = AnonymousUser
 @login_manager.user_loader
 def load_user(user_id):
     if user_id is not None:
-        return VNUser.query.get(int(user_id))
+        return VNUser.get(int(user_id))
     return None

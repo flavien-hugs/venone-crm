@@ -32,25 +32,23 @@ def owner_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         if (
-            current_user.is_authenticated
-            and current_user.vn_house_owner
+            current_user.vn_house_owner
             and current_user.vn_activated
         ):
             return func(*args, **kwargs)
-        return render_template("pages/no_access.html", page_title="Accès non autorisé")
-
+        else:
+            abort(400)
     return decorated_function
 
 
-def agency_required(function):
-    @wraps(function)
+def agency_required(func):
+    @wraps(func)
     def decorated_function(*args, **kwargs):
         if (
-            current_user.is_authenticated
-            and current_user.vn_company
+            current_user.vn_company
             and current_user.vn_activated
         ):
-            return function(*args, **kwargs)
-        return render_template("pages/no_access.html", page_title="Accès non autorisé")
-
+            return func(*args, **kwargs)
+        else:
+            abort(400)
     return decorated_function

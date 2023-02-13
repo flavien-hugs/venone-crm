@@ -77,7 +77,7 @@ def create_venone_app(config_name):
         @venone_app.errorhandler(CSRFError)
         def handle_csrf_error(e):
             page_title = e.name
-            image_path = url_for("static", filename="img/error/404.svg")
+            image_path = url_for("static", filename="img/error/400.svg")
             return (
                 render_template(
                     "pages/error.html",
