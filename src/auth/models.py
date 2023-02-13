@@ -115,7 +115,7 @@ class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, Timestamp
         return self.vn_fullname or self.vn_agencie_name
 
     def __repr__(self):
-        return "<VNUser %r>" % self.vn_fullname
+        return f"VNUser({self.id}, {self.vn_fullname})"
 
     @staticmethod
     def houseowners_count():

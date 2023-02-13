@@ -9,7 +9,6 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
-from src import csrf
 from src import db
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
@@ -77,7 +76,6 @@ def login():
 
 
 @auth_bp.route("/owner/signup/", methods=["POST", "GET"])
-@csrf.exempt
 def registerowner_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
@@ -110,7 +108,6 @@ def registerowner_page():
 
 
 @auth_bp.route("/company/signup/", methods=["POST", "GET"])
-@csrf.exempt
 def agencieregister_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
