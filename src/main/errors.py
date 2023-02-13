@@ -15,7 +15,12 @@ error_bp = Blueprint("error_bp", __name__)
 def handle_csrf_error(e):
     page_title = e.name
     image_path = url_for("static", filename="img/error/404.svg")
-    return render_template("pages/error.html", page_title=page_title, image_path=image_path, error=e), 400
+    return (
+        render_template(
+            "pages/error.html", page_title=page_title, image_path=image_path, error=e
+        ),
+        400,
+    )
 
 
 @error_bp.errorhandler(400)

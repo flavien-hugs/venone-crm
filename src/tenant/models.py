@@ -27,7 +27,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         cascade="all,delete",
         backref="house",
         passive_deletes=True,
-        lazy='dynamic',
+        lazy="dynamic",
     )
 
     def __str__(self):
@@ -96,7 +96,7 @@ class VNHouse(TimestampMixin):
         cascade="all,delete",
         backref="tenant",
         passive_deletes=True,
-        lazy='dynamic',
+        lazy="dynamic",
     )
 
     def __str__(self):
@@ -144,16 +144,7 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
 
     @staticmethod
     def tenant_list_query():
-        return VNTenant.query.filter_by(
-            vn_user_id=current_user.id,
-            vn_activated=True
-        )
-
-    @property
-    def data_json(self):
-        data = dict((name, f.data) for name, f in iteritems(self._fields))
-        print(data)
-        return data
+        return VNTenant.query.filter_by(vn_user_id=current_user.id, vn_activated=True)
 
     def __str__(self):
         return self.vn_fullname
@@ -168,12 +159,6 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
-
-    @staticmethod
-    def tenant_list_query():
-        return VNTenant.query.where(VNTenant.vn_user_id == current_user.id).filter_by(
-            vn_activated=True
-        )
 
     @staticmethod
     def get_tenant_name(tenant):

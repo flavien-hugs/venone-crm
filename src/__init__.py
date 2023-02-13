@@ -9,7 +9,6 @@ from flask import url_for
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
-from flask_session import Session
 from flask_cors import CORS
 from flask_flatpages import FlatPages
 from flask_htmlmin import HTMLMIN
@@ -17,6 +16,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_moment import Moment
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
 cors = CORS()

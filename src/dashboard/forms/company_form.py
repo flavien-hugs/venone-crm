@@ -4,6 +4,7 @@ from wtforms import StringField
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 
 
 class CompanySettingForm(DefaultForm, FlaskForm):
@@ -25,5 +26,4 @@ class CompanySettingForm(DefaultForm, FlaskForm):
         excluded_chars = "*?!'^+%&/()=}][{$#"
         for char in self.fullname.data:
             if char in excluded_chars:
-                raise ValidationError(
-                    f"Character {char} is not allowed in fullname.")
+                raise ValidationError(f"Character {char} is not allowed in fullname.")

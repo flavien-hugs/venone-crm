@@ -43,7 +43,7 @@ def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
-        user = db.session.query(VNUser).filter_by(vn_addr_email=email_lower).first()
+        user = VNUser.query.filter_by(vn_addr_email=email_lower).first()
         if user:
             if not user.vn_activated:
                 flash(
@@ -146,7 +146,7 @@ def password_reset_request():
     form = PasswordResetRequestForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
-        user = db.session.query(VNUser).filter_by(vn_addr_email=email_lower).first()
+        user = VNUser.query.filter_by(vn_addr_email=email_lower).first()
         if user:
             token = user.generate_reset_token()
             send_email(

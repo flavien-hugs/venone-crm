@@ -5,11 +5,10 @@ See `.flaskenv` for default settings.
 import os
 from typing import Generator
 
+import redis
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
-
-import redis
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -74,7 +73,7 @@ class Config:
     SESSION_PERMANENT = False
     SESSION_USE_SIGNER = True
     SESSION_TYPE = "redis"
-    SESSION_REDIS = redis.from_url('redis://localhost:6379')
+    SESSION_REDIS = redis.from_url("redis://localhost:6379")
 
     @staticmethod
     def init_app(venone_app):
