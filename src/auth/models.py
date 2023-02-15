@@ -76,34 +76,34 @@ class VNAgencieInfoModelMixin(db.Model):
     __abstract__ = True
 
     vn_agencie_name = db.Column(
-        db.String(80), name="nom de votre agence", unique=True, nullable=True
+        db.String(80), unique=True, nullable=True
     )
     vn_business_number = db.Column(
-        db.String(80), name="N° Registre de commerce", unique=True, nullable=True
+        db.String(80), unique=True, nullable=True
     )
 
 
-class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, TimestampMixin):
+class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, TimestampMixin, db.Model):
 
     __tablename__ = "user"
 
-    vn_country = db.Column(db.String(80), name="country", nullable=False)
-    vn_avatar = db.Column(db.String(80), name="avatar", nullable=True)
+    vn_country = db.Column(db.String(80), nullable=False)
+    vn_avatar = db.Column(db.String(80), nullable=True)
     vn_activated = db.Column(
-        db.Boolean, name="account status", nullable=False, default=False
+        db.Boolean, nullable=False, default=False
     )
-    vn_password = db.Column(db.String(180), name="password", nullable=False)
-    vn_birthdate = db.Column(db.Date, name="user birth date", nullable=True)
+    vn_password = db.Column(db.String(180), nullable=False)
+    vn_birthdate = db.Column(db.Date, nullable=True)
     vn_last_seen = db.Column(
-        db.DateTime, name="user last seen", onupdate=datetime.utcnow()
+        db.DateTime, onupdate=datetime.utcnow()
     )
 
-    vn_house_owner = db.Column(db.Boolean(), name="house owner", default=False)
-    vn_company = db.Column(db.Boolean(), name="company", default=False)
+    vn_house_owner = db.Column(db.Boolean(), default=False)
+    vn_company = db.Column(db.Boolean(), default=False)
 
-    vn_device = db.Column(db.String(80), name="devise", nullable=True)
-    vn_find_us = db.Column(db.String(100), name="user find us", nullable=True)
-    vn_ip_address = db.Column(db.String(50), name="user ip address", nullable=True)
+    vn_device = db.Column(db.String(80), nullable=True)
+    vn_find_us = db.Column(db.String(100), nullable=True)
+    vn_ip_address = db.Column(db.String(50), nullable=True)
     vn_role_id = db.Column(
         db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
@@ -219,10 +219,3 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 login_manager.anonymous_user = AnonymousUser
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    if user_id is not None:
-        return VNUser.get(int(user_id))
-    return None

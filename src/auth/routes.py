@@ -9,6 +9,7 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
+from src import login_manager
 from src import db
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
@@ -20,6 +21,11 @@ from src.auth.models import VNUser
 from src.mixins.email import send_email
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/customer/")
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.query(VNUser).get(user_id)
 
 
 @auth_bp.before_app_request
@@ -40,6 +46,9 @@ def unactivated():
 
 @auth_bp.route("/login/", methods=["GET", "POST"])
 def login():
+
+    if current_user.is_authenticated:
+        return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
 
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
