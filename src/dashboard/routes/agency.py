@@ -70,7 +70,7 @@ def agency_setting(uuid):
     )
 
 
-@agency_bp.route("/<string:uuid>/create_tenant/", methods=["GET", "POST"])
+@agency_bp.route("/<string:uuid>/tenants/", methods=["GET", "POST"])
 @login_required
 @agency_required
 def agency_create_tenant(uuid):
