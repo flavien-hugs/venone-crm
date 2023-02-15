@@ -38,7 +38,7 @@ class FormMixin:
 
     def validate_addr_email(self, field):
         user = (
-            db.session.query(VNUser).filter_by(vn_addr_email=field.data.lower()).first()
+            VNUser.query.filter_by(vn_addr_email=field.data.lower()).first()
         )
         if user:
             raise ValidationError(
@@ -49,5 +49,5 @@ class FormMixin:
             )
 
     def validate_phonenumber_one(self, field):
-        if db.session.query(VNUser).filter_by(vn_phonenumber_one=field.data).first():
+        if VNUser.query.filter_by(vn_phonenumber_one=field.data).first():
             raise ValidationError("Ce numéro est déjà utilisé.")
