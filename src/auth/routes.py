@@ -9,7 +9,7 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
-from src import csrf
+from src import login_manager
 from src import db
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
@@ -21,6 +21,11 @@ from src.auth.models import VNUser
 from src.mixins.email import send_email
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/customer/")
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.query(VNUser).get(user_id)
 
 
 @auth_bp.before_app_request
@@ -41,10 +46,13 @@ def unactivated():
 
 @auth_bp.route("/login/", methods=["GET", "POST"])
 def login():
+
+    if current_user.is_authenticated:
+        return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
+
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
-        email_lower = form.addr_email.data.lower()
-        user = db.session.query(VNUser).filter_by(vn_addr_email=email_lower).first()
+        user = VNUser.query.filter_by(vn_addr_email=form.addr_email.data).first()
         if user:
             if not user.vn_activated:
                 flash(
@@ -52,20 +60,15 @@ def login():
                     Veuillez contacter l'administrateur du système.""",
                     category="danger",
                 )
-            elif not user.verify_password(form.password.data):
+            if not user.verify_password(form.password.data):
                 flash("Le mot de passe invalide.", category="danger")
-            else:
 
-                login_user(user, form.remember_me.data)
-                return redirect(
-                    request.args.get("next")
-                    or url_for("owner_bp.dashboard", uuid=user.uuid)
-                )
-
-                flash(
-                    f"Hello, bienvenu(e) sur votre tableau de bord: {user.vn_fullname}",
-                    category="success",
-                )
+            login_user(user, form.remember_me.data)
+            flash(
+                f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
+                category="success",
+            )
+            return redirect(url_for("owner_bp.dashboard", uuid=user.uuid))
         else:
             flash(
                 "L'utilisateur n'existe pas ou le compte à été désactivé ! \
@@ -78,7 +81,6 @@ def login():
 
 
 @auth_bp.route("/owner/signup/", methods=["POST", "GET"])
-@csrf.exempt
 def registerowner_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
@@ -103,7 +105,7 @@ def registerowner_page():
             Hey {user_to_create.vn_fullname},
             votre compte a été créé ! Connectez-vous maintenant !
         """
-        flash(msg_success, "success")
+        flash(msg_success, category="success")
         return redirect(url_for("auth_bp.login"))
 
     page_title = "Créer un compte particulier"
@@ -111,7 +113,6 @@ def registerowner_page():
 
 
 @auth_bp.route("/company/signup/", methods=["POST", "GET"])
-@csrf.exempt
 def agencieregister_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
@@ -150,7 +151,7 @@ def password_reset_request():
     form = PasswordResetRequestForm()
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
-        user = db.session.query(VNUser).filter_by(vn_addr_email=email_lower).first()
+        user = VNUser.query.filter_by(vn_addr_email=email_lower).first()
         if user:
             token = user.generate_reset_token()
             send_email(

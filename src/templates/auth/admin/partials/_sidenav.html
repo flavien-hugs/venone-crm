@@ -1,9 +1,4 @@
-{% set avatar, dasboard_url, setting_owner_url, setting_agency_url, logout_url =
-    url_for('static', filename="img/element/avatar.png"),
-    url_for('owner_bp.dashboard', uuid=current_user.uuid),
-    url_for("owner_bp.owner_setting", uuid=current_user.uuid),
-    url_for("agency_bp.agency_setting", uuid=current_user.uuid),
-    url_for('auth_bp.logout') %}
+{% set avatar = url_for('static', filename="img/element/avatar.png") %}
 
 <nav class="topnav navbar navbar-expand shadow justify-content-between justify-content-sm-start navbar-light bg-white" id="sidenavAccordion">
 
@@ -11,7 +6,7 @@
         <i data-feather="menu"></i>
     </button>
 
-    <a class="navbar-brand pe-3 ps-4 ps-lg-2" href="{{ dasboard_url }}">{{ current_user.get_name() }}</a>
+    <a class="navbar-brand pe-3 ps-4 ps-lg-2" href="{{ url_for('owner_bp.dashboard', uuid=current_user.uuid) }}">{{ current_user.get_name() }}</a>
 
     <ul class="navbar-nav align-items-center ms-auto">
 
@@ -76,7 +71,7 @@
                 <div class="dropdown-divider"></div>
 
                 {% if current_user.vn_house_owner %}
-                    <a class="dropdown-item" href="{{ setting_owner_url }}">
+                    <a class="dropdown-item" href="{{ url_for("owner_bp.owner_setting", uuid=current_user.uuid) }}">
                         <div class="dropdown-item-icon">
                         <i data-feather="settings"></i></div>
                         Paramètre du compte
@@ -84,7 +79,7 @@
                 {% endif %}
 
                 {% if current_user.vn_company %}
-                    <a class="dropdown-item" href="{{ setting_agency_url }}">
+                    <a class="dropdown-item" href="{{ url_for("agency_bp.agency_setting", uuid=current_user.uuid) }}">
                         <div class="dropdown-item-icon">
                         <i data-feather="settings"></i></div>
                         Paramètre du compte
@@ -96,7 +91,7 @@
                     <i data-feather="help-circle"></i></div>
                     Centre d'aide
                 </a>
-                <a class="dropdown-item" href="{{ logout_url }}">
+                <a class="dropdown-item" href="{{  url_for('auth_bp.logout') }}">
                     <div class="dropdown-item-icon">
                         <i data-feather="log-out"></i>
                     </div>

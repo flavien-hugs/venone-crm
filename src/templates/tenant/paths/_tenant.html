@@ -1,0 +1,44 @@
+{% for tenant in current_user.tenants %}
+	<tr>
+		<td>
+			<a href="#!" class="badge bg-green-soft text-green">#{{ tenant.vn_tenant_id|safe}}</a>
+		</td>
+		<td>{{ tenant.vn_fullname|safe }}</td>
+		<td>{{ tenant.vn_phonenumber_one|safe }} {% if tenant.vn_phonenumber_two %}/{{ tenant.vn_phonenumber_two }}{% endif %}</td>
+		<td>{{ tenant.tenant.vn_house_type|safe }} - {{ tenant.tenant.vn_house_rent|safe }}</td>
+		<td><a href="#!" class="badge bg-green-soft text-green">Payé</a></td>
+		<td>{{ tenant.vn_created_at.date() }}</td>
+		<td>
+			<a class="btn btn-datatable btn-icon btn-transparent-dark me-2" href="#"><i data-feather="edit"></i></a>
+
+			<a class="btn btn-datatable btn-icon btn-transparent-dark" type="button" data-bs-toggle="modal" data-bs-target="#removeTenantModal"><i data-feather="trash-2"></i></a>
+
+			<div class="modal fade" id="removeTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="tenantModal">Retirer ce propritaire de maison ?</h5>
+						</div>
+
+						<div class="modal-body">
+							Êtes-vous sur ?
+						</div>
+
+						<div class="modal-footer">
+							<div class="row">
+								<div class="col-xxl-6 d-grid">
+									<button class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
+									Annuler</button>
+								</div>
+
+								<div class="col-xxl-6 d-grid">
+									<a class="btn btn-success text-uppercase shadow-none" href="#!">Valider</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
+	</tr>
+{% endfor %}
