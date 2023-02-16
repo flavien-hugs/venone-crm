@@ -29,7 +29,7 @@ upgrade: ## Apply the upgrade to the database
 	$(MANAGE) flask db upgrade
 
 revision: ## Apply the revision to the database
-	$(MANAGE) flask db revision --rev-id 26da90f00a8a
+	$(MANAGE) flask db revision --rev-id 2e45b86ed899
 
 heads: ## Apply the heads to the database
 	$(MANAGE) flask db stamp heads
