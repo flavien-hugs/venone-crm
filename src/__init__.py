@@ -33,7 +33,7 @@ pages = FlatPages()
 csrf = CSRFProtect()
 scheduler = APScheduler()
 login_manager = LoginManager()
-cache = Cache(config={"CACHE_TYPE": "simple"})
+cache = Cache(config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
 htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
 
 login_manager.login_view = "auth_bp.login"

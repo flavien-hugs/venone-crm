@@ -160,8 +160,6 @@ def agency_house_list(uuid):
         house.vn_user_id = current_user.id
         house.save()
 
-    if tenant_form.validate_on_submit():
-
         tenant = VNTenant(
             vn_gender=tenant_form.gender.data,
             vn_fullname=tenant_form.fullname.data,

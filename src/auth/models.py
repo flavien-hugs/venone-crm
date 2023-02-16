@@ -10,7 +10,6 @@ from src import db
 from src import login_manager
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
-from src.tenant import VNHouseOwner
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
@@ -116,10 +115,6 @@ class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, Timestamp
 
     def __repr__(self):
         return f"VNUser({self.id}, {self.vn_fullname})"
-
-    @staticmethod
-    def houseowners_count():
-        return VNHouseOwner.houseowner_list_query().count()
 
     def set_password(self, password):
         self.vn_password = generate_password_hash(password)
