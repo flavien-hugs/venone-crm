@@ -34,7 +34,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         return self.vn_fullname
 
     def __repr__(self):
-        return "<VNHouseOwner %r>" % self.vn_fullname, self.vn_phonenumber_one
+        return f"VNHouseOwner({self.id}, {self.vn_fullname})"
 
     @staticmethod
     def houseowner_list_query():
@@ -49,6 +49,11 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
     @staticmethod
     def get_houseowner(owner_uuid):
         return VNHouseOwner.query.filter_by(uuid=owner_uuid).first()
+
+    def get_owner_available(self):
+        if self.vn_activated:
+            return "Compte actif"
+        return "Compte inactif"
 
     def save(self):
         db.session.add(self)
@@ -88,9 +93,12 @@ class VNHouse(TimestampMixin):
         db.Boolean, name="house is open", nullable=False, default=True
     )
     vn_houseowner_id = db.Column(
-        db.Integer, db.ForeignKey("houseowner.id", ondelete="SET NULL"), nullable=False
+        db.Integer, db.ForeignKey("houseowner.id", ondelete="SET NULL"), nullable=True
     )
     vn_activated = db.Column(db.Boolean, name="status", nullable=False, default=True)
+    vn_user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"), nullable=True
+    )
     tenants = db.relationship(
         "VNTenant",
         cascade="all,delete",
@@ -100,10 +108,10 @@ class VNHouse(TimestampMixin):
     )
 
     def __str__(self):
-        return self.vn_fullname
+        return self.vn_house_type
 
     def __repr__(self):
-        return "<VNHouse %r>" % self.vn_fullname, self.vn_phonenumber_one
+        return f"VNHouse({self.id}, {self.vn_house_type})"
 
     def save(self):
         db.session.add(self)
@@ -112,6 +120,11 @@ class VNHouse(TimestampMixin):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+    def get_house_open(self):
+        if self.vn_house_is_open:
+            return "Disponible"
+        return "Indisponible"
 
     @staticmethod
     def get_house_id(house):
@@ -150,7 +163,7 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
         return self.vn_fullname
 
     def __repr__(self):
-        return "<VNTenant %r>" % self.vn_fullname, self.vn_phonenumber_one
+        return f"VNTenant({self.id}, {self.vn_tenant_id})"
 
     def save(self):
         db.session.add(self)
