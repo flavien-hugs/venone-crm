@@ -1,4 +1,4 @@
-{% for owner in houseowners %}
+{% for owner in current_user.houseowners %}
 	<tr>
 		<td>
 			<a href="#!" class="badge bg-green-soft text-green">#{{ owner.vn_owner_id|safe}}</a>
@@ -6,8 +6,8 @@
 		<td>{{ owner.vn_fullname|safe }}</td>
 		<td>{{ owner.vn_phonenumber_one|safe }} {% if owner.vn_phonenumber_two %}/{{ owner.vn_phonenumber_two }}{% endif %}</td>
 		<td>{{ owner.houses.count()}}</td>
-		<td>{{ owner.vn_created_at.date() }}</td>
-		<td>{{ owner.vn_activated }}</td>
+		<td>{{ owner.get_owner_available() }}</td>
+		<td data-type="date" data-format="DD/MM/YYYY">{{ moment(owner.vn_created_at).format('LL') }}</td>
 		<td>
 			<a class="btn btn-datatable btn-icon btn-transparent-dark me-2" href="#"><i data-feather="edit"></i></a>
 

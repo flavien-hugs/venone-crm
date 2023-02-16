@@ -93,7 +93,7 @@
                 {% endif %}
 
                 <div class="sidenav-menu-heading">Gestion Propriétés</div>
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ url_for('agency_bp.agency_house_list', uuid=current_user.uuid)}}">
                     <div class="nav-link-icon">
                         <i data-feather="home"></i>
                     </div> Propriétés

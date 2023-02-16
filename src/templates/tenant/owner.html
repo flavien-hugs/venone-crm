@@ -1,10 +1,5 @@
 {% extends "tenant/_base.html" %}
 
-{% block other_css_src %}
-{{ super() }}
-<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
-{% endblock other_css_src %}
-
 
 {% block breadcrmub_plus %}
 
@@ -13,29 +8,18 @@
 {% block dashboard_content %}
     <div class="card">
         <div class="card-body">
-            <table id="datatablesSimple">
+            <table class="table hover" id="tableData">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nom &amp; prénoms</th>
                         <th>Téléphone</th>
                         <th>Nombre de propriétés</th>
-                        <th>Date d'ajout</th>
                         <th>Status</th>
+                        <th>Date d'ajout</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tfoot>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nom &amp; prénoms</th>
-                        <th>Téléphone</th>
-                        <th>Nombre de propriétés</th>
-                        <th>Date d'ajout</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </tfoot>
                 <tbody>
                     {% include "tenant/paths/_owner.html" %}
                 </tbody>
@@ -44,15 +28,3 @@
     </div>
 {% endblock dashboard_content %}
 
-{% block other_js_src %}
-    {{ super() }}
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', event => {
-            const datatablesSimple = document.getElementById('datatablesSimple');
-            if (datatablesSimple) {
-                new simpleDatatables.DataTable(datatablesSimple);
-            }
-        });
-    </script>
-{% endblock other_js_src %}

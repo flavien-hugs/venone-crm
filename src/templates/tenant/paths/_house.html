@@ -1,0 +1,45 @@
+{% for house in current_user.houses %}
+	<tr>
+		<td>
+			<a href="#!" class="badge bg-green-soft text-green">#{{ house.vn_house_id|safe}}</a>
+		</td>
+		<td>{{ house.vn_house_type|safe }}</td>
+		<td>{{ house.vn_house_rent|safe }}</td>
+		<td>{{ house.vn_house_guaranty|safe }}/{{ house.vn_house_month|safe }}/{{ house.vn_number_or_room|safe }}</td>
+		<td>{{ house.vn_house_address|safe }}</td>
+		<td data-type="date" data-format="DD/MM/YYYY">{{ moment(house.vn_created_at).format('LL') }}</td>
+		<td>{{ house.get_house_open() }}</td>
+		<td>
+			<a class="btn btn-datatable btn-icon btn-transparent-dark me-2" href="#"><i data-feather="edit"></i></a>
+
+			<a class="btn btn-datatable btn-icon btn-transparent-dark" type="button" data-bs-toggle="modal" data-bs-target="#removehouseModal"><i data-feather="trash-2"></i></a>
+
+			<div class="modal fade" id="removehouseModal" tabindex="-1" role="dialog" aria-labelledby="houseModal" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="houseModal">Retirer ce propritaire de maison ?</h5>
+						</div>
+
+						<div class="modal-body">
+							Êtes-vous sur ?
+						</div>
+
+						<div class="modal-footer">
+							<div class="row">
+								<div class="col-xxl-6 d-grid">
+									<button class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
+									Annuler</button>
+								</div>
+
+								<div class="col-xxl-6 d-grid">
+									<a class="btn btn-success text-uppercase shadow-none" href="#!">Valider</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
+	</tr>
+{% endfor %}

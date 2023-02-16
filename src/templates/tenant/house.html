@@ -1,0 +1,116 @@
+{% extends "tenant/_base.html" %}
+
+{% block breadcrmub_plus %}
+    <div class="col-12 col-xl-auto mb-3">
+        <button class="btn btn-sm btn-success text-white" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+            <i class="me-2" data-feather="home"></i>
+            Enregistrer une propriété
+        </button>
+    </div>
+{% endblock breadcrmub_plus %}
+
+{% block dashboard_content %}
+    <div class="card">
+        <div class="card-body">
+            <table class="table display" id="tableData">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type de maison</th>
+                        <th>Loyer/mois</th>
+                        <th>Caution/avance/nombre de pièces</th>
+                        <th>Situation géographique</th>
+                        <th>Date de mise en location</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% include "tenant/paths/_house.html" %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="card-header">
+                    <div class="nav nav-pills nav-justified nav-wizard" id="cardTab tenantModal" role="tablist">
+                        <a class="nav-item nav-link active p-3" id="wizard1-tab" href="#wizard1" data-bs-toggle="tab" role="tab" aria-controls="wizard1" aria-selected="true">
+                            <div class="wizard-step-icon">1</div>
+                            <div class="wizard-step-text">
+                                <div class="modal-title wizard-step-text-name">
+                                    Enregistrer la propriété
+                                </div>
+                            </div>
+                        </a>
+
+                         <a class="nav-item nav-link p-3" id="wizard2-tab" href="#wizard2" data-bs-toggle="tab" role="tab" aria-controls="wizard2" aria-selected="true">
+                            <div class="wizard-step-icon">2</div>
+                            <div class="wizard-step-text">
+                                <div class="modal-title wizard-step-text-name">
+                                   Enregistrer le locataire
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form action="." method="POST">
+                        {{ tenant_form.hidden_tag() }}
+                        {{ house_form.hidden_tag() }}
+
+                        <div class="tab-content" id="cardTabContent">
+                            <div class="tab-pane fade show active" id="wizard1" role="tabpanel" aria-labelledby="wizard1-tab">
+                                <div class="row gx-3 mb-3">
+                                    {% for field in house_form %}
+                                        <div class="col-md-4 mb-3">
+                                            {{ field.label(class="small mb-1") }}
+                                            {% if field.errors %}
+                                                {{ field(class="form-control", placeholder=field.label.text) }}
+                                                <div class="invalid-feedback">
+                                                    {% for error in field.errors %}
+                                                        <span>{{ error }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                {{ field(class="form-control", placeholder=field.label.text) }}
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="wizard2" role="tabpanel" aria-labelledby="wizard2-tab">
+                                <div class="row gx-3 mb-3">
+                                    {% for field in tenant_form %}
+                                        <div class="col-md-4 mb-3">
+                                            {{ field.label(class="small mb-1") }}
+                                            {% if field.errors %}
+                                                {{ field(class="form-control", placeholder=field.label.text) }}
+                                                <div class="invalid-feedback">
+                                                    {% for error in field.errors %}
+                                                        <span>{{ error }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                {{ field(class="form-control", placeholder=field.label.text) }}
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <hr class="my-3">
+
+                                <div class="d-grid">
+                                    <button class="btn btn-success text-uppercase" type="submit">Valider</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+{% endblock dashboard_content %}

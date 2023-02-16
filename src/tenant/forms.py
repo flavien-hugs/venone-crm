@@ -40,13 +40,13 @@ class TenantForm(FlaskForm):
 
     gender = SelectField(label="Genre", choices=GENDER, coerce=str)
     fullname = StringField(label="Nom & prénom", validators=[DataRequired()])
+    cni_number = StringField(label="N° de votre CNI", validators=[DataRequired()])
     phonenumber_one = StringField(
         label="Numéro de téléphone 1", validators=[DataRequired()]
     )
     phonenumber_two = StringField(
         label="Numéro de téléphone 2", validators=[Optional()]
     )
-    cni_number = StringField(label="N° de votre CNI", validators=[DataRequired()])
     addr_email = StringField(label="Adresse e-mail", validators=[Optional()])
     profession = StringField(label="Profession", validators=[DataRequired()])
     parent_name = StringField(label="Nom d'un parent", validators=[Optional()])
@@ -57,8 +57,8 @@ class TenantForm(FlaskForm):
 class HouseOwnerForm(DefaultForm, FlaskForm):
 
     fullname = StringField(label="Nom & prénom", validators=[DataRequired()])
-    addr_email = StringField(label="Adresse e-mail", validators=[Optional()])
     cni_number = StringField(label="N° de votre CNI", validators=[DataRequired()])
+    addr_email = StringField(label="Adresse e-mail", validators=[Optional()])
     phonenumber_one = StringField(
         label="Numéro de téléphone 1", validators=[DataRequired()]
     )
