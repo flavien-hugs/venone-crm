@@ -108,6 +108,7 @@ class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, Timestamp
         db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
     houseowners = db.relationship("VNHouseOwner", backref="house_owner", lazy="dynamic")
+    houses = db.relationship("VNHouse", backref="houses", lazy="dynamic")
     tenants = db.relationship("VNTenant", backref="tenants", lazy="dynamic")
 
     def __str__(self):
