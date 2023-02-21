@@ -22,11 +22,30 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFError
 from flask_wtf.csrf import CSRFProtect
+from sqlalchemy import MetaData
+
+naming_convention = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(column_0_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
+
+metadata = MetaData(
+    naming_convention={
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s",
+    }
+)
 
 cors = CORS()
 mail = Mail()
 bcrypt = Bcrypt()
-db = SQLAlchemy()
+db = SQLAlchemy(metadata=metadata)
 moment = Moment()
 migrate = Migrate()
 pages = FlatPages()
@@ -41,7 +60,9 @@ login_manager.session_protection = "strong"
 login_manager.login_message_category = "info"
 login_manager.needs_refresh_message_category = "info"
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
-login_manager.needs_refresh_message = "Pour protéger votre compte, veuillez vous réauthentifier pour accéder à cette page."
+login_manager.needs_refresh_message = "Pour protéger votre compte,\
+    veuillez vous réauthentifier pour accéder à cette page."
+
 
 def create_venone_app(config_name):
     venone_app = Flask(__name__)
@@ -62,18 +83,28 @@ def create_venone_app(config_name):
     scheduler.init_app(venone_app)
     login_manager.init_app(venone_app)
 
-    migrate.init_app(venone_app, db)
     db.init_app(venone_app)
+    migrate.init_app(venone_app, db)
+
+    scheduler.start()
 
     with venone_app.app_context():
 
         from src.auth import auth_bp
         from src.dashboard.routes import owner_bp, agency_bp, admin_bp
+        from src.api import api
 
         venone_app.register_blueprint(auth_bp)
         venone_app.register_blueprint(owner_bp)
         venone_app.register_blueprint(agency_bp)
         venone_app.register_blueprint(admin_bp)
+
+        venone_app.register_blueprint(api)
+
+        @venone_app.before_first_request
+        def load_tasks():
+            pass
+            # from src.auth.tasks import get_user  # noqa
 
         @venone_app.errorhandler(CSRFError)
         def handle_csrf_error(e):
