@@ -26,7 +26,7 @@ class AgencieSignupForm(FormMixin, FlaskForm):
     submit = SubmitField("Ouvrir mon compte")
 
     def validate_business_number(self, field):
-        if db.session.query(VNUser).filter_by(vn_business_number=field.data).first():
+        if VNUser.query.filter_by(vn_business_number=field.data).first():
             raise ValidationError(
                 "Ce numéro de régistre de commerce est déjà utilisé !"
             )

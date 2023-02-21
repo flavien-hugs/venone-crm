@@ -10,6 +10,9 @@ from src import db
 from src import login_manager
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
+from src.tenant import VNHouse
+from src.tenant import VNHouseOwner
+from src.tenant import VNTenant
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
@@ -74,28 +77,24 @@ class VNAgencieInfoModelMixin(db.Model):
 
     __abstract__ = True
 
-    vn_agencie_name = db.Column(
-        db.String(80), unique=True, nullable=True
-    )
-    vn_business_number = db.Column(
-        db.String(80), unique=True, nullable=True
-    )
+    vn_agencie_name = db.Column(db.String(80), unique=True, nullable=True)
+    vn_business_number = db.Column(db.String(80), unique=True, nullable=True)
 
 
-class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, TimestampMixin, db.Model):
+class VNUser(
+    UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, TimestampMixin, db.Model
+):
 
     __tablename__ = "user"
 
     vn_country = db.Column(db.String(80), nullable=False)
-    vn_avatar = db.Column(db.String(80), nullable=True)
-    vn_activated = db.Column(
-        db.Boolean, nullable=False, default=False
+    vn_avatar = db.Column(
+        db.String(80), nullable=True, default="/static/img/element/avatar.png"
     )
+    vn_activated = db.Column(db.Boolean, nullable=False, default=False)
     vn_password = db.Column(db.String(180), nullable=False)
     vn_birthdate = db.Column(db.Date, nullable=True)
-    vn_last_seen = db.Column(
-        db.DateTime, onupdate=datetime.utcnow()
-    )
+    vn_last_seen = db.Column(db.DateTime, onupdate=datetime.utcnow())
 
     vn_house_owner = db.Column(db.Boolean(), default=False)
     vn_company = db.Column(db.Boolean(), default=False)
@@ -106,9 +105,30 @@ class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, Timestamp
     vn_role_id = db.Column(
         db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
-    houseowners = db.relationship("VNHouseOwner", backref="house_owner", lazy="dynamic")
-    houses = db.relationship("VNHouse", backref="houses", lazy="dynamic")
-    tenants = db.relationship("VNTenant", backref="tenants", lazy="dynamic")
+    houseowners = db.relationship(
+        "VNHouseOwner",
+        backref="house_owner",
+        lazy="dynamic",
+        cascade="all, delete, delete-orphan",
+        single_parent=True,
+        order_by="desc(VNHouseOwner.vn_created_at)"
+    )
+    houses = db.relationship(
+        "VNHouse",
+        backref="houses",
+        lazy="dynamic",
+        cascade="all, delete, delete-orphan",
+        single_parent=True,
+        order_by="desc(VNHouse.vn_created_at)"
+    )
+    tenants = db.relationship(
+        "VNTenant",
+        backref="tenants",
+        lazy="dynamic",
+        cascade="all, delete, delete-orphan",
+        single_parent=True,
+        order_by="desc(VNTenant.vn_created_at)"
+    )
 
     def __str__(self):
         return self.vn_fullname or self.vn_agencie_name
@@ -182,8 +202,12 @@ class VNUser(UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, Timestamp
         db.session.add(self)
         db.session.commit()
 
-    def delete(self):
+    def remove(self):
         db.session.delete(self)
+        db.session.commit()
+
+    def disable(self):
+        self.vn_activated = False
         db.session.commit()
 
     def ping(self):

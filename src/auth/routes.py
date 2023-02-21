@@ -9,8 +9,8 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
-from src import login_manager
 from src import db
+from src import login_manager
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
 from src.auth.forms.auth_form import LoginForm
@@ -28,20 +28,24 @@ def load_user(user_id):
     return db.session.query(VNUser).get(user_id)
 
 
+@auth_bp.get("/unactivated/")
+def unconfirmed():
+    if current_user.is_authenticated and not current_user.vn_activated:
+        flash(
+            "L'utilisateur n'existe pas ou le compte à été désactivé ! \
+                Veuillez contacter l'administrateur système.",
+            category="danger",
+        )
+        return redirect(url_for("auth_bp.login"))
+    return render_template("auth/unactivated.html", page_title="Compte indisponible")
+
+
 @auth_bp.before_app_request
 def before_request():
     if current_user.is_authenticated:
         current_user.ping()
         if not current_user.vn_activated and request.blueprint != "auth_bp":
-            return redirect(url_for("auth_bp.unactivated"))
-
-
-@auth_bp.route("/unactivated/")
-@login_required
-def unactivated():
-    if current_user.vn_activated:
-        return redirect(url_for("auth_bp.login"))
-    return render_template("auth/unconfirmed.html")
+            return redirect(url_for("auth_bp.unconfirmed"))
 
 
 @auth_bp.route("/login/", methods=["GET", "POST"])
@@ -53,28 +57,26 @@ def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         user = VNUser.query.filter_by(vn_addr_email=form.addr_email.data).first()
-        if user:
-            if not user.vn_activated:
-                flash(
-                    """Vous n'êtes autorisé à accéder au système !
-                    Veuillez contacter l'administrateur du système.""",
-                    category="danger",
-                )
-            if not user.verify_password(form.password.data):
-                flash("Le mot de passe invalide.", category="danger")
-
+        if user and user.verify_password(form.password.data) and user.vn_activated:
             login_user(user, form.remember_me.data)
+            next_page = request.args.get("next")
+            if next_page is None or not next_page.startswith("/"):
+                next_page = url_for("owner_bp.dashboard", uuid=user.uuid)
+
             flash(
                 f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
                 category="success",
             )
-            return redirect(url_for("owner_bp.dashboard", uuid=user.uuid))
+            return redirect(next_page)
         else:
-            flash(
-                "L'utilisateur n'existe pas ou le compte à été désactivé ! \
-                Veuillez contacter l'administrateur système.",
-                category="danger",
-            )
+            if not user.vn_activated:
+                flash(
+                    "L'utilisateur n'existe pas ou le compte à été désactivé ! \
+                    Veuillez contacter l'administrateur système.",
+                    category="danger",
+                )
+            if not user.verify_password(form.password.data):
+                flash("Le mot de passe invalide.", category="danger")
 
     page_title = "Se connecter"
     return render_template("auth/login.html", page_title=page_title, form=form)
