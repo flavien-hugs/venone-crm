@@ -1,34 +1,10 @@
 {% extends "auth/admin/dashboard.html" %}
 
-{% block other_css_src %}
-	{{ super() }}
-	<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
-{% endblock other_css_src %}
-
 {% block dashboard_content %}
 
 {% endblock dashboard_content %}
 
 {% block other_js_src %}
     {{ super() }}
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', event => {
-            const table = document.getElementById('tableData');
-            if (table) {
-                let datatable = new simpleDatatables.DataTable(table, {
-                    labels: {
-                        placeholder: "Rechercher ...",
-                        searchTitle: "Recherche dans la table",
-                        perPage: "éléments par page",
-                        noRows: "Aucun élément trouvé",
-                        info: "de {start} à {end} sur {rows} éléments (page {page} à {pages} pages)",
-                        noResults: "Aucun résultat ne correspond à votre requête de recherche.",
-                    },
-                    fixedHeight: true,
-                    tabIndex: true
-                });
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename="js/admin/vue.global.prod.js") }}"></script>
 {% endblock other_js_src %}

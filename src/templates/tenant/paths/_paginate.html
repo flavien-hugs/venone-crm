@@ -1,0 +1,15 @@
+<nav lass="my-4">
+	<ul class="pagination pagination-md justify-content-center text-center">
+		<li class="page-item" :class="{ disabled: currentPage === 1 }">
+			<span class="page-link" @click="prevPage"><i class="me-2" data-feather="arrow-left"></i> Précédent</span>
+		</li>
+		
+		<li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+          <span class="page-link">{ page }</span>
+        </li>
+
+		<li class="page-item" :class="{ disabled: currentPage === totalPages }">
+			<span class="page-link" @click="nextPage">Suivant <i class="ms-2" data-feather="arrow-right"></i></span>
+		</li>
+	</ul>
+</nav>

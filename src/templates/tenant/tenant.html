@@ -1,40 +1,76 @@
 {% extends "tenant/_base.html" %}
 
 {% block breadcrmub_plus %}
-    <div class="col-12 col-xl-auto mb-3">
-        <button class="btn btn-sm btn-success text-white" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
-            <i class="me-2" data-feather="user-plus"></i>
-            Enregistrer un locataire
-        </button>
-    </div>
+
 {% endblock breadcrmub_plus %}
 
 {% block dashboard_content %}
-    <div class="card">
-        <div class="card-body">
-            <table class="table hover" id="tableData">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nom &amp; prénoms</th>
-                        <th>Téléphone</th>
-                        <th>Type, loyer/mois</th>
-                        <th>Status paiement</th>
-                         <th>Date de location</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% include "tenant/paths/_tenant.html" %}
-                </tbody>
-            </table>
+    <section id="tenantTable">
+
+        <!-- Alert message -->
+        <div v-if="showDeleteAlert" class="alert alert-success" role="alert">
+            Locataire supprimé avec succès.
         </div>
-    </div>
+
+        <div v-if="tenants.length == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
+            <div class="text-center py-2">
+
+                <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}" alt="">
+
+                <h4 class="d-flex justify-content-center text-muted mb-4">
+                    Vous n'avez aucun locataire enregistré en ce moment.
+                </h4>
+
+                <button class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+                    <i class="me-2" data-feather="user-plus"></i>
+                    Enregistrer un locataire
+                </abutton>
+            </div>
+        </div>
+
+        <div v-else-if="tenants.length > 0" class="card card-header-actions mx-auto">
+            
+            <div class="card-header">
+                <span class="fw-700">Locataires ({ tenants.length })</span>
+                <button class="btn btn-sm btn-success text-white text-uppercase fw-700" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+                    <i class="me-2" data-feather="user-plus"></i>
+                    Enregistrer un locataire
+                </button>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-hover table-responsive">
+                    <thead class="small">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nom &amp; prénoms / contact</th>
+                            <th scope="col">Bailleur</th>
+                            <th scope="col">Loyer</th>
+                            <th scope="col">Status paiement</th>
+                             <th scope="col">Date de location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <p v-if="isLoading">Loading...</p>
+                        {% include "tenant/paths/_tenant.html" %}
+                    </tbody>
+                </table>
+
+                {% include "tenant/paths/_paginate.html" %}
+            </div>
+        </div>
+    </section>
 
     <div class="modal fade" id="addTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="card-header">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tenantModal">Enregistrer un localtaire</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
                     <div class="nav nav-pills nav-justified nav-wizard" id="cardTab tenantModal" role="tablist">
                         <a class="nav-item nav-link active p-3" id="wizard1-tab" href="#wizard1" data-bs-toggle="tab" role="tab" aria-controls="wizard1" aria-selected="true">
                             <div class="wizard-step-icon">1</div>
@@ -63,13 +99,124 @@
                             </div>
                         </a>
                     </div>
-                </div>
 
-                <div class="card-body">
-                    {% include "tenant/paths/_form.html" %}
+                    <hr class="my-3">
+                     
+                    {% include "tenant/paths/_tenant_register.html" %}
                 </div>
             </div>
         </div>
     </div>
 {% endblock dashboard_content %}
 
+{% block other_js_src %}
+    {{ super() }}
+    <script>
+        window.addEventListener('DOMContentLoaded', event => {
+            var app = Vue.createApp({
+                data() {
+                    return {
+                        tenants: [],
+                        perPage: 20,
+                        currentPage: 1,
+                        totalPages: 1,
+                        isLoading: false,
+                        tenantUUID: null,
+                        showDeleteAlert: false,
+                    }
+                },
+                delimiters: ["{", "}"],
+                compilerOptions: {
+                    delimiters: ["{", "}"]
+                },
+
+                mounted() {
+                    this.getTenants()
+                },
+
+                methods: {
+                    getTenants() {
+                        
+                        this.isLoading = true
+                        const url = {{ url_for("api.get_all_tenants")|tojson }}
+
+                        fetch(url + '?page=' + this.currentPage, {
+                            method: "GET",
+                            headers: {
+                                'Content-type': 'application/json'
+                            }
+                        })
+                        .then((response) => {
+                            if (response.ok) {
+                                return response.json();
+                            } else {
+                                throw new Error("NETWORK RESPONSE ERROR");
+                            }
+                        })
+                        .then((data) => {
+                            this.tenants = data.tenants;
+                            this.totalPages = Math.ceil(data.total / this.perPage);
+                            this.isLoading = false;
+                        })
+                        .catch((error) => {
+                            console.error("FETCH ERROR:", error);
+                            this.tenants = error;
+                        });
+                    },
+
+                    deleteTenantConfirm(tenantUUID) {
+                        this.tenantUUID = tenantUUID;
+                        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                        modal.show();
+                    },
+
+                    onDeleteTenant() {
+                        const deleteURL = `/api/tenant/${this.tenantUUID}/delete/`;
+                        fetch(deleteURL, {
+                            method: "DELETE",
+                            headers: {
+                                'Content-type': 'application/json'
+                            }
+                        })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                this.tenants = this.tenants.filter(tenant => tenant.tenant_uuid !== this.tenantUUID);
+                                this.getTenants();
+                                this.tenantUUID = null;
+                                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                                modal.hide();
+                                this.showDeleteAlert = true;
+                                console.log(data.message);
+                                setTimeout(() => {
+                                    this.showDeleteAlert = false;
+                                }, 3000);
+                            } else {
+                                console.log(data.message);
+                            }
+                        })
+                        .catch((error) => console.error(error));
+                    },
+
+                    prevPage() {
+                        if (this.currentPage > this.totalPages) {
+                            this.currentPage--;
+                            this.getTenants();
+                        }
+                        window.scrollTo({top: 0, behavior: 'smooth'});
+                    },
+
+                    nextPage() {
+                        if (this.currentPage <= this.totalPages) {
+                            this.currentPage++;
+                            this.getTenants();
+                        }
+                        window.scrollTo({top: 0, behavior: 'smooth'});
+                    },
+                },
+            })
+
+            app.mount('#tenantTable');
+        });
+    </script>
+{% endblock other_js_src %}

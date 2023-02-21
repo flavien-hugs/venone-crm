@@ -1,0 +1,52 @@
+<form action="." method="POST">
+	{{ tenant_form.hidden_tag() }}
+	{{ house_form.hidden_tag() }}
+
+	<div class="tab-content" id="cardTabContent">
+		<div class="tab-pane fade show active" id="wizard1" role="tabpanel" aria-labelledby="wizard1-tab">
+			<div class="row gx-3 mb-3">
+				{% for field in house_form %}
+				<div class="col-md-4 mb-3">
+					{{ field.label(class="small mb-1") }}
+					{% if field.errors %}
+					{{ field(class="form-control", placeholder=field.label.text) }}
+					<div class="invalid-feedback">
+						{% for error in field.errors %}
+						<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+					{% else %}
+					{{ field(class="form-control", placeholder=field.label.text) }}
+					{% endif %}
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="wizard2" role="tabpanel" aria-labelledby="wizard2-tab">
+			<div class="row gx-3 mb-3">
+				{% for field in tenant_form %}
+				<div class="col-md-4 mb-3">
+					{{ field.label(class="small mb-1") }}
+					{% if field.errors %}
+					{{ field(class="form-control", placeholder=field.label.text) }}
+					<div class="invalid-feedback">
+						{% for error in field.errors %}
+						<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+					{% else %}
+					{{ field(class="form-control", placeholder=field.label.text) }}
+					{% endif %}
+				</div>
+				{% endfor %}
+			</div>
+
+			<hr class="my-3">
+
+			<div class="d-grid">
+				<button class="btn btn-success text-uppercase" type="submit">Valider</button>
+			</div>
+		</div>
+	</div>
+</form>
