@@ -25,14 +25,15 @@ COUNTRY = (
     (MAL, "ML - Mali"),
     (COM, "KM - Comores"),
 )
-
-
-XOF = "XOF - CFA Franc BCEAO"
-
-DEVICE = ((XOF, "XOF - CFA Franc BCEAO"),)
-
 COUNTRY_DEFAULT = CIV
 
+XOF = "XOF - Franc CFA BCEAO"
+XAF = "XAF - Franc CFA BEAC"
+DEVISE = (
+    (XOF, "XOF - CFA Franc BCEAO"),
+    (XAF, "XAF - CFA Franc BEAC"),
+)
+DEVISE_DEFAULT = XOF
 
 HOMME = "M."
 FEMME = "Mme"
@@ -43,7 +44,6 @@ GENDER = (
     (FEMME, "Mme"),
     (MDLLE, "Mlle"),
 )
-
 GENDER_DEFAULT = HOMME
 
 STUDIO = "Studio"
@@ -51,5 +51,4 @@ VILLA = "Villa"
 MAGASIN = "Magasin"
 
 HOUSE_TYPES = ((STUDIO, "Studio"), (VILLA, "Villa"), (MAGASIN, "Magasin"))
-
 DEFAULT_HOUSE_TYPES = VILLA
