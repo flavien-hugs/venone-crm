@@ -41,7 +41,7 @@ class Config:
 
     # mail settings
     MAIL_SUBJECT_PREFIX = "[Venone]"
-    MAIL_POST = os.environ.get("MAIL_POST")
+    MAIL_PORT = os.environ.get("MAIL_PORT")
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS")
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
@@ -53,7 +53,7 @@ class Config:
     FLATPAGES_MARKDOWN_EXTENSIONS = ["codehilite"]
 
     MAX_CONTENT_LENGTH = 16 * 1000 * 1000
-    ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg"]
+    ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "svg"]
     UPLOAD_FOLDER_PATH = os.path.join(BASE_DIR, "upload/")
 
     MINIFY_HTML = True

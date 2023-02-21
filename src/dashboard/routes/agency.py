@@ -1,12 +1,16 @@
+from flask import abort
 from flask import Blueprint
 from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import session
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
+from flask_login import logout_user
 from src import csrf
+from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
 from src.mixins.decorators import agency_required
 from src.tenant import HouseForm
@@ -16,17 +20,9 @@ from src.tenant import VNHouse
 from src.tenant import VNHouseOwner
 from src.tenant import VNTenant
 
+
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(agency_bp)
-
-
-@agency_bp.route("/api/", methods=["GET"])
-@login_required
-def api():
-    from flask import jsonify
-
-    data = {"id": current_user.id, "addr_email": current_user.vn_addr_email}
-    return jsonify({"data": data}), 200
 
 
 @agency_bp.route("/<string:uuid>/settings/", methods=["GET", "POST"])
@@ -35,7 +31,9 @@ def api():
 def agency_setting(uuid):
     page_title = "Paramètres"
     form = CompanySettingForm()
+
     if request.method == "POST" and form.validate_on_submit():
+
         current_user.vn_gender = form.gender.data
         current_user.vn_fullname = form.fullname.data
 
@@ -46,6 +44,7 @@ def agency_setting(uuid):
         current_user.vn_business_number = form.business_number.data
 
         current_user.vn_location = form.location.data
+        current_user.vn_device = form.devise.data
 
         current_user.save()
         flash("Votre compte a été mise à jour avec succès.", "success")
@@ -61,6 +60,7 @@ def agency_setting(uuid):
         form.business_number.data = current_user.vn_business_number
 
         form.location.data = current_user.vn_location
+        form.devise.data = current_user.vn_device
 
     return render_template(
         "auth/admin/pages/company/settings.html",
@@ -75,7 +75,6 @@ def agency_setting(uuid):
 @agency_required
 def agency_create_tenant(uuid):
     page_title = "Vos locataires"
-    houseowners = VNHouseOwner.houseowner_list_query()
 
     house_owner_form = HouseOwnerForm(request.form)
     house_form = HouseForm(request.form)
@@ -122,10 +121,13 @@ def agency_create_tenant(uuid):
             vn_phonenumber_two=tenant_form.phonenumber_two.data,
         )
         tenant.vn_house_id = house.id
+        tenant.vn_houseowner_id = houseowner.id
         tenant.vn_user_id = current_user.id
         tenant.save()
 
-        return redirect(url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid))
+        return redirect(
+            url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid)
+        )
 
     return render_template(
         "tenant/tenant.html",
@@ -133,7 +135,6 @@ def agency_create_tenant(uuid):
         house_form=house_form,
         tenant_form=tenant_form,
         page_title=page_title,
-        houseowners=houseowners,
         current_user=current_user,
     )
 
@@ -233,14 +234,39 @@ def create_house_owner(uuid):
     )
 
 
-@agency_bp.route("/<string:owner_uuid>/delete_house_owner/")
+@agency_bp.route("/<string:uuid>/delete_houseowner/", methods=["POST"])
 @login_required
 @agency_required
-def agency_delete_tenant(owner_uuid):
-    owner = VNHouseOwner.get_houseowner(owner_uuid)
-    owner.desactivate()
+def agency_delete_houseowner(uuid):
+    houseowner = VNHouseOwner.get_houseowner(uuid)
+    if current_user != houseowner.vn_user_id:
+        abort(400)
+    houseowner.disable()
     flash(
-        f"Le propriétaire {owner.vn_fullname} a été retiré avec succès !",
+        f"Le propriétaire {houseowner.vn_fullname} a été retiré avec succès !",
         category="success",
     )
     return redirect(url_for("agency_bp.house_owner_list", uuid=current_user.uuid))
+
+
+@agency_bp.route("/<string:uuid>/delete_account/", methods=["POST"])
+@login_required
+def delete_account(uuid):
+    user = VNUser.query.filter_by(uuid=uuid).first()
+    if current_user != user:
+        abort(400)
+    try:
+        user.disable()
+        logout_user()
+        session.clear()
+        flash("Votre compte a été supprimé avec succès !", category="success")
+        return redirect(url_for("auth_bp.login"))
+    except Exception as e:
+        print(f"Une erreur s'est produite: {e}")
+        abort(500)
+
+
+@agency_bp.route("/api/tenant/data/")
+@login_required
+def data():
+    return {"data": [tenant.to_tenant_dict() for tenant in current_user.tenants]}

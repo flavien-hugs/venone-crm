@@ -3,17 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="robots" content="follow,all">
-    <meta name="distribution" content="Global">
-    <meta name="revisit-after" content="3 days">
     <meta http-equiv="content-type" content="text/html">
     <meta name="format-detection" content="telephone=yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="title" content="{{ config.SITE_NAME|safe }}">
-    <meta name="description" content="Venone est une application de gestion immobilière">
-    <meta name="keywords" content="immobilier, application, gestion">
 
     <meta property="og:type" content="website">
     <meta property="og:locale" content="fr_CI">
@@ -39,6 +32,10 @@
     <link rel="canonical" href="{{ config.WEBSITE_BUILDER }}">
     <link rel="preconnect" href="{{ config.WEBSITE_BUILDER }}">
 
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
     {% block other_css_src %}
         {% include "includes/assets/css.html" %}
     {% endblock other_css_src %}
@@ -62,6 +59,13 @@
         {% block other_js_src %}
             {% include "includes/assets/js.html" %}
         {% endblock other_js_src %}
-    </body>
 
+        <script>
+            if('serviceWorker' in navigator) {
+                navigator.serviceWorker
+                    .register('/static/sw.js')
+                    .then(function() { console.log("Service Worker Registered"); });
+            }
+        </script>
+    </body>
 </html>

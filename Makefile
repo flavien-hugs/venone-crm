@@ -22,14 +22,14 @@ test: ## Run the unit tests
 initdb: ## Init and create database
 	$(MANAGE) flask db init && $(MANAGE) flask init_db
 
-migrate: ## Generate an initial migration
+migrate: ## Generate an migration
 	$(MANAGE) flask db migrate -m 'Intial Migration'
 
 upgrade: ## Apply the upgrade to the database
 	$(MANAGE) flask db upgrade
 
 revision: ## Apply the revision to the database
-	$(MANAGE) flask db revision --rev-id 2e45b86ed899
+	$(MANAGE) flask db revision --rev-id 4b02772f2a84
 
 heads: ## Apply the heads to the database
 	$(MANAGE) flask db stamp heads

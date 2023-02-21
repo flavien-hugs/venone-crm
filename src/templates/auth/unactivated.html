@@ -1,15 +1,19 @@
 {% extends "auth/signup/owner.html" %}
 
 {% block template_user_title %}
-	 Vous voulez changer votre adresse e-mail ?
 {% endblock template_user_title %}
 
 {% block template_user_subtitle %}
-	Pour changer votre adresse e-mail, saisissez le ci-dessous.
+
 {% endblock template_user_subtitle %}
 
 {% block template_user_content %}
-
+	<div class="row g-4">
+		<div class="col-md-12">
+			<p>L'utilisateur avec cet adresse e-mail n'existe pas ou le compte a été désactivé !
+            Veuillez contacter l'administrateur.</p>
+		</div>
+	</div>
 {% endblock template_user_content %}
 
 {% block template_user_footer %}

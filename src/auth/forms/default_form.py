@@ -1,4 +1,3 @@
-from src import db
 from src.auth.models import VNUser
 from src.constants import COUNTRY
 from wtforms import PasswordField
@@ -37,9 +36,7 @@ class FormMixin:
     )
 
     def validate_addr_email(self, field):
-        user = (
-            VNUser.query.filter_by(vn_addr_email=field.data.lower()).first()
-        )
+        user = VNUser.query.filter_by(vn_addr_email=field.data.lower()).first()
         if user:
             raise ValidationError(
                 f"""

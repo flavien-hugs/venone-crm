@@ -71,8 +71,6 @@ class ChangeEmailForm(FlaskForm):
 
     def validate_addr_email(self, field):
         if (
-            db.session.query(VNUser)
-            .filter_by(vn_user_addr_email=field.data.lower())
-            .first()
+            VNUser.query.filter_by(vn_user_addr_email=field.data.lower()).first()
         ):
             raise ValidationError("L'adresse électronique est déjà enregistrée.")

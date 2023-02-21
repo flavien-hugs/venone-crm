@@ -51,7 +51,6 @@ class TenantForm(FlaskForm):
     profession = StringField(label="Profession", validators=[DataRequired()])
     parent_name = StringField(label="Nom d'un parent", validators=[Optional()])
     location = StringField(label="Lieu de résidence", validators=[DataRequired()])
-    birthdate = DateField(label="Date de naissance", validators=[Optional()])
 
 
 class HouseOwnerForm(DefaultForm, FlaskForm):

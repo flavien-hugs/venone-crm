@@ -1,44 +1,51 @@
-{% for tenant in current_user.tenants %}
-	<tr>
-		<td>
-			<a href="#!" class="badge bg-green-soft text-green">#{{ tenant.vn_tenant_id|safe}}</a>
-		</td>
-		<td>{{ tenant.vn_fullname|safe }}</td>
-		<td>{{ tenant.vn_phonenumber_one|safe }} {% if tenant.vn_phonenumber_two %}/{{ tenant.vn_phonenumber_two }}{% endif %}</td>
-		<td>{{ tenant.tenant.vn_house_type|safe }} - {{ tenant.tenant.vn_house_rent|safe }}</td>
-		<td><a href="#!" class="badge bg-green-soft text-green">Payé</a></td>
-		<td data-type="date" data-format="DD/MM/YYYY">{{ moment(tenant.vn_created_at).format('LL') }}</td>
-		<td>
-			<a class="btn btn-datatable btn-icon btn-transparent-dark me-2" href="#"><i data-feather="edit"></i></a>
+<tr v-for="tenant in tenants" v-bind:key="tenant.tenant_uuid">
+	<td>
+		<a v-bind:href="tenant.tenant_url" class="badge bg-blue-soft text-blue">{tenant.tenant_id}</a>
+	</td>
+	<td>{tenant.fullname} ({tenant.phonenumber_one})</td>
+	<td>
+		<a v-bind:href="tenant.owner_url">{tenant.houseowner_fullname}</a>
+	</td>
+	
+	<td><a v-bind:href="tenant.house_url">{tenant.house_type}</a></td>
+	<td><a href="#!" class="badge bg-green-soft text-green">Payé</a></td>
+	<td>{tenant.created_at}</td>
+	<td>
+		<a class="btn btn-datatable btn-icon btn-transparent-dark me-2" href="#">
+			<i data-feather="edit"></i>
+		</a>
 
-			<a class="btn btn-datatable btn-icon btn-transparent-dark" type="button" data-bs-toggle="modal" data-bs-target="#removeTenantModal"><i data-feather="trash-2"></i></a>
+		<button @click="deleteTenantConfirm(tenant.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
+			<i data-feather="trash-2"></i>
+		</button>
+	</td>
+</tr>
 
-			<div class="modal fade" id="removeTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
-				<div class="modal-dialog modal-dialog-centered" role="document">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="tenantModal">Retirer ce propritaire de maison ?</h5>
-						</div>
+<div class="modal fade" data-bs-backdrop="static" id="confirmModal">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Retirer ce propritaire de maison ?</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
 
-						<div class="modal-body">
-							Êtes-vous sur ?
-						</div>
+			<div class="modal-body">
+				Êtes-vous sûr de vouloir supprimer ce propriétaire ?
+			</div>
 
-						<div class="modal-footer">
-							<div class="row">
-								<div class="col-xxl-6 d-grid">
-									<button class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
-									Annuler</button>
-								</div>
+			<div class="modal-footer">
+				<div class="row">
+					<div class="col-xl-6 d-grid">
+						<button @click="tenantUUID = null; onDeleteTenant = false" class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
+						Annuler</button>
+					</div>
 
-								<div class="col-xxl-6 d-grid">
-									<a class="btn btn-success text-uppercase shadow-none" href="#!">Valider</a>
-								</div>
-							</div>
-						</div>
+					<div class="col-xl-6 d-grid">
+						<button @click="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none">
+						Oui</button>
 					</div>
 				</div>
 			</div>
-		</td>
-	</tr>
-{% endfor %}
+		</div>
+	</div>
+</div>
