@@ -1,27 +1,22 @@
 from flask import Blueprint
+from flask import current_app
 from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-from src.auth.forms.auth_form import ChangePasswordForm
-
 from src import cache
+from src import csrf
+from src.auth.forms.auth_form import ChangePasswordForm
+from src.auth.utils import upload_avatar
 from src.dashboard.forms import OwnerSettingForm
 from src.mixins.decorators import owner_required
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
-
-
-@owner_bp.route("/api/", methods=["GET"])
-@login_required
-def api():
-    from flask import jsonify
-
-    data = {"id": current_user.id, "addr_email": current_user.vn_addr_email}
-    return jsonify({"data": data}), 200
+csrf.exempt(owner_bp)
 
 
 @owner_bp.route("/<string:uuid>/index/", methods=["GET"])
@@ -40,7 +35,13 @@ def dashboard(uuid):
 def owner_setting(uuid):
     page_title = "Paramètres"
     form = OwnerSettingForm()
+
     if request.method == "POST" and form.validate_on_submit():
+
+        if form.picture.data:
+            picture_file = upload_avatar(form.picture.data)
+            current_user.vn_avatar = picture_file
+
         current_user.vn_gender = form.gender.data
         current_user.vn_fullname = form.fullname.data
 
@@ -50,6 +51,7 @@ def owner_setting(uuid):
         current_user.vn_profession = form.profession.data
         current_user.vn_parent_name = form.parent_name.data
 
+        current_user.vn_device = form.devise.data
         current_user.vn_location = form.location.data
         current_user.vn_birthdate = form.birthdate.data
 
@@ -67,6 +69,7 @@ def owner_setting(uuid):
         form.profession.data = current_user.vn_profession
         form.parent_name.data = current_user.vn_parent_name
 
+        form.devise.data = current_user.vn_device
         form.location.data = current_user.vn_location
         form.birthdate.data = current_user.vn_birthdate
 
@@ -99,3 +102,8 @@ def change_password(uuid):
         form=form,
         current_user=current_user,
     )
+
+
+@owner_bp.route("/<filename>/")
+def avatar(filename):
+    return send_from_directory(current_app.config["UPLOAD_FOLDER_PATH"], filename)
