@@ -3,7 +3,7 @@
 		<li class="page-item" :class="{ disabled: currentPage === 1 }">
 			<span class="page-link" @click="prevPage"><i class="me-2" data-feather="arrow-left"></i> Précédent</span>
 		</li>
-		
+
 		<li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
           <span class="page-link">{ page }</span>
         </li>

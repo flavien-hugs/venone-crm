@@ -60,9 +60,9 @@
 				<h4 class="modal-title">Bailleur: {owner.owner_id} - { owner.gender } {owner.fullname}</h4>
 				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 			</div>
-			
+
 			<div class="modal-body">
-				<span v-if="owner.houses > 0" v-for="house in owner.houses" :key="house.house_uuid">                
+				<span v-if="owner.houses > 0" v-for="house in owner.houses" :key="house.house_uuid">
                     { house }
                 </span>
 			</div>

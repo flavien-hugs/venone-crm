@@ -10,9 +10,6 @@ from src import db
 from src import login_manager
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
-from src.tenant import VNHouse
-from src.tenant import VNHouseOwner
-from src.tenant import VNTenant
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
@@ -111,7 +108,7 @@ class VNUser(
         lazy="dynamic",
         cascade="all, delete, delete-orphan",
         single_parent=True,
-        order_by="desc(VNHouseOwner.vn_created_at)"
+        order_by="desc(VNHouseOwner.vn_created_at)",
     )
     houses = db.relationship(
         "VNHouse",
@@ -119,7 +116,7 @@ class VNUser(
         lazy="dynamic",
         cascade="all, delete, delete-orphan",
         single_parent=True,
-        order_by="desc(VNHouse.vn_created_at)"
+        order_by="desc(VNHouse.vn_created_at)",
     )
     tenants = db.relationship(
         "VNTenant",
@@ -127,7 +124,7 @@ class VNUser(
         lazy="dynamic",
         cascade="all, delete, delete-orphan",
         single_parent=True,
-        order_by="desc(VNTenant.vn_created_at)"
+        order_by="desc(VNTenant.vn_created_at)",
     )
 
     def __str__(self):

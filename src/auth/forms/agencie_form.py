@@ -1,5 +1,4 @@
 from flask_wtf import FlaskForm
-from src import db
 from src.auth.forms.default_form import FormMixin
 from src.auth.models import VNUser
 from src.constants import GENDER
