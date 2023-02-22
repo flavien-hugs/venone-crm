@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v3.8.1
+        uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.TOKEN }}
           title: 'Automated Pull Request'
