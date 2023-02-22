@@ -3,7 +3,6 @@ from src.constants import DEFAULT_HOUSE_TYPES
 from src.constants import GENDER
 from src.constants import HOUSE_TYPES
 from src.dashboard.forms.default_form import DefaultForm
-from wtforms import DateField
 from wtforms import IntegerField
 from wtforms import SelectField
 from wtforms import StringField
