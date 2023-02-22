@@ -27,4 +27,4 @@ jobs:
           branch-suffix: random
           base: 'dev'
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
