@@ -11,19 +11,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Configuration
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
-          git config --global user.email "geekactux@gmail.com"
-          git config --global user.name "flavien-hugs"
-
-      - name: git add
-        run: |
-          git add -A
-          ls -la
-
-      - name: commit and push
-        run: |
-          git commit -m "branch are updated"
-          git push
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
