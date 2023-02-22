@@ -16,7 +16,9 @@ class TimestampMixin(Updateable, db.Model):
         nullable=False,
         primary_key=True,
     )
-    uuid = db.Column(db.String(40), name="uuid", index=True, default=lambda: str(uuid.uuid4()))
+    uuid = db.Column(
+        db.String(40), name="uuid", index=True, default=lambda: str(uuid.uuid4())
+    )
     vn_created_at = db.Column(db.DateTime, default=datetime.utcnow())
     vn_updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow())
 
