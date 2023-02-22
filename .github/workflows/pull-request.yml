@@ -15,9 +15,9 @@ jobs:
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
+          token: ${{ secrets.TOKEN }}
           title: 'Automated Pull Request'
           commit-message: 'Make changes'
           body: 'Changes made in main branch'
           branch: 'tenant'
           base: 'dev'
-          token: ${{ secrets.TOKEN }}
