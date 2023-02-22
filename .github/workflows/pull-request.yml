@@ -17,7 +17,8 @@ jobs:
           git config --global user.email "geekactux@gmail.com"
           git config --global user.name "flavien-hugs"
           git commit -m "Faire des modifications"
-          git push origin HEAD
+          git fetch origin HEAD
+          git merge origin/dev
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
