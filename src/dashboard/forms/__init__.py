@@ -1,5 +1,6 @@
-from .company_form import CompanySettingForm  # noqa
-from .owner_form import OwnerSettingForm  # noqa
+from .company_form import CompanySettingForm
+from .owner_form import OwnerSettingForm
+
 
 __all__ = (
     "CompanySettingForm",

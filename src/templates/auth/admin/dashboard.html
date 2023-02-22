@@ -5,15 +5,15 @@
 {% endblock other_css_src %}
 
 {% block head_title %}
-	{{ current_user.get_name() }} &smid; {{ super() }}
+    {{ current_user.get_name() }} &smid; {{ super() }}
 {% endblock head_title %}
 
 {% block body_content %}
-	<section class="nav-fixed">
-		{% include "auth/admin/partials/_sidenav.html" %}
+    <section class="nav-fixed">
+        {% include "auth/admin/partials/_sidenav.html" %}
 
-		<section id="layoutSidenav">
-			{% include "auth/admin/partials/_layoutsidenav.html" %}
+        <section id="layoutSidenav">
+            {% include "auth/admin/partials/_layoutsidenav.html" %}
 
             <section id="layoutSidenav_content">
                 <main>
@@ -36,8 +36,33 @@
                     </header>
 
                     <div class="container-xl px-4 mt-4">
+                        <!--  {% include "includes/partials/message.html" %} -->
                         {% block dashboard_content %}
-                            {% include "includes/partials/message.html" %}
+                            <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row mb-4">
+                                <div class="me-4 mb-3 mb-sm-0">
+                                    <h1 class="mb-0">{{ page_title | e}}</h1>
+                                    <div class="small">
+                                        <span class="fw-500 text-primary">{{ moment().format('dddd') }} </span>
+                                        {{ moment().format('Do MMMM YYYY') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card card-waves mb-3 mt-4">
+                                <div class="card-body p-5">
+                                    <div class="row align-items-center justify-content-between">
+                                        <div class="col">
+                                            <h2 class="text-primary">Bienvenue, votre tableau de bord est prêt !</h2>
+                                            <p class="text-gray-700">Bravo, votre tableau de bord est prêt à fonctionner ! Vous pouvez visualiser les paiements, générer des factures, préparer des contrats et télécharger des rapports à l'aide de ce tableau de bord.</p>
+                                        </div>
+                                        <div class="col d-none d-lg-block mt-xxl-n4">
+                                            <img loading="lazy" class="img-fluid px-xl-4 mt-xxl-n5" src="{{ url_for('static', filename="img/element/statistic.svg")}}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% include "auth/admin/partials/_kpi.html" %}
                         {% endblock dashboard_content %}
                     </div>
                 </main>
@@ -54,14 +79,14 @@
                     </div>
                 </footer>
             </section>
-		</section>
-	</section>
+        </section>
+    </section>
 {% endblock body_content %}
 
 
 {% block other_js_src %}
-	{{ super() }}
-	<script src="{{ url_for('static', filename="js/admin/feather.min.js") }}"></script>
-	<script src="{{ url_for('static', filename="js/admin/all.min.js") }}"></script>
-	<script src="{{ url_for('static', filename="js/admin/admin.js") }}"></script>
+    {{ super() }}
+    <script src="{{ url_for('static', filename="js/feather.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/all.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/admin.js") }}"></script>
 {% endblock other_js_src %}

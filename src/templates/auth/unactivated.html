@@ -1,0 +1,33 @@
+{% extends "auth/signup/owner.html" %}
+
+{% block template_user_title %}
+{% endblock template_user_title %}
+
+{% block template_user_subtitle %}
+
+{% endblock template_user_subtitle %}
+
+{% block template_user_content %}
+	<div class="row g-4">
+		<div class="col-md-12">
+			<p>L'utilisateur avec cet adresse e-mail n'existe pas ou le compte a été désactivé !
+            Veuillez contacter l'administrateur.</p>
+		</div>
+	</div>
+{% endblock template_user_content %}
+
+{% block template_user_footer %}
+	<div class="row">
+		<div class="position-relative my-4">
+			<hr>
+		</div>
+
+		<div class="mb-4 d-flex justify-content-center">
+			<div class="text-white-hover">
+				<a href="{{ url_for('auth_bp.login') }}" class="btn bg-google text-white">
+					<i class="fa fa-arrow-left me-2"></i> Connectez-vous
+				</a>
+			</div>
+		</div>
+	</div>
+{% endblock template_user_footer %}

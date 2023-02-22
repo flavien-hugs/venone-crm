@@ -38,16 +38,10 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    SLOW_DB_QUERY_TIME = 0.5
-
-    BCRYPT_LOG_ROUNDS = 13
-    DEBUG_TB_ENABLED = False
-    DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     # mail settings
     MAIL_SUBJECT_PREFIX = "[Venone]"
-    MAIL_POST = os.environ.get("MAIL_POST")
+    MAIL_PORT = os.environ.get("MAIL_PORT")
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS")
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
@@ -59,7 +53,7 @@ class Config:
     FLATPAGES_MARKDOWN_EXTENSIONS = ["codehilite"]
 
     MAX_CONTENT_LENGTH = 16 * 1000 * 1000
-    ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg"]
+    ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "svg"]
     UPLOAD_FOLDER_PATH = os.path.join(BASE_DIR, "upload/")
 
     MINIFY_HTML = True
@@ -67,6 +61,7 @@ class Config:
     WEBSITE_BUILDER = "gestion.venone.app"
 
     SCHEDULER_API_ENABLED = True
+    WTF_CSRF_ENABLED = False
 
     @staticmethod
     def init_app(venone_app):
@@ -76,7 +71,6 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
-    WTF_CSRF_ENABLED = False
 
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
 
