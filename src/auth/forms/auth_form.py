@@ -1,5 +1,4 @@
 from flask_wtf import FlaskForm
-from src import db
 from src.auth.models import VNUser
 from wtforms import BooleanField
 from wtforms import PasswordField
@@ -70,7 +69,5 @@ class ChangeEmailForm(FlaskForm):
     submit = SubmitField("Mise à jour de l'adresse e-mail")
 
     def validate_addr_email(self, field):
-        if (
-            VNUser.query.filter_by(vn_user_addr_email=field.data.lower()).first()
-        ):
+        if VNUser.query.filter_by(vn_user_addr_email=field.data.lower()).first():
             raise ValidationError("L'adresse électronique est déjà enregistrée.")
