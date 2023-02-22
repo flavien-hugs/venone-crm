@@ -12,11 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Make changes
-        run: |
-          git commit -m "Make changes"
-          git push origin HEAD
-
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
