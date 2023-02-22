@@ -1,11 +1,12 @@
 import random
 import string
 
-from flask import url_for, current_app
+from flask import url_for
 from flask_login import current_user
 from src import db
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
+
 
 def id_generator():
     return "".join(random.choices(string.digits, k=5))
@@ -19,9 +20,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         db.String(5), name="owner ID", nullable=True, unique=True, default=id_generator
     )
     vn_avatar = db.Column(db.String(80), nullable=True)
-    vn_user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False
-    )
+    vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     houses = db.relationship(
         "VNHouse",
         backref="owner_house",
@@ -29,7 +28,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         single_parent=True,
         lazy="dynamic",
         cascade="all, delete, delete-orphan",
-        order_by="desc(VNHouse.vn_created_at)"
+        order_by="desc(VNHouse.vn_created_at)",
     )
     tenants = db.relationship(
         "VNTenant",
@@ -38,7 +37,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         single_parent=True,
         lazy="dynamic",
         cascade="all, delete, delete-orphan",
-        order_by="desc(VNTenant.vn_created_at)"
+        order_by="desc(VNTenant.vn_created_at)",
     )
 
     def to_json(self):
@@ -61,8 +60,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "number_tenants": self.tenants.count(),
             "tenants": [tenant.to_json() for tenant in self.tenants],
             "owner_url": url_for(
-                "api.get_houseowner",
-                owner_uuid=self.uuid, _external=True
+                "api.get_houseowner", owner_uuid=self.uuid, _external=True
             ),
             "owner_delete_url": url_for(
                 "api.delete_houseowner", owner_uuid=self.uuid, _external=True
@@ -73,7 +71,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "tenants_url": url_for(
                 "api.get_houseowner_tenants", owner_uuid=self.uuid, _external=True
             ),
-            "created_at": self.vn_created_at.strftime('%d %B %Y'),
+            "created_at": self.vn_created_at.strftime("%d %B %Y"),
         }
         return json_houseowner
 
@@ -109,15 +107,21 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
     @staticmethod
     def get_houseowners_list():
-        return VNHouseOwner.query.filter_by(vn_user_id=current_user.id, vn_activated=True)
+        return VNHouseOwner.query.filter_by(
+            vn_user_id=current_user.id, vn_activated=True
+        )
 
     @staticmethod
     def get_houseowner(owner_uuid):
-        return VNHouseOwner.query.filter_by(vn_user_id=current_user.id, uuid=owner_uuid).first()
+        return VNHouseOwner.query.filter_by(
+            vn_user_id=current_user.id, uuid=owner_uuid
+        ).first()
 
     @staticmethod
     def get_owner_tenant(owner_uuid):
-        return VNTenant.query.filter_by(uuid=owner_uuid, vn_houseowner_id=self.id, vn_user_id=current_user.uuid).first()
+        return VNTenant.query.filter_by(
+            uuid=owner_uuid, vn_user_id=current_user.uuid
+        ).first()
 
 
 class VNHouse(TimestampMixin):
@@ -128,29 +132,17 @@ class VNHouse(TimestampMixin):
         db.String(5), nullable=False, unique=True, default=id_generator
     )
     vn_house_type = db.Column(db.String(20), nullable=False)
-    vn_house_rent = db.Column(
-        db.Integer, nullable=False, default=10000
-    )
-    vn_house_guaranty = db.Column(
-        db.Integer, nullable=False, default=10000
-    )
-    vn_house_month = db.Column(
-        db.Integer, nullable=False, default=1
-    )
-    vn_number_or_room = db.Column(
-        db.Integer, nullable=False, default=1
-    )
+    vn_house_rent = db.Column(db.Integer, nullable=False, default=10000)
+    vn_house_guaranty = db.Column(db.Integer, nullable=False, default=10000)
+    vn_house_month = db.Column(db.Integer, nullable=False, default=1)
+    vn_number_or_room = db.Column(db.Integer, nullable=False, default=1)
     vn_house_address = db.Column(db.String(120), nullable=False)
-    vn_house_is_open = db.Column(
-        db.Boolean, nullable=False, default=True
-    )
+    vn_house_is_open = db.Column(db.Boolean, nullable=False, default=True)
     vn_houseowner_id = db.Column(
         db.Integer, db.ForeignKey("houseowner.id"), nullable=True
     )
     vn_activated = db.Column(db.Boolean, nullable=False, default=True)
-    vn_user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False
-    )
+    vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     tenants = db.relationship(
         "VNTenant",
         backref="house",
@@ -158,7 +150,7 @@ class VNHouse(TimestampMixin):
         single_parent=True,
         lazy="dynamic",
         cascade="all, delete, delete-orphan",
-        order_by="desc(VNTenant.vn_created_at)"
+        order_by="desc(VNTenant.vn_created_at)",
     )
 
     def to_json(self):
@@ -183,7 +175,7 @@ class VNHouse(TimestampMixin):
             ),
             "house_is_open": self.vn_house_is_open,
             "house_status": self.get_house_open(),
-            "created_at": self.vn_created_at.strftime('%d %B %Y'),
+            "created_at": self.vn_created_at.strftime("%d %B %Y"),
         }
         return json_house
 
@@ -220,7 +212,9 @@ class VNHouse(TimestampMixin):
 
     @staticmethod
     def get_house(house_uuid):
-        return VNHouse.query.filter_by(uuid=house_uuid, vn_user_id=current_user.id).first()
+        return VNHouse.query.filter_by(
+            uuid=house_uuid, vn_user_id=current_user.id
+        ).first()
 
 
 class VNTenant(DefaultUserInfoModel, TimestampMixin):
@@ -234,9 +228,7 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
         default=id_generator,
     )
     vn_birthdate = db.Column(db.Date, nullable=True)
-    vn_house_id = db.Column(
-        db.Integer, db.ForeignKey("house.id"), nullable=True
-    )
+    vn_house_id = db.Column(db.Integer, db.ForeignKey("house.id"), nullable=True)
     vn_houseowner_id = db.Column(
         db.Integer,
         db.ForeignKey("houseowner.id"),
@@ -269,10 +261,8 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
             "owner_url": url_for(
                 "api.get_houseowner", owner_uuid=self.owner_tenant.uuid, _external=True
             ),
-            "house_url": url_for(
-                "api.get_house", uuid=self.house.uuid, _external=True
-            ),
-            "created_at": self.vn_created_at.strftime('%d %B %Y'),
+            "house_url": url_for("api.get_house", uuid=self.house.uuid, _external=True),
+            "created_at": self.vn_created_at.strftime("%d %B %Y"),
         }
         return json_tenant
 
@@ -307,4 +297,6 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
 
     @staticmethod
     def get_tenant(tenant_uuid):
-        return VNTenant.query.filter_by(uuid=tenant_uuid, vn_user_id=current_user.id).first()
+        return VNTenant.query.filter_by(
+            uuid=tenant_uuid, vn_user_id=current_user.id
+        ).first()
