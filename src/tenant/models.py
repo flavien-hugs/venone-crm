@@ -18,9 +18,9 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
     vn_owner_id = db.Column(
         db.String(5), name="owner ID", nullable=True, unique=True, default=id_generator
     )
-    vn_avatar = db.Column(db.String(80), name="owner avatar", nullable=True)
+    vn_avatar = db.Column(db.String(80), nullable=True)
     vn_user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"), nullable=False
+        db.Integer, db.ForeignKey("user.id"), nullable=False
     )
     houses = db.relationship(
         "VNHouse",
@@ -145,11 +145,11 @@ class VNHouse(TimestampMixin):
         db.Boolean, nullable=False, default=True
     )
     vn_houseowner_id = db.Column(
-        db.Integer, db.ForeignKey("houseowner.id", ondelete="SET NULL"), nullable=True
+        db.Integer, db.ForeignKey("houseowner.id"), nullable=True
     )
     vn_activated = db.Column(db.Boolean, nullable=False, default=True)
     vn_user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"), nullable=False
+        db.Integer, db.ForeignKey("user.id"), nullable=False
     )
     tenants = db.relationship(
         "VNTenant",
@@ -235,16 +235,16 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     )
     vn_birthdate = db.Column(db.Date, nullable=True)
     vn_house_id = db.Column(
-        db.Integer, db.ForeignKey("house.id", ondelete="SET NULL"), nullable=True
+        db.Integer, db.ForeignKey("house.id"), nullable=True
     )
     vn_houseowner_id = db.Column(
         db.Integer,
-        db.ForeignKey("houseowner.id", ondelete="SET NULL"),
+        db.ForeignKey("houseowner.id"),
         nullable=True,
     )
     vn_user_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id", ondelete="SET NULL"),
+        db.ForeignKey("user.id"),
         nullable=False,
     )
 
