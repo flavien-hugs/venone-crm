@@ -1,5 +1,8 @@
 import random
 import string
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
 
 from flask import url_for
 from flask_login import current_user
@@ -14,36 +17,50 @@ def id_generator():
 
 class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
+    """
+    les propriétaires des maisons
+    Ce modèle représentera les propriétaires des biens locatifs.
+    """
+
     __tablename__ = "houseowner"
 
     vn_owner_id = db.Column(
-        db.String(5), name="owner ID", nullable=True, unique=True, default=id_generator
+        db.String(5), nullable=True, unique=True, default=id_generator
     )
     vn_avatar = db.Column(db.String(80), nullable=True)
-    vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="cascade"))
+
     houses = db.relationship(
         "VNHouse",
-        backref="owner_house",
-        passive_deletes=True,
-        single_parent=True,
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
+        backref="owner_houses",
+        single_parent=True,
+        passive_deletes=True,
+        cascade="all,delete,delete-orphan",
         order_by="desc(VNHouse.vn_created_at)",
     )
+
     tenants = db.relationship(
         "VNTenant",
-        backref="owner_tenant",
-        passive_deletes=True,
-        single_parent=True,
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
+        backref="owner_tenants",
+        single_parent=True,
+        passive_deletes=True,
+        cascade="all,delete,delete-orphan",
         order_by="desc(VNTenant.vn_created_at)",
     )
 
+    payments = db.relationship(
+        "VNPayment",
+        backref="owner_payment",
+        lazy="dynamic",
+        order_by="desc(VNPayment.vn_pay_date)",
+    )
+
     def to_json(self):
-        json_houseowner = {
-            "user_uuid": current_user.uuid,
+        json_owner = {
             "owner_uuid": self.uuid,
+            "user_uuid": current_user.uuid,
             "owner_id": self.get_owner_id(),
             "gender": self.vn_gender,
             "fullname": self.vn_fullname,
@@ -54,26 +71,47 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "location": self.vn_location,
             "phonenumber_one": self.vn_phonenumber_one,
             "phonenumber_two": self.vn_phonenumber_two,
-            "number_houses": self.houses.count(),
             "activated": self.get_owner_available(),
-            "houses": [house.to_json() for house in self.houses],
+            "houses": [h.to_json() for h in self.houses],
+            "tenants": [t.to_json() for t in self.tenants],
+            "payments": [p.to_json() for p in self.payments],
+            "number_houses": self.houses.count(),
             "number_tenants": self.tenants.count(),
-            "tenants": [tenant.to_json() for tenant in self.tenants],
-            "owner_url": url_for(
-                "api.get_houseowner", owner_uuid=self.uuid, _external=True
-            ),
-            "owner_delete_url": url_for(
-                "api.delete_houseowner", owner_uuid=self.uuid, _external=True
-            ),
-            "houses_url": url_for(
-                "api.get_houseowner_houses", owner_uuid=self.uuid, _external=True
-            ),
-            "tenants_url": url_for(
-                "api.get_houseowner_tenants", owner_uuid=self.uuid, _external=True
-            ),
-            "created_at": self.vn_created_at.strftime("%d %B %Y"),
+            "number_payments": self.payments.count(),
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "_links": {
+                "self": url_for("api.get_houseowner", owner_uuid=self.uuid),
+                "houses_url": url_for(
+                    "api.get_houseowner_houses", owner_uuid=self.uuid
+                ),
+                "tenants_url": url_for(
+                    "api.get_houseowner_tenants", owner_uuid=self.uuid
+                ),
+            },
         }
-        return json_houseowner
+        return json_owner
+
+    @staticmethod
+    def from_json(json_owner):
+        fullname = json_owner.get("fullname")
+        addr_email = json_owner.get("addr_email")
+        profession = json_owner.get("addr_email")
+        parent_name = json_owner.get("parent_name")
+        card_number = json_owner.get("card_number")
+        location = json_owner.get("location")
+        phonenumber_one = json_owner.get("phonenumber_one")
+        phonenumber_two = json_owner.get("phonenumber_two")
+
+        return VNHouseOwner(
+            fullname=fullname,
+            addr_email=addr_email,
+            profession=profession,
+            parent_name=parent_name,
+            card_number=card_number,
+            location=location,
+            phonenumber_one=phonenumber_one,
+            phonenumber_two=phonenumber_two,
+        )
 
     def __str__(self):
         return self.vn_fullname
@@ -93,89 +131,102 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             return "Compte actif"
         return "Compte inactif"
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def disable(self):
-        self.vn_activated = False
-        db.session.commit()
-
-    def remove(self):
-        db.session.delete(self)
-        db.session.commit()
-
     @staticmethod
-    def get_houseowners_list():
+    def get_owners_list():
         return VNHouseOwner.query.filter_by(
             vn_user_id=current_user.id, vn_activated=True
         )
 
     @staticmethod
-    def get_houseowner(owner_uuid):
+    def get_owner(owner_uuid):
         return VNHouseOwner.query.filter_by(
             vn_user_id=current_user.id, uuid=owner_uuid
         ).first()
 
     @staticmethod
-    def get_owner_tenant(owner_uuid):
+    def get_houses_list():
+        return VNHouse.query.filter_by(vn_user_id=current_user.id, vn_activated=True)
+
+    @staticmethod
+    def get_house(owner_uuid):
+        return VNHouse.query.filter_by(
+            vn_user_id=current_user.id,
+            uuid=owner_uuid,
+        ).first()
+
+    @staticmethod
+    def get_tenants(owner_uuid):
         return VNTenant.query.filter_by(
-            uuid=owner_uuid, vn_user_id=current_user.uuid
+            uuid=owner_uuid.uuid, vn_user_id=current_user.uuid
+        ).first()
+
+    @staticmethod
+    def get_tenant(owner_uuid):
+        return VNTenant.query.filter_by(
+            uuid=owner_uuid.uuid, vn_user_id=current_user.uuid
         ).first()
 
 
 class VNHouse(TimestampMixin):
+
+    """
+    VNHouse
+    Ce modèle représentera les propriétés locatives et leurs propriétaires associés.
+    """
 
     __tablename__ = "house"
 
     vn_house_id = db.Column(
         db.String(5), nullable=False, unique=True, default=id_generator
     )
-    vn_house_type = db.Column(db.String(20), nullable=False)
-    vn_house_rent = db.Column(db.Integer, nullable=False, default=10000)
-    vn_house_guaranty = db.Column(db.Integer, nullable=False, default=10000)
+    vn_house_type = db.Column(db.String(80), nullable=False)
+    vn_house_rent = db.Column(db.Float, nullable=False)
+    vn_house_guaranty = db.Column(db.Float, nullable=False)
     vn_house_month = db.Column(db.Integer, nullable=False, default=1)
-    vn_number_or_room = db.Column(db.Integer, nullable=False, default=1)
+    vn_house_number_room = db.Column(db.Integer, nullable=False, default=1)
     vn_house_address = db.Column(db.String(120), nullable=False)
     vn_house_is_open = db.Column(db.Boolean, nullable=False, default=True)
-    vn_houseowner_id = db.Column(
-        db.Integer, db.ForeignKey("houseowner.id"), nullable=True
-    )
+
     vn_activated = db.Column(db.Boolean, nullable=False, default=True)
-    vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    vn_house_lease_start_date = db.Column(db.Date, nullable=False)
+    vn_house_lease_end_date = db.Column(db.Date, nullable=False)
+
+    vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    vn_owner_id = db.Column(db.Integer, db.ForeignKey("houseowner.id"))
+
     tenants = db.relationship(
         "VNTenant",
-        backref="house",
-        passive_deletes=True,
-        single_parent=True,
-        lazy="dynamic",
-        cascade="all, delete, delete-orphan",
+        backref="house_tenant",
         order_by="desc(VNTenant.vn_created_at)",
+    )
+    payments = db.relationship(
+        "VNPayment", backref="house_payment", order_by="desc(VNPayment.vn_pay_date)"
     )
 
     def to_json(self):
         json_house = {
-            "user_uuid": current_user.uuid,
             "house_uuid": self.uuid,
+            "user_uuid": current_user.uuid,
             "house_id": self.get_house_id(),
             "house_type": self.vn_house_type,
             "house_rent": self.vn_house_rent,
             "house_guaranty": self.vn_house_guaranty,
             "house_month": self.vn_house_month,
-            "number_or_room": self.vn_number_or_room,
+            "house_number_room": self.vn_house_number_room,
             "house_address": self.vn_house_address,
-            "houseowner_fullname": self.owner_house.vn_fullname,
-            "tenants": [tenant.to_json() for tenant in self.tenants],
-            "house_url": url_for("api.get_house", uuid=self.uuid, _external=True),
-            "owner_url": url_for(
-                "api.get_houseowner", owner_uuid=self.uuid, _external=True
-            ),
-            "tenant_url": url_for(
-                "api.get_house_tenant", uuid=self.uuid, _external=True
-            ),
             "house_is_open": self.vn_house_is_open,
             "house_status": self.get_house_open(),
-            "created_at": self.vn_created_at.strftime("%d %B %Y"),
+            "house_lease_start_date": self.vn_house_lease_start_date.strftime(
+                "%d-%m-%Y"
+            ),
+            "house_lease_end_date": self.vn_house_lease_end_date,
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "house_url": url_for("api.get_house", house_uuid=self.uuid, _external=True),
+            "_links": {
+                "owner_url": url_for("api.get_houseowner", owner_uuid=self.uuid),
+                "tenant_url": url_for("api.get_house_tenant", house_uuid=self.uuid),
+            },
         }
         return json_house
 
@@ -185,17 +236,8 @@ class VNHouse(TimestampMixin):
     def __repr__(self):
         return f"VNHouse({self.id}, {self.vn_house_type})"
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def disable(self):
-        self.vn_activated = False
+    def house_disable(self):
         self.vn_house_is_open = False
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
         db.session.commit()
 
     def get_house_open(self):
@@ -216,8 +258,19 @@ class VNHouse(TimestampMixin):
             uuid=house_uuid, vn_user_id=current_user.id
         ).first()
 
+    def lease_end_date(self):
+        start_date = self.vn_house_lease_start_date
+        notice_period = timedelta(days=15)
+        due_date = start_date + timedelta(days=45) - notice_period
+        return due_date
+
 
 class VNTenant(DefaultUserInfoModel, TimestampMixin):
+
+    """
+    VNTenant
+    Ce modèle représentera les locataires qui occupent les propriétés locatives.
+    """
 
     __tablename__ = "tenant"
 
@@ -228,16 +281,16 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
         default=id_generator,
     )
     vn_birthdate = db.Column(db.Date, nullable=True)
-    vn_house_id = db.Column(db.Integer, db.ForeignKey("house.id"), nullable=True)
-    vn_houseowner_id = db.Column(
-        db.Integer,
-        db.ForeignKey("houseowner.id"),
-        nullable=True,
-    )
-    vn_user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("user.id"),
-        nullable=False,
+
+    vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    vn_house_id = db.Column(db.Integer, db.ForeignKey("house.id"))
+    vn_owner_id = db.Column(db.Integer, db.ForeignKey("houseowner.id"))
+
+    payments = db.relationship(
+        "VNPayment",
+        lazy="dynamic",
+        backref="tenant_payment",
+        order_by="desc(VNPayment.vn_pay_date)",
     )
 
     def to_json(self):
@@ -245,6 +298,8 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
             "user_uuid": current_user.uuid,
             "tenant_uuid": self.uuid,
             "tenant_id": self.get_tenant_id(),
+            "owner": self.tenants.to_json(),
+            "house": self.house_tenant.to_json(),
             "gender": self.vn_gender,
             "fullname": self.vn_fullname,
             "addr_email": self.vn_addr_email,
@@ -254,38 +309,23 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
             "location": self.vn_location,
             "phonenumber_one": self.vn_phonenumber_one,
             "phonenumber_two": self.vn_phonenumber_two,
-            "house_type": f"{self.house.vn_house_type} de {self.house.vn_house_rent}",
             "activated": self.vn_activated,
-            "houseowner_fullname": self.owner_tenant.vn_fullname,
-            "tenant_url": url_for("api.get_tenant", uuid=self.uuid, _external=True),
-            "owner_url": url_for(
-                "api.get_houseowner", owner_uuid=self.owner_tenant.uuid, _external=True
-            ),
-            "house_url": url_for("api.get_house", uuid=self.house.uuid, _external=True),
-            "created_at": self.vn_created_at.strftime("%d %B %Y"),
+            "monthly_rent": self.get_monthly_rent(),
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "_links": {
+                "tenant_url": url_for("api.get_tenant", tenant_uuid=self.uuid),
+            },
         }
         return json_tenant
 
     def __str__(self):
-        return self.vn_fullname
+        return f"{self.vn_gender} {self.vn_fullname}"
 
     def __repr__(self):
         return f"VNTenant({self.id}, {self.vn_tenant_id})"
 
     def get_tenant_id(self):
         return f"#{self.vn_tenant_id}"
-
-    def disable(self):
-        self.vn_activated = False
-        db.session.commit()
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
 
     @staticmethod
     def get_tenant_name(tenant):
@@ -300,3 +340,37 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
         return VNTenant.query.filter_by(
             uuid=tenant_uuid, vn_user_id=current_user.id
         ).first()
+
+    def get_monthly_rent(self):
+
+        from src.payment import VNPayment
+
+        today = date.today()
+        mouth_rent = self.house_tenant.vn_house_rent
+        due_date = self.house_tenant.vn_house_lease_end_date
+        last_payment = self.payments.order_by(VNPayment.vn_pay_date.desc()).first()
+
+        if due_date is None:
+            return 0
+
+        if today > due_date:
+            days_late = (today - due_date).days
+            if days_late < 15:
+                rent_due = mouth_rent
+            else:
+                late_fee = mouth_rent * 0.1 * days_late
+                rent_due = mouth_rent + late_fee
+        else:
+            rent_due = mouth_rent
+
+        if (
+            last_payment
+            and last_payment.date.month == today.month
+            and last_payment.date.year == today.year
+        ):
+            rent_due -= last_payment.vn_pay_amount
+
+        if rent_due <= 0:
+            return 0
+
+        return rent_due
