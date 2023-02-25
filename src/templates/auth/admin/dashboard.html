@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 
 {% block other_css_src %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin/admin.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
 {% endblock other_css_src %}
 
 {% block head_title %}
@@ -48,19 +48,22 @@
                                 </div>
                             </div>
 
-                            <div class="card card-waves mb-3 mt-4">
-                                <div class="card-body p-5">
-                                    <div class="row align-items-center justify-content-between">
-                                        <div class="col">
-                                            <h2 class="text-primary">Bienvenue, votre tableau de bord est prêt !</h2>
-                                            <p class="text-gray-700">Bravo, votre tableau de bord est prêt à fonctionner ! Vous pouvez visualiser les paiements, générer des factures, préparer des contrats et télécharger des rapports à l'aide de ce tableau de bord.</p>
-                                        </div>
-                                        <div class="col d-none d-lg-block mt-xxl-n4">
-                                            <img loading="lazy" class="img-fluid px-xl-4 mt-xxl-n5" src="{{ url_for('static', filename="img/element/statistic.svg")}}"/>
+                            <!--
+                                <div class="card card-waves mb-3 mt-4">
+                                    <div class="card-body p-5">
+                                        <div class="row align-items-center justify-content-between">
+                                            <div class="col">
+                                                <h2 class="text-primary">Bienvenue, votre tableau de bord est prêt !</h2>
+                                                <p class="text-gray-700">Bravo, votre tableau de bord est prêt à fonctionner ! Vous pouvez visualiser les paiements, générer des factures, préparer des contrats et télécharger des rapports à l'aide de ce tableau de bord.</p>
+                                            </div>
+                                            <div class="col d-none d-lg-block mt-xxl-n4">
+                                                <img loading="lazy" class="img-fluid px-xl-4 mt-xxl-n5"
+                                                    src="{{ url_for('static', filename="img/element/statistic.svg")}}"/>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            -->
 
                             {% include "auth/admin/partials/_kpi.html" %}
                         {% endblock dashboard_content %}
@@ -83,10 +86,9 @@
     </section>
 {% endblock body_content %}
 
-
 {% block other_js_src %}
     {{ super() }}
-    <script src="{{ url_for('static', filename="js/feather.min.js") }}"></script>
-    <script src="{{ url_for('static', filename="js/all.min.js") }}"></script>
-    <script src="{{ url_for('static', filename="js/admin.js") }}"></script>
+    <script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock other_js_src %}

@@ -37,7 +37,8 @@
     <meta name="mobile-web-app-capable" content="yes">
 
     {% block other_css_src %}
-        {% include "includes/assets/css.html" %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/font-awesome/css/all.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     {% endblock other_css_src %}
 
     <title>
@@ -54,11 +55,12 @@
             {% endblock body_content %}
         </main>
 
+        {% block other_js_src %}
+            <script type="text/javascript" src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+        {% endblock other_js_src %}
+
         {{ moment.include_moment() }}
         {{ moment.locale(auto_detect=True) }}
-        {% block other_js_src %}
-            {% include "includes/assets/js.html" %}
-        {% endblock other_js_src %}
 
         <script>
             if('serviceWorker' in navigator) {
