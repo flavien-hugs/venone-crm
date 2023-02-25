@@ -3,6 +3,7 @@ from datetime import datetime
 import jwt
 from flask import current_app
 from flask import request
+from flask import url_for
 from flask_login import AnonymousUserMixin
 from flask_login import current_user
 from flask_login import UserMixin
@@ -24,7 +25,7 @@ class VNRole(db.Model):
     __tablename__ = "roles"
 
     id = db.Column(db.Integer, index=True, primary_key=True)
-    role_permissions = db.Column(db.Integer)
+    role_permissions = db.Column(db.Integer, default=Permission.ADMIN)
     role_name = db.Column(db.String(64), unique=True)
     role_default = db.Column(db.Boolean, default=False, index=True)
     users = db.relationship("VNUser", backref="role", lazy="dynamic")
@@ -106,25 +107,25 @@ class VNUser(
         "VNHouseOwner",
         backref="house_owner",
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
-        single_parent=True,
         order_by="desc(VNHouseOwner.vn_created_at)",
     )
     houses = db.relationship(
         "VNHouse",
         backref="houses",
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
-        single_parent=True,
         order_by="desc(VNHouse.vn_created_at)",
     )
     tenants = db.relationship(
         "VNTenant",
         backref="tenants",
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
-        single_parent=True,
         order_by="desc(VNTenant.vn_created_at)",
+    )
+    payments = db.relationship(
+        "VNPayment",
+        backref="payments",
+        lazy="dynamic",
+        order_by="desc(VNPayment.vn_pay_date)",
     )
 
     def __str__(self):
@@ -132,6 +133,48 @@ class VNUser(
 
     def __repr__(self):
         return f"VNUser({self.id}, {self.vn_fullname})"
+
+    def to_json(self):
+        json_user = {
+            "user_id": self.uuid,
+            "fullname": self.vn_fullname,
+            "addr_email": self.vn_addr_email,
+            "profession": self.vn_profession,
+            "parent_name": self.vn_parent_name,
+            "phonenumber_one": self.vn_phonenumber_one,
+            "phonenumber_two": self.vn_phonenumber_two,
+            "cni_number": self.vn_cni_number,
+            "location": self.vn_location,
+            "country": self.vn_country,
+            "agencie_name": self.vn_agencie_name,
+            "business_number": self.vn_business_number,
+            "devise": self.vn_device,
+            "find_us": self.vn_find_us,
+            "ip_address": self.vn_ip_address,
+            "is_company": self.vn_company,
+            "is_owner": self.vn_house_owner,
+            "is_activated": self.vn_activated,
+            "owner_count": self.houseowners.count(),
+            "house_count": self.houses.count(),
+            "tenant_count": self.tenants.count(),
+            "payment": self.payments.count(),
+            "last_seen": self.vn_last_seen,
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "url": url_for("api.get_user", user_uuid=self.uuid, _external=True),
+            "owners": url_for(
+                "api.get_user_owners", user_uuid=self.uuid, _external=True
+            ),
+            "houses": url_for(
+                "api.get_user_houses", user_uuid=self.uuid, _external=True
+            ),
+            "tenants": url_for(
+                "api.get_user_tenants", user_uuid=self.uuid, _external=True
+            ),
+            "payments": url_for(
+                "api.get_user_payments", user_uuid=self.uuid, _external=True
+            ),
+        }
+        return json_user
 
     def set_password(self, password):
         self.vn_password = generate_password_hash(password)
@@ -195,21 +238,13 @@ class VNUser(
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def remove(self):
-        db.session.delete(self)
-        db.session.commit()
-
     def disable(self):
         self.vn_activated = False
         db.session.commit()
 
     def ping(self):
-        self.vn_last_seen = datetime.utcnow()
         self.vn_ip_address = request.remote_addr
+        self.vn_last_seen = datetime.utcnow()
         db.session.add(self)
 
     @staticmethod
@@ -226,6 +261,14 @@ class VNUser(
         if self.vn_company:
             return self.vn_agencie_name
 
+    @staticmethod
+    def get_users_list():
+        return VNUser.query.filter_by(id=current_user.id, vn_activated=True)
+
+    @staticmethod
+    def get_user(user_uuid):
+        return VNUser.query.filter_by(id=current_user.id, uuid=user_uuid).first()
+
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -236,3 +279,8 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 login_manager.anonymous_user = AnonymousUser
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.query(VNUser).get(user_id)

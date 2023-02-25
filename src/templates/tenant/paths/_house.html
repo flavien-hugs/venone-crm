@@ -3,24 +3,77 @@
 		<a v-bind:href="house.house_url" class="badge bg-blue-soft text-blue">{ house.house_id }</a>
 	</td>
 	<td>
-		<a v-bind:href="house.owner_url">{ house.houseowner_fullname }</a>
-	</td>
-	<td>
-		<span>{ house.house_type } de { house.house_rent }/Mois</span>
-		<br>Lieu: { house.house_address }
+		{ house.house_type } de { house.house_rent.toLocaleString() }/mois situé à { house.house_address }
 	</td>
 	<td><span class="badge bg-green-soft text-green">{ house.house_status }</span></td>
 	<td>{ house.created_at }</td>
 	<td>
-		<button class="btn btn-datatable btn-icon btn-transparent-dark me-2">
-			<i data-feather="edit"></i>
+		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
+			<i class="text-primary" data-feather="eye"></i>
 		</button>
 
-		<button @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark"><i data-feather="trash-2"></i></button>
+		<button @click="updateHouse(house)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+			<i class="text-secondary" data-feather="edit-2"></i>
+		</button>
+
+		<button @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+			<i class="text-danger" data-feather="trash-2"></i>
+		</button>
 	</td>
 </tr>
 
-<div class="modal fade" data-bs-backdrop="static" id="confirmModal">
+<!-- updat house modal -->
+<div class="modal fade" data-bs-backdrop="static" id="updateHouseConfirm">
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">
+					<div class="modal-title">
+						Mise à jour location : { houseData.house_id }
+					</div>
+				</div>
+
+				<div class="modal-body">
+					<div class="row gx-3 mb-4">
+			            <div class="col-md-4">
+			                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
+			            </div>
+
+			            <div class="col-md-4">
+			                <input placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
+			            </div>
+
+			            <div class="col-md-4">
+			                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
+			            </div>
+			        </div>
+
+			        <div class="row gx-3 mb-4">
+			            <div class="col-md-4">
+			                <input placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
+			            </div>
+
+			            <div class="col-md-4">
+			                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
+			            </div>
+
+			            <div class="col-md-4">
+			                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
+			            </div>
+			        </div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
+					<button type="button" @click="onUpdateHouse" class="btn btn-success shadow-none">Mettre à jour</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- delete house modal -->
+<div class="modal fade" data-bs-backdrop="static" id="deleteHouseModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -35,8 +88,7 @@
 			<div class="modal-footer">
 				<div class="row">
 					<div class="col-xl-6 d-grid">
-						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-danger text-uppercase" type="button" data-bs-dismiss="modal">
-						Annuler</button>
+						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-danger text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
 					</div>
 
 					<div class="col-xl-6 d-grid">

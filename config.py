@@ -63,6 +63,13 @@ class Config:
     SCHEDULER_API_ENABLED = True
     WTF_CSRF_ENABLED = False
 
+    CINETPAY_API_KEY = os.getenv("API_KEY")
+    CINETPAY_SITE_ID = os.getenv("SITE_ID")
+    CINETPAY_TRANS_ID = os.getenv("TRANS_ID")
+
+    SENDER_ID = os.getenv("SENDER_ID")
+    SMS_API_KEY = os.getenv("SMS_API_KEY")
+
     @staticmethod
     def init_app(venone_app):
         pass

@@ -1,6 +1,5 @@
 window.addEventListener('DOMContentLoaded', event => {
-
-    const DEFAULT_EDIT_DATA = {
+    const OWNER_DATA = {
         owner_uuid: '',
         gender: '',
         fullname: '',
@@ -13,18 +12,46 @@ window.addEventListener('DOMContentLoaded', event => {
         phonenumber_two: '',
     };
 
+    const HOUSE_DATA = {
+        house_uuid: '',
+        house_type: '',
+        house_rent: '',
+        house_guaranty: '',
+        house_month: '',
+        house_number_room: '',
+        house_address: '',
+    };
+
+    const TENANT_DATA = {
+        tenant_uuid: '',
+        fullname: '',
+        addr_email: '',
+        card_number: '',
+        profession: '',
+        parent_name: '',
+        location: '',
+        phonenumber_one: '',
+        phonenumber_two: '',
+    };
+
     var app = Vue.createApp({
         data() {
             return {
                 owners: [],
                 owner: [],
                 perPage: 20,
+                currentStep: 1,
                 currentPage: 1,
                 totalPages: 1,
                 ownerUUID: null,
-                showDeleteAlert: false,
+
+                messageAlert: "",
+                showMessageAlert: false,
+
                 isLoading: false,
-                updateDataOwner: { ...DEFAULT_EDIT_DATA }
+                ownerData: { ...OWNER_DATA },
+                houseData: { ...HOUSE_DATA },
+                tenantData: { ...TENANT_DATA }
             }
         },
 
@@ -38,46 +65,63 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         methods: {
-            getOwners() {
-                this.isLoading = true
-                const route = `{{ url_for('api.get_all_houseowners') }}`;
 
-                fetch(`/api/owners/?page=` + this.currentPage, {
-                    method: "GET",
-                    headers: {
-                        'Content-type': 'application/json'
-                    }
-                })
-                .then((response) => {
+            nextStep() {
+                this.currentStep++;
+            },
+
+            prevStep() {
+                this.currentStep--;
+            },
+
+            async getOwners() {
+                try {
+                    this.isLoading = true;
+                    const ownersURL = `/api/owners/?page==${this.currentPage}`;
+
+                    const response = await fetch(ownersURL, {
+                        method: "GET",
+                        headers: {
+                            'Content-type': 'application/json'
+                        }
+                    });
+
                     if (response.ok) {
-                        return response.json();
+                        const data = await response.json();
+                        this.owners = data.houseowners;
+                        this.totalPages = Math.ceil(data.total / this.perPage);
+                        this.isLoading = false;
                     } else {
                         throw new Error("NETWORK RESPONSE ERROR");
                     }
-                })
-                .then((data) => {
-                    this.owners = data.houseowners;
-                    this.totalPages = Math.ceil(data.total / this.perPage);
-                })
-                .catch((error) => console.error(error))
-                .finally(() => {
-                    this.isLoading = false;
-                });
+                } catch (error) {
+                    console.error("FETCH ERROR:", error);
+                    this.owners = error;
+                }
             },
 
-            getOwner(ownerUUID) {
-                const getOwnerURL = `/api/owner/${ownerUUID}/`;
-                fetch(getOwnerURL, {
-                    method: "GET",
-                    headers: {'Content-type': 'application/json'},
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    this.owner = data;
+            async getOwner(ownerUUID) {
+                try {
+                    const ownerURL = `/api/owner/${ownerUUID}/`;
+                    const response = await fetch(ownerURL, {
+                        method: "GET",
+                        headers: {'Content-type': 'application/json'},
+                    });
+
+                    const data = await response.json();
+                    this.owner = data.owner;
+
                     const modal = new bootstrap.Modal(document.getElementById('detailModal'));
                     modal.show();
-                })
-                .catch((error) => console.error(error));
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+
+            updateOwnerConfirm(owner) {
+                this.ownerData = { ...owner } ?? {};
+                const modal = new bootstrap.Modal(document.getElementById('editModal'));
+                modal.show();
             },
 
             deleteOwnerConfirm(ownerUUID) {
@@ -86,82 +130,128 @@ window.addEventListener('DOMContentLoaded', event => {
                 modal.show();
             },
 
-            onDeleteOwner() {
-                const deleteURL = `/api/owner/${this.ownerUUID}/delete/`;
-                fetch(deleteURL, {
-                    method: "DELETE",
-                    headers: {
-                        'Content-type': 'application/json'
-                    }
-                })
-                .then((response) => response.json())
-                .then((data) => {
+            createOwnerTenantConfirm(ownerUUID) {
+                this.ownerUUID = ownerUUID;
+                this.houseData = { ...ownerUUID } ?? {};
+                this.tenantData = { ...ownerUUID } ?? {};
+                const modal = new bootstrap.Modal(document.getElementById('addOwnerTenantModal'));
+                modal.show();
+            },
+
+            async onCreateOwnerTenant() {
+                try {
+                    const registerURL = `/api/owner/${this.ownerUUID}/create_tenant/`;
+                    const response = await fetch(registerURL, {
+                        method: "POST",
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            house_data: this.houseData,
+                            tenant_data: this.tenantData
+                        }),
+                    });
+
+                    const data = await response.json();
                     if (data.success) {
-                        this.owners = this.owners.filter(owner => owner.owner_uuid !== this.ownerUUID);
-                        this.getOwners();
-                        this.ownerUUID = null;
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-                        modal.hide();
-                        this.showDeleteAlert = true;
+                        await this.getOwners();
+                        this.houseData = { ...HOUSE_DATA };
+                        this.tenantData = { ...TENANT_DATA };
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
                         setTimeout(() => {
-                            this.showDeleteAlert = false;
+                            this.showMessageAlert = false;
+                        }, 3000);
+                    } else {
+                        this.messageAlert = data.message;
+                    }
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addOwnerTenantModal'));
+                    modal.hide();
+                }
+            },
+
+            async onUpdateOwner() {
+                try {
+                    const updateURL = `/api/owner/${this.ownerData.owner_uuid}/update/`;
+                    const response = await fetch(updateURL, {
+                        method: "PUT",
+                        headers: {'Content-type': 'application/json'},
+                        body: JSON.stringify(this.ownerData),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const index = this.owners.findIndex(owner => owner.owner_uuid === this.ownerData.owner_uuid);
+                        this.owners.splice(index, 1, this.ownerData);
+                        this.ownerData = { ...OWNER_DATA };
+                        await this.getOwners();
+
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                        setTimeout(() => {
+                            this.showMessageAlert = false;
                         }, 3000);
                     } else {
                         console.log(data.message);
                     }
-                })
-                .catch((error) => console.error(error));
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    this.ownerData.owner_uuid = null;
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    modal.hide();
+                }
             },
 
-            updateOwnerConfirm(owner) {
-                this.updateDataOwner = { ...owner } ?? {};
-                const modal = new bootstrap.Modal(document.getElementById('editModal'));
-                modal.show();
-            },
+            async onDeleteOwner() {
+                try {
+                    const deleteURL = `/api/owner/${this.ownerUUID}/delete/`;
+                    const response = await fetch(deleteURL, {
+                        method: "DELETE",
+                        headers: {
+                            'Content-type': 'application/json'
+                        }
+                    });
 
-            onUpdateOwner() {
-                const updateURL = `/api/owner/${this.updateDataOwner.owner_uuid}/update/`;
-                fetch(updateURL, {
-                    method: "PUT",
-                    headers: {'Content-type': 'application/json'},
-                    body: JSON.stringify(this.updateDataOwner),
-                })
-                .then(response => response.json())
-                .then((data) => {
+                    const data = await response.json();
+
                     if (data.success) {
-                        const index = this.owners.findIndex(owner => owner.owner_uuid === this.updateDataOwner.owner_uuid);
-                        this.owners.splice(index, 1, this.updateDataOwner);
-                        this.updateDataOwner = { ...DEFAULT_EDIT_DATA };
-                        this.getOwners();
+                        this.owners = this.owners.filter(owner => owner.owner_uuid !== this.ownerUUID);
+                        await this.getOwners();
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                        setTimeout(() => {
+                            this.showMessageAlert = false;
+                        }, 3000);
                     } else {
                         console.log(data.message);
                     }
-                })
-                .catch((error) => console.error(error))
-                .finally(() => {
-                    this.updateDataOwner.owner_uuid = null;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    this.ownerUUID = null;
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
                     modal.hide();
-                });
+                }
             },
 
             prevPage() {
-                if (this.currentPage > this.totalPages) {
-                    this.currentPage--;
-                    this.getOwners();
-                }
+                this.currentPage--;
+                this.getOwners();
                 window.scrollTo({top: 0, behavior: 'smooth'});
             },
 
             nextPage() {
-                if (this.currentPage <= this.totalPages) {
-                    this.currentPage++;
-                    this.getOwners();
-                }
+                this.currentPage++;
+                this.getOwners();
                 window.scrollTo({top: 0, behavior: 'smooth'});
             },
         },
-    });
+    })
 
     app.mount('#houseOwnerTable');
 });

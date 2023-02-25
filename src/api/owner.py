@@ -1,8 +1,14 @@
+from datetime import datetime, timedelta
+
 from flask import jsonify
 from flask import request
 from flask import url_for
+from flask_login import current_user
 from flask_login import login_required
+from src import db
+from src.tenant import VNHouse
 from src.tenant import VNHouseOwner
+from src.tenant import VNTenant
 
 from . import api
 
@@ -14,11 +20,11 @@ def get_all_houseowners():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = VNHouseOwner.get_houseowners_list().paginate(
+    pagination = VNHouseOwner.get_owners_list().paginate(
         page=page, per_page=per_page, error_out=False
     )
 
-    houseowners = pagination.items
+    owners = pagination.items
     prev = None
     if pagination.has_prev:
         prev = url_for("api.get_all_houseowners", page=page - 1, _external=True)
@@ -28,7 +34,7 @@ def get_all_houseowners():
 
     return jsonify(
         {
-            "houseowners": [owner.to_json() for owner in houseowners],
+            "houseowners": [owner.to_json() for owner in owners],
             "prev": prev,
             "next": next,
             "page": page,
@@ -41,26 +47,27 @@ def get_all_houseowners():
 @api.get("/owner/<string:owner_uuid>/")
 @login_required
 def get_houseowner(owner_uuid):
-    houseowner = VNHouseOwner.get_houseowner(owner_uuid)
-    return jsonify(houseowner.to_json())
+    owner = VNHouseOwner.get_owner(owner_uuid)
+    return jsonify({"owner": owner.to_json()})
 
 
 @api.delete("/owner/<string:owner_uuid>/delete/")
 @login_required
 def delete_houseowner(owner_uuid):
-    owner = VNHouseOwner.get_houseowner(owner_uuid)
+    owner = VNHouseOwner.get_owner(owner_uuid)
     if owner is not None:
         owner.disable()
         return jsonify(
             {
                 "success": True,
-                "message": f"Le compte du bailleur {owner} a été supprimé avec succès.",
+                "message": f"Le compte du bailleur\
+                    #{owner.vn_owner_id} a été supprimé avec succès.",
             }
         )
     return jsonify(
         {
             "success": False,
-            "message": f"L'élément avec l'id {owner_uuid} n'a pas été trouvé.",
+            "message": "Oups ! L'élément n'a pas été trouvé.",
         }
     )
 
@@ -68,7 +75,7 @@ def delete_houseowner(owner_uuid):
 @api.put("/owner/<string:owner_uuid>/update/")
 @login_required
 def update_houseowner(owner_uuid):
-    owner = VNHouseOwner.get_houseowner(owner_uuid)
+    owner = VNHouseOwner.get_owner(owner_uuid)
 
     if not owner:
         return jsonify({"message": "owner not found"}), 404
@@ -98,7 +105,7 @@ def update_houseowner(owner_uuid):
         jsonify(
             {
                 "success": True,
-                "message": f"Owner {owner.vn_owner_id} updated successfully",
+                "message": f"Propriétaire #{owner.vn_owner_id} mise à jour avec succès !",
                 "owner": owner.to_json(),
             }
         ),
@@ -106,15 +113,80 @@ def update_houseowner(owner_uuid):
     )
 
 
+@api.post("/owner/<string:owner_uuid>/create_tenant/")
+@login_required
+def owner_create_tenant(owner_uuid):
+
+    owner = VNHouseOwner.get_owner(owner_uuid)
+
+    if request.method == "POST":
+
+        house_data = request.json.get("house_data")
+        tenant_data = request.json.get("tenant_data")
+
+        house = VNHouse()
+
+        house.vn_house_type = house_data.get("house_type")
+        house.vn_house_rent = house_data.get("house_rent")
+        house.vn_house_guaranty = house_data.get("house_guaranty")
+        house.vn_house_month = house_data.get("house_month")
+        house.vn_house_number_room = house_data.get("house_number_room")
+        house.vn_house_address = house_data.get("house_address")
+        house_lease = house_data.get("house_lease_start_date")
+        house.vn_house_lease_start_date = (
+            datetime.strptime(house_lease, "%Y-%m-%d").date() if house_lease else None
+        )
+
+        notice_period = timedelta(days=15)
+        due_date = datetime.strptime(house_lease, "%Y-%m-%d").date() + timedelta(days=45) - notice_period
+        house.vn_house_lease_end_date = due_date
+
+        house.vn_user_id = current_user.id
+        house.vn_owner_id = owner.id
+
+        tenant = VNTenant()
+
+        tenant.vn_fullname = tenant_data.get("fullname")
+        tenant.vn_addr_email = tenant_data.get("addr_email")
+        tenant.vn_cni_number = tenant_data.get("cni_number")
+        tenant.vn_location = tenant_data.get("location")
+        tenant.vn_profession = tenant_data.get("profession")
+        tenant.vn_parent_name = tenant_data.get("parent_name")
+        tenant.vn_phonenumber_one = tenant_data.get("phonenumber_one")
+        tenant.vn_phonenumber_two = tenant_data.get("phonenumber_two")
+
+        tenant.vn_user_id = current_user.id
+
+        owner.houses.append(house)
+        owner.tenants.append(tenant)
+        house.tenants.append(tenant)
+
+        db.session.add_all([house, tenant])
+        db.session.commit()
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": f"Nouveau locataire pour le propriétaire\
+                        #{owner.vn_owner_id} ajouté avec succès !",
+                }
+            ),
+            201,
+        )
+
+    return jsonify({"success": False, "message": "Erreur"})
+
+
 @api.get("/owner/<string:owner_uuid>/houses/")
 @login_required
 def get_houseowner_houses(owner_uuid):
-    houseowner = VNHouseOwner.get_houseowner(owner_uuid)
+    owner = VNHouseOwner.get_owner(owner_uuid)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = houseowner.houses.paginate(
+    pagination = owner.houses.query.paginate(
         page=page, per_page=per_page, error_out=False
     )
 
@@ -145,12 +217,13 @@ def get_houseowner_houses(owner_uuid):
 @api.route("/owner/<string:owner_uuid>/tenants/")
 @login_required
 def get_houseowner_tenants(owner_uuid):
-    houseowner = VNHouseOwner.get_houseowner(owner_uuid)
+
+    owner = VNHouseOwner.get_owner(owner_uuid)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = houseowner.tenants.paginate(
+    pagination = owner.tenants.query.paginate(
         page=page, per_page=per_page, error_out=False
     )
 

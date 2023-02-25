@@ -1,15 +1,11 @@
 {% extends "tenant/_base.html" %}
 
-{% block breadcrmub_plus %}
-
-{% endblock breadcrmub_plus %}
-
 {% block dashboard_content %}
     <section id="tenantTable">
 
         <!-- Alert message -->
-        <div v-if="showDeleteAlert" class="alert alert-success" role="alert">
-            Locataire supprimé avec succès.
+        <div v-if="showMessageAlert" class="alert alert-success" role="alert">
+            { messageAlert }
         </div>
 
         <div v-if="tenants.length == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
@@ -21,7 +17,7 @@
                     Vous n'avez aucun locataire enregistré en ce moment.
                 </h4>
 
-                <button class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+                <button @click="createTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
                     <i class="me-2" data-feather="user-plus"></i>
                     Enregistrer un locataire
                 </abutton>
@@ -32,7 +28,7 @@
 
             <div class="card-header">
                 <span class="fw-700">Locataires ({ tenants.length })</span>
-                <button class="btn btn-sm btn-success text-white text-uppercase fw-700" type="button" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+                <button @click="createTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700">
                     <i class="me-2" data-feather="user-plus"></i>
                     Enregistrer un locataire
                 </button>
@@ -44,10 +40,9 @@
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">Nom &amp; prénoms / contact</th>
-                            <th scope="col">Bailleur</th>
-                            <th scope="col">Loyer</th>
+                            <th scope="col">Loyer du mois en cours</th>
                             <th scope="col">Status paiement</th>
-                             <th scope="col">Date de location</th>
+                            <th scope="col">Date de location</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -60,53 +55,66 @@
                 {% include "tenant/paths/_paginate.html" %}
             </div>
         </div>
-    </section>
 
-    <div class="modal fade" id="addTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tenantModal">Enregistrer un localtaire</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="nav nav-pills nav-justified nav-wizard" id="cardTab tenantModal" role="tablist">
-                        <a class="nav-item nav-link active p-3" id="wizard1-tab" href="#wizard1" data-bs-toggle="tab" role="tab" aria-controls="wizard1" aria-selected="true">
-                            <div class="wizard-step-icon">1</div>
-                            <div class="wizard-step-text">
-                                <div class="modal-title wizard-step-text-name">
-                                    Enregistrer le propriétaire
-                                </div>
-                            </div>
-                        </a>
-
-                        <a class="nav-item nav-link p-3" id="wizard2-tab" href="#wizard2" data-bs-toggle="tab" role="tab" aria-controls="wizard2" aria-selected="true">
-                            <div class="wizard-step-icon">2</div>
-                            <div class="wizard-step-text">
-                                <div class="modal-title wizard-step-text-name">
-                                    Enregistrer la propriété
-                                </div>
-                            </div>
-                        </a>
-
-                         <a class="nav-item nav-link p-3" id="wizard2-tab" href="#wizard3" data-bs-toggle="tab" role="tab" aria-controls="wizard3" aria-selected="true">
-                            <div class="wizard-step-icon">3</div>
-                            <div class="wizard-step-text">
-                                <div class="modal-title wizard-step-text-name">
-                                   Enregistrer le locataire
-                                </div>
-                            </div>
-                        </a>
+        <div class="modal fade" data-bs-backdrop="static" id="createTenantModal">
+            <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Enregistrer un locataire</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    <hr class="my-3">
+                    <div class="modal-body">
+                        <div class="nav nav-pills nav-justified nav-wizard" role="tablist">
+                            <div :class="{ active: currentStep === 1 }" class="nav-item nav-link p-3">
+                                <div class="wizard-step-icon">1</div>
+                                <div class="wizard-step-text">
+                                    <div class="modal-title wizard-step-text-name fw-700">
+                                        Propriétaire
+                                    </div>
+                                    <small class="wizard-step-text-details">Informations sur le propriétaire</small>
+                                </div>
+                            </div>
 
-                    {% include "tenant/paths/_tenant_register.html" %}
+                            <div :class="{ active: currentStep === 2 }" class="nav-item nav-link p-3" id="wizard2-tab">
+                                <div class="wizard-step-icon">2</div>
+                                <div class="wizard-step-text">
+                                    <div class="modal-title wizard-step-text-name fw-700">
+                                        Propriété
+                                    </div>
+                                    <small class="wizard-step-text-details">Informations sur la propriété</small>
+                                </div>
+                            </div>
+
+                            <div :class="{ active: currentStep === 3 }" class="nav-item nav-link p-3" id="wizard2-tab">
+                                <div class="wizard-step-icon">3</div>
+                                <div class="wizard-step-text">
+                                    <div class="modal-title wizard-step-text-name fw-700">
+                                       Locataire
+                                    </div>
+                                    <small class="wizard-step-text-details">Informations sur le locataire</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        {% include "tenant/paths/_tenant_register.html" %}
+                    </div>
+
+                    <div class="row modal-footer justify-content-center">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <button :class="{ disabled: currentStep === 1 }" @click="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
+                                <button v-if="currentStep < 3" @click="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
+                                <button v-if="currentStep === 3" @click="onCreateTenant" class="btn btn-success shadow-none" type="submit">Valider</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </button>
 {% endblock dashboard_content %}
 
 {% block other_js_src %}

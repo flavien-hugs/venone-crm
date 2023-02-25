@@ -1,158 +1,114 @@
-<form action="." method="POST">
-
-    {{ house_owner_form.hidden_tag() }}
-    {{ tenant_form.hidden_tag() }}
-    {{ house_form.hidden_tag() }}
-
-    <div class="tab-content" id="cardTabContent">
-        <div class="tab-pane fade show active" id="wizard1" role="tabpanel" aria-labelledby="wizard1-tab">
-            <div class="row gx-3 mb-3">
-                <div class="col-2">
-                    {{ house_owner_form.gender.label(class="small mb-1") }}
-                    {{ house_owner_form.gender(class="form-select") }}
-                </div>
-
-                <div class="col-10">
-                    {{ house_owner_form.fullname.label(class="small mb-1") }}
-                    {% if house_owner_form.fullname.errors %}
-                        {{ house_owner_form.fullname(class="form-control", placeholder=house_owner_form.fullname.label.text) }}
-                        <div class="invalid-feedback">
-                            {% for error in house_owner_form.fullname.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ house_owner_form.fullname(class="form-control", placeholder=house_owner_form.fullname.label.text) }}
-                    {% endif %}
-                </div>
+<div class="tab-content">
+    <div :class="{ active: currentStep === 1 }"class="tab-pane fade show">
+        <div class="row gx-3 mb-3">
+            <div class="col-md-6">
+                <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="ownerData.fullname">
             </div>
 
-            <div class="row gx-3 mb-3">
-                <div class="col-md-6">
-                    {{ house_owner_form.cni_number.label(class="small mb-1") }}
-                    {% if house_owner_form.cni_number.errors %}
-                        {{ house_owner_form.cni_number(class="form-control", placeholder=house_owner_form.cni_number.label.text) }}
-                        <div class="invalid-feedback">
-                            {% for error in house_owner_form.cni_number.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ house_owner_form.cni_number(class="form-control", placeholder=house_owner_form.cni_number.label.text) }}
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    {{ house_owner_form.addr_email.label(class="small mb-1") }}
-                    {% if house_owner_form.addr_email.errors %}
-                        {{ house_owner_form.addr_email(class="form-control", placeholder=house_owner_form.addr_email.label.text) }}
-                        <div class="invalid-feedback">
-                            {% for error in house_owner_form.addr_email.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ house_owner_form.addr_email(class="form-control", placeholder=house_owner_form.addr_email.label.text) }}
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="row gx-3 mb-3">
-                <div class="col-md-6">
-                    {{ house_owner_form.parent_name.label(class="small mb-1") }}
-                    {% if house_owner_form.parent_name.errors %}
-                        {{ house_owner_form.parent_name(class="form-control", placeholder=house_owner_form.parent_name.label.text) }}
-                        <div class="invalid-feedback">
-                            {% for error in house_owner_form.parent_name.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ house_owner_form.parent_name(class="form-control", placeholder=house_owner_form.parent_name.label.text) }}
-                    {% endif %}
-                </div>
-                <div class="col-md-6">
-                    {{ house_owner_form.profession.label(class="small mb-1") }}
-                    {% if house_owner_form.profession.errors %}
-                        {{ house_owner_form.profession(class="form-control", placeholder=house_owner_form.profession.label.text) }}
-                        <div class="invalid-feedback">
-                            {% for error in house_owner_form.profession.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ house_owner_form.profession(class="form-control", placeholder=house_owner_form.profession.label.text) }}
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="row gx-3 mb-3">
-                <div class="col-md-6">
-                    {{ house_owner_form.phonenumber_one.label(class="small mb-1") }}
-                    {{ house_owner_form.phonenumber_one(class="form-control", type="tel", placeholder=house_owner_form.phonenumber_one.label.text) }}
-                </div>
-                <div class="col-md-6">
-                    {{ house_owner_form.phonenumber_two.label(class="small mb-1") }}
-                    {{ house_owner_form.phonenumber_two(class="form-control", type="tel", placeholder=house_owner_form.phonenumber_two.label.text) }}
-                </div>
-            </div>
-
-            <div class="row gx-3 mb-3">
-                <div class="col-md-6">
-                    <label>Pays/Région</label>
-                    <span class="form-control bg-light">{{ current_user.vn_country }}</span>
-                </div>
-                <div class="col-md-6">
-                    {{ house_owner_form.location.label(class="small mb-1") }}
-                    {{ house_owner_form.location(class="form-control", placeholder=house_owner_form.location.label.text) }}
-                </div>
+            <div class="col-md-6">
+                <input placeholder="Numéro de Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model.trim="ownerData.card_number">
             </div>
         </div>
 
-        <div class="tab-pane fade" id="wizard2" role="tabpanel" aria-labelledby="wizard2-tab">
-            <div class="row gx-3 mb-3">
-                {% for field in house_form %}
-                    <div class="col-md-4 mb-3">
-                        {{ field.label(class="small mb-1") }}
-                        {% if field.errors %}
-                            {{ field(class="form-control", placeholder=field.label.text) }}
-                            <div class="invalid-feedback">
-                                {% for error in field.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ field(class="form-control", placeholder=field.label.text) }}
-                        {% endif %}
-                    </div>
-                {% endfor %}
+        <div class="row gx-3 mb-3">
+            <div class="col-md-6">
+                <input @input="formatPhoneNumber(ownerData.phonenumber_one)" placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="ownerData.phonenumber_one" placeholder="01-5157-1393">
+            </div>
+
+            <div class="col-md-6">
+                <input @input="formatPhoneNumber(ownerData.phonenumber_two)" placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="ownerData.phonenumber_two">
             </div>
         </div>
 
-        <div class="tab-pane fade" id="wizard3" role="tabpanel" aria-labelledby="wizard3-tab">
-            <div class="row gx-3 mb-3">
-                {% for field in tenant_form %}
-                    <div class="col-md-4 mb-3">
-                        {{ field.label(class="small mb-1") }}
-                        {% if field.errors %}
-                            {{ field(class="form-control", placeholder=field.label.text) }}
-                            <div class="invalid-feedback">
-                                {% for error in field.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ field(class="form-control", placeholder=field.label.text) }}
-                        {% endif %}
-                    </div>
-                {% endfor %}
+        <div class="row gx-3 mb-3">
+            <div class="col-md-6">
+                <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="ownerData.profession">
             </div>
 
-            <hr class="my-3">
+            <div class="col-md-6">
+                <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model.trim="ownerData.addr_email">
+            </div>
+        </div>
 
-            <div class="d-grid">
-                <button class="btn btn-success text-uppercase" type="submit">Valider</button>
+        <div class="row gx-3 mb-3">
+            <div class="col-md-6">
+                <input placeholder="Lieu d'habitation" type="text" class="form-control" id="location" v-model="ownerData.location">
+            </div>
+
+            <div class="col-md-6">
+                <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="ownerData.parent_name">
             </div>
         </div>
     </div>
-</form>
+
+    <div :class="{ active: currentStep === 2 }"class="tab-pane fade show">
+        <div class="row gx-3 mb-4">
+            <div class="col-md-3">
+                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
+            </div>
+
+            <div class="col-md-3">
+                <input @input="filterNumber(houseData.house_rent)" placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
+            </div>
+
+            <div class="col-md-3">
+                <input @input="filterNumber(houseData.house_number_room)" placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
+            </div>
+
+            <div class="col-md-3">
+                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
+            </div>
+        </div>
+
+        <div class="row gx-3 mb-4">
+            <div class="col-md-3">
+                <input @input="filterNumber(houseData.house_month)" placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
+            </div>
+
+            <div class="col-md-3">
+                <input @input="filterNumber(houseData.house_guaranty)" placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
+            </div>
+
+            <div class="col-md-3">
+                <input v-bind:placeholder="houseData.house_lease_start_date" type="date" class="form-control" id="house_lease_start_date" v-model="houseData.house_lease_start_date">
+                <span class="text-muted small">Date de location</span>
+            </div>
+        </div>
+    </div>
+
+    <div :class="{ active: currentStep === 3 }" class="tab-pane fade show">
+        <div class="row gx-3 mb-3">
+            <div class="col-md-6">
+                <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <input placeholder="Numéro de Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
+            </div>
+        </div>
+
+        <div class="row gx-3 mb-3">
+            <div class="col-md-6">
+                <input @input="formatPhoneNumber(tenantData.phonenumber_one)" placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
+            </div>
+
+            <div class="col-md-6">
+                <input @input="formatPhoneNumber(tenantData.phonenumber_two)" placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
+            </div>
+        </div>
+
+        <div class="row gx-3 mb-3">
+            <div class="col-md-4">
+                <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="tenantData.profession">
+            </div>
+
+            <div class="col-md-4">
+                <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model="tenantData.addr_email">
+            </div>
+
+            <div class="col-md-4">
+                <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
+            </div>
+        </div>
+    </div>
+</div>

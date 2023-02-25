@@ -1,15 +1,11 @@
 {% extends "tenant/_base.html" %}
 
-{% block breadcrmub_plus %}
-
-{% endblock breadcrmub_plus %}
-
 {% block dashboard_content %}
     <section id="houseTable">
 
         <!-- Alert message -->
-        <div v-if="showDeleteAlert" class="alert alert-success" role="alert">
-            Le compte du bailleur a été supprimé avec succès.
+        <div v-if="showMessageAlert" class="alert alert-success" role="alert">
+            { messageAlert }
         </div>
 
         <div v-if="houses.length == 0" class="card card-body shadow-none bg-transparent border-0">
@@ -35,8 +31,7 @@
                 <thead class="small">
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Bailleur</th>
-                        <th scope="col">Proprité</th>
+                        <th scope="col">Proprité &amp; Localisation</th>
                         <th scope="col">Status location</th>
                         <th scope="col">Mise en location le</th>
                         <th>Actions</th>

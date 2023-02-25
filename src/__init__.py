@@ -7,7 +7,6 @@ from flask import current_app
 from flask import Flask
 from flask import redirect
 from flask import render_template
-from flask import send_from_directory
 from flask import url_for
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
@@ -178,14 +177,6 @@ def create_venone_app(config_name):
                     error=e,
                 ),
                 500,
-            )
-
-        @venone_app.route("/favicon.ico")
-        def favicon():
-            return send_from_directory(
-                os.path.join(current_app.root_path, "static"),
-                "img/logo/favicon.png",
-                mimetype="img/logo/favicon.png",
             )
 
         try:

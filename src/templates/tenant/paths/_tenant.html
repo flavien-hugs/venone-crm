@@ -1,36 +1,99 @@
 <tr v-for="tenant in tenants" v-bind:key="tenant.tenant_uuid">
 	<td>
-		<a v-bind:href="tenant.tenant_url" class="badge bg-blue-soft text-blue">{tenant.tenant_id}</a>
-	</td>
-	<td>{tenant.fullname} ({tenant.phonenumber_one})</td>
-	<td>
-		<a v-bind:href="tenant.owner_url">{tenant.houseowner_fullname}</a>
-	</td>
-
-	<td><a v-bind:href="tenant.house_url">{tenant.house_type}</a></td>
-	<td><a href="#!" class="badge bg-green-soft text-green">Payé</a></td>
-	<td>{tenant.created_at}</td>
-	<td>
-		<a class="btn btn-datatable btn-icon btn-transparent-dark me-2" href="#">
-			<i data-feather="edit"></i>
+		<a v-bind:href="tenant.tenant_url"
+			class="badge bg-blue-soft text-blue">
+			{ tenant.tenant_id }
 		</a>
+	</td>
+	<td>{ tenant.fullname } ({ tenant.phonenumber_one })</td>
+	<td>{ tenant.monthly_rent.toLocaleString() } à payer le { tenant.house.house_lease_end_date.toLocaleString() }</td>
+	<td>Impayé</td>
+	<td>{ tenant.house.house_lease_start_date.toLocaleString() }</td>
+	<td>
+		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
+			<i class="text-primary" data-feather="eye"></i>
+		</button>
 
-		<button @click="deleteTenantConfirm(tenant.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
-			<i data-feather="trash-2"></i>
+		<button @click.prevent="updateTenant(tenant)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+			<i class="text-secondary" data-feather="edit-2"></i>
+		</button>
+
+		<button @click.prevent="deleteTenantConfirm(tenant.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
+			<i class="text-danger" data-feather="trash-2"></i>
 		</button>
 	</td>
 </tr>
 
+<!-- update tenant modal -->
+<div class="modal fade" data-bs-backdrop="static" id="updateTenantConfirm">
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">
+					<h4 class="modal-title">
+						Mise à jour locataire : { tenantData.tenant_id } - { tenantData.fullname }
+					</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<div class="row gx-3 mb-3">
+						<div class="col-md-6">
+							<label for="fullname" class="form-label">Nom &amp; prénoms</label>
+							<input type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
+						</div>
+
+						<div class="col-md-6">
+							<label for="card_number" class="form-label">N° CNI/Attestion/Passport</label>
+							<input type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
+						</div>
+					</div>
+
+					<div class="row gx-3 mb-3">
+						<div class="col-md-4">
+							<label for="phonenumber_one" class="form-label">Téléphone I</label>
+							<input type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
+						</div>
+						<div class="col-md-4">
+							<label for="phonenumber_two" class="form-label">Téléphone II</label>
+							<input type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
+						</div>
+
+						<div class="col-md-4">
+							<label for="addr_email" class="form-label">Addresse e-mail</label>
+							<input type="email" class="form-control" id="addr_email" v-model="tenantData.addr_email">
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<label for="parent_name" class="form-label">Nom du parent</label>
+						<input type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
+					</div>
+
+					<div class="row gx-3 mb-3">
+						<label for="profession" class="form-label">Profession</label>
+						<input type="text" class="form-control" id="profession" v-model="tenantData.profession">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
+					<button type="button" @click="onUpdateTenant" class="btn btn-success shadow-none">Mettre à jour</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- delete tenant modal -->
 <div class="modal fade" data-bs-backdrop="static" id="confirmModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">Retirer ce propritaire de maison ?</h5>
+				<h5 class="modal-title">Retirer le locataire { tenant.tenannt } de maison ?</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 
 			<div class="modal-body">
-				Êtes-vous sûr de vouloir supprimer ce propriétaire ?
+				Êtes-vous sûr de vouloir supprimer ce locataire ?
 			</div>
 
 			<div class="modal-footer">
@@ -41,7 +104,7 @@
 					</div>
 
 					<div class="col-xl-6 d-grid">
-						<button @click="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none">
+						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none">
 						Oui</button>
 					</div>
 				</div>

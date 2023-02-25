@@ -21,7 +21,6 @@ csrf.exempt(owner_bp)
 
 @owner_bp.route("/<string:uuid>/index/", methods=["GET"])
 @login_required
-@cache.cached(timeout=100)
 def dashboard(uuid):
     page_title = "Tableau de board"
     return render_template(
@@ -105,5 +104,6 @@ def change_password(uuid):
 
 
 @owner_bp.route("/<filename>/")
+@cache.cached(timeout=100)
 def avatar(filename):
     return send_from_directory(current_app.config["UPLOAD_FOLDER_PATH"], filename)

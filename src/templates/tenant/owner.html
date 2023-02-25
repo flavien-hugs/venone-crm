@@ -1,17 +1,12 @@
 {% extends "tenant/_base.html" %}
 
-
-{% block breadcrmub_plus %}
-
-{% endblock breadcrmub_plus %}
-
 {% block dashboard_content %}
 
     <section id="houseOwnerTable">
 
         <!-- Alert message -->
-        <div v-if="showDeleteAlert" class="alert alert-success" role="alert">
-            Le compte du bailleur a été supprimé avec succès.
+        <div v-if="showMessageAlert" class="alert alert-success" role="alert">
+            { messageAlert }
         </div>
 
         <div v-if="owners.length == 0" class="card card-body shadow-none bg-transparent border-0">
@@ -39,6 +34,7 @@
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">Nom &amp; prénoms / contact</th>
+                            <th scope="col">Budget</th>
                             <th scope="col">Total propriétés</th>
                             <th scope="col">Total locataires</th>
                             <th scope="col">Date d'ajout</th>
