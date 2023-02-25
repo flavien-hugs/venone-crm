@@ -76,64 +76,8 @@ def agency_setting(uuid):
 def agency_create_tenant(uuid):
     page_title = "Vos locataires"
 
-    house_owner_form = HouseOwnerForm(request.form)
-    house_form = HouseForm(request.form)
-    tenant_form = TenantForm(request.form)
-
-    if tenant_form.validate_on_submit():
-
-        houseowner = VNHouseOwner(
-            vn_gender=house_owner_form.gender.data,
-            vn_fullname=house_owner_form.fullname.data,
-            vn_addr_email=house_owner_form.addr_email.data,
-            vn_cni_number=house_owner_form.cni_number.data,
-            vn_profession=house_owner_form.profession.data,
-            vn_parent_name=house_owner_form.parent_name.data,
-            vn_location=house_owner_form.location.data,
-            vn_phonenumber_one=house_owner_form.phonenumber_one.data,
-            vn_phonenumber_two=house_owner_form.phonenumber_two.data,
-        )
-        houseowner.vn_user_id = current_user.id
-        houseowner.save()
-
-        house = VNHouse(
-            vn_house_type=house_form.house_type.data,
-            vn_house_rent=house_form.house_rent.data,
-            vn_house_guaranty=house_form.house_guaranty.data,
-            vn_house_month=house_form.house_month.data,
-            vn_number_or_room=house_form.house_number_or_room.data,
-            vn_house_address=house_form.house_address.data,
-        )
-        house.vn_houseowner_id = houseowner.id
-        house.vn_user_id = current_user.id
-        house.save()
-
-        tenant = VNTenant(
-            vn_gender=tenant_form.gender.data,
-            vn_fullname=tenant_form.fullname.data,
-            vn_addr_email=tenant_form.addr_email.data,
-            vn_cni_number=tenant_form.cni_number.data,
-            vn_profession=tenant_form.profession.data,
-            vn_parent_name=tenant_form.parent_name.data,
-            vn_location=tenant_form.location.data,
-            vn_birthdate=tenant_form.birthdate.data,
-            vn_phonenumber_one=tenant_form.phonenumber_one.data,
-            vn_phonenumber_two=tenant_form.phonenumber_two.data,
-        )
-        tenant.vn_house_id = house.id
-        tenant.vn_houseowner_id = houseowner.id
-        tenant.vn_user_id = current_user.id
-        tenant.save()
-
-        return redirect(
-            url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid)
-        )
-
     return render_template(
         "tenant/tenant.html",
-        house_owner_form=house_owner_form,
-        house_form=house_form,
-        tenant_form=tenant_form,
         page_title=page_title,
         current_user=current_user,
     )
