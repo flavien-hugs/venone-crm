@@ -3,7 +3,7 @@
 		<a title="Détail du bailleur" type="button" @click="getOwner(own.owner_uuid)" class="badge bg-blue-soft text-blue">{ own.owner_id }</a>
 	</td>
 	<td>{ own.fullname } ({own.phonenumber_one})</td>
-	<td>100 0000</td>
+	<td>100 0000 { own.user.devise }</td>
 	<td>{ own.number_houses } <span v-if="own.number_houses > 0">(Afficher)</span></td>
 	<td>{ own.number_tenants } <span v-if="own.number_tenants > 0">(Afficher)</span></td>
 	<td>{ own.created_at }</td>
@@ -13,7 +13,7 @@
 		</button>
 
 		<button @click="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-secondary" data-feather="edit-2"></i>
+			<i class="text-secondary" data-feather="edit"></i>
 		</button>
 
 		<button @click.prevent="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">

@@ -1,14 +1,14 @@
-<nav lass="my-4">
+<nav v-if="totalPages > 1" class="my-4">
 	<ul class="pagination justify-content-center text-center">
-		<li class="page-item" :class="{ disabled: currentPage === 1 }">
+		<li class="page-item" :class="{ disabled: currentPage <= 1 }">
 			<a type="button" class="page-link small" @click.prevent="prevPage"><i class="me-2" data-feather="chevron-left"></i>Précédent</a>
 		</li>
 
-		<li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
-			<span class="page-link">{ page }</span>
+		<li class="page-item">
+			<span class="page-link small">{ currentPage } - { totalPages }</span>
         </li>
 
-		<li class="page-item" :class="{ disabled: currentPage === totalPages }">
+		<li class="page-item" :class="{ disabled: currentPage >= totalPages }">
 			<a type="button" class="page-link small" @click.prevent="nextPage">Suivant <i class="ms-2" data-feather="chevron-right"></i></a>
 		</li>
 	</ul>
