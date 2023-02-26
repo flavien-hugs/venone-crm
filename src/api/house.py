@@ -12,7 +12,7 @@ from . import api
 def get_all_houses():
 
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 20, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
     pagination = VNHouse.get_houses_list().paginate(
         page=page, per_page=per_page, error_out=False
