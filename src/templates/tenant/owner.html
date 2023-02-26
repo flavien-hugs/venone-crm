@@ -21,20 +21,42 @@
         </div>
 
         <div v-else-if="owners.length > 0" class="card card-header-actions">
+
+            <div v-if="isLoading" class="preloader">
+                <div class="preloader-body">
+                    <p>Chargement en cours...</p>
+                    <div class="cssload-container">
+                        <div class="cssload-speeding-wheel"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-header">
-                <span class="fw-700">Bailleurs ({ owners.length })</span>
-                <form>
-                    <input class="form-control" placeholder="Rechercher">
-                </form>
+                <span class="fw-700">Bailleurs ({{ current_user.houseowners.count() }})</span>
+                <button class="btn btn-sm btn-success text-white text-uppercase fw-700">
+                    <i class="me-2" data-feather="user-plus"></i>
+                    Enregistrer un Bailleur
+                </button>
             </div>
 
             <div class="card-body">
+
+                <div class="input-group input-group-joined input-group-solid shadow-none">
+                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                    <input
+                        type="text"
+                        placeholder="Rechercher un propriétaire ..."
+                        class="form-control shadow-none ps-0"
+                        aria-label="Rechercher"
+                    >
+                </div>
+
                 <table class="table table-hover table-responsive">
                     <thead class="small">
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">Nom &amp; prénoms / contact</th>
-                            <th scope="col">Budget</th>
+                            <th scope="col">Loyer collecté du mois</th>
                             <th scope="col">Total propriétés</th>
                             <th scope="col">Total locataires</th>
                             <th scope="col">Date d'ajout</th>
@@ -42,7 +64,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <p v-if="isLoading">Loading...</p>
                         {% include "tenant/paths/_owner.html" %}
                     </tbody>
                 </table>

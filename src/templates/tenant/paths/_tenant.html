@@ -1,21 +1,22 @@
-<tr v-for="tenant in tenants" v-bind:key="tenant.tenant_uuid">
-	<td>
+<tr v-for="tenant in filteredTenants" v-bind:key="tenant.tenant_uuid">
+	<td scope="row">
 		<a v-bind:href="tenant.tenant_url"
 			class="badge bg-blue-soft text-blue">
 			{ tenant.tenant_id }
 		</a>
 	</td>
 	<td>{ tenant.fullname } ({ tenant.phonenumber_one })</td>
-	<td>{ tenant.monthly_rent.toLocaleString() } à payer le { tenant.house.house_lease_end_date.toLocaleString() }</td>
-	<td>Impayé</td>
+	<td>{ tenant.monthly_rent } { tenant.user.devise } </td>
 	<td>{ tenant.house.house_lease_start_date.toLocaleString() }</td>
+	<td>{ tenant.house.house_lease_end_date.toLocaleString() }</td>
+	<td ><span class="badge bg-danger text-white p-2">Impayé</span></td>
 	<td>
 		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
 			<i class="text-primary" data-feather="eye"></i>
 		</button>
 
 		<button @click.prevent="updateTenant(tenant)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-secondary" data-feather="edit-2"></i>
+			<i class="text-secondary" data-feather="edit"></i>
 		</button>
 
 		<button @click.prevent="deleteTenantConfirm(tenant.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">

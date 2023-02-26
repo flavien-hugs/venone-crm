@@ -21,10 +21,10 @@ def get_all_users():
     users = pagination.items
     prev = None
     if pagination.has_prev:
-        prev = url_for("api.get_all_users", page=page-1, _external=True)
+        prev = url_for("api.get_all_users", page=page - 1, _external=True)
     next = None
     if pagination.has_next:
-        next = url_for("api.get_all_users", page=page+1, _external=True)
+        next = url_for("api.get_all_users", page=page + 1, _external=True)
 
     return jsonify(
         {
@@ -38,14 +38,14 @@ def get_all_users():
     )
 
 
-@api.get("/user/<string:user_uuid>/")
+@api.get("/user/")
 @login_required
-def get_user(user_uuid):
-    user = VNUser.get_user(user_uuid)
+def get_user():
+    user = VNUser.get_user_logged()
     return jsonify({"user": user.to_json()})
 
 
-@api.route('/user/<string:user_uuid>/owners/')
+@api.route("/user/<string:user_uuid>/owners/")
 @login_required
 def get_user_owners(user_uuid):
 
@@ -54,26 +54,30 @@ def get_user_owners(user_uuid):
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = user.houseowners.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = user.houseowners.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     owners = pagination.items
     prev = None
     if pagination.has_prev:
-        prev = url_for('api.get_user_owners', page=page-1, _external=True)
+        prev = url_for("api.get_user_owners", page=page - 1, _external=True)
     next = None
     if pagination.has_next:
-        next = url_for('api.get_user_owners', page=page+1, _external=True)
+        next = url_for("api.get_user_owners", page=page + 1, _external=True)
 
-    return jsonify({
-        'owners': [owner.to_json() for owner in owners],
-        'prev': prev,
-        'next': next,
-        "page": page,
-        "per_page": per_page,
-        "total": pagination.total,
-    })
+    return jsonify(
+        {
+            "owners": [owner.to_json() for owner in owners],
+            "prev": prev,
+            "next": next,
+            "page": page,
+            "per_page": per_page,
+            "total": pagination.total,
+        }
+    )
 
 
-@api.route('/user/<string:user_uuid>/tenants/')
+@api.route("/user/<string:user_uuid>/tenants/")
 @login_required
 def get_user_tenants(user_uuid):
 
@@ -86,22 +90,24 @@ def get_user_tenants(user_uuid):
     tenants = pagination.items
     prev = None
     if pagination.has_prev:
-        prev = url_for('api.get_user_tenants', page=page-1, _external=True)
+        prev = url_for("api.get_user_tenants", page=page - 1, _external=True)
     next = None
     if pagination.has_next:
-        next = url_for('api.get_user_tenants', page=page+1, _external=True)
+        next = url_for("api.get_user_tenants", page=page + 1, _external=True)
 
-    return jsonify({
-        'tenants': [tenant.to_json() for tenant in tenants],
-        'prev': prev,
-        'next': next,
-        "page": page,
-        "per_page": per_page,
-        "total": pagination.total,
-    })
+    return jsonify(
+        {
+            "tenants": [tenant.to_json() for tenant in tenants],
+            "prev": prev,
+            "next": next,
+            "page": page,
+            "per_page": per_page,
+            "total": pagination.total,
+        }
+    )
 
 
-@api.route('/user/<string:user_uuid>/houses/')
+@api.route("/user/<string:user_uuid>/houses/")
 @login_required
 def get_user_houses(user_uuid):
 
@@ -114,22 +120,24 @@ def get_user_houses(user_uuid):
     houses = pagination.items
     prev = None
     if pagination.has_prev:
-        prev = url_for('api.get_user_houses', page=page-1, _external=True)
+        prev = url_for("api.get_user_houses", page=page - 1, _external=True)
     next = None
     if pagination.has_next:
-        next = url_for('api.get_user_houses', page=page+1, _external=True)
+        next = url_for("api.get_user_houses", page=page + 1, _external=True)
 
-    return jsonify({
-        'houses': [house.to_json() for house in houses],
-        'prev': prev,
-        'next': next,
-        "page": page,
-        "per_page": per_page,
-        "total": pagination.total,
-    })
+    return jsonify(
+        {
+            "houses": [house.to_json() for house in houses],
+            "prev": prev,
+            "next": next,
+            "page": page,
+            "per_page": per_page,
+            "total": pagination.total,
+        }
+    )
 
 
-@api.route('/user/<string:user_uuid>/payments/')
+@api.route("/user/<string:user_uuid>/payments/")
 @login_required
 def get_user_payments(user_uuid):
 
@@ -142,16 +150,18 @@ def get_user_payments(user_uuid):
     payments = pagination.items
     prev = None
     if pagination.has_prev:
-        prev = url_for('api.get_user_payments', page=page-1, _external=True)
+        prev = url_for("api.get_user_payments", page=page - 1, _external=True)
     next = None
     if pagination.has_next:
-        next = url_for('api.get_user_payments', page=page+1, _external=True)
+        next = url_for("api.get_user_payments", page=page + 1, _external=True)
 
-    return jsonify({
-        'payments': [pay.to_json() for pay in payments],
-        'prev': prev,
-        'next': next,
-        "page": page,
-        "per_page": per_page,
-        "total": pagination.total,
-    })
+    return jsonify(
+        {
+            "payments": [pay.to_json() for pay in payments],
+            "prev": prev,
+            "next": next,
+            "page": page,
+            "per_page": per_page,
+            "total": pagination.total,
+        }
+    )

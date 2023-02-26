@@ -1,15 +1,15 @@
-CIV = "CI - Côte d'Ivoire"
-SEN = "SN - Sénégal"
-TOG = "TG - Togo"
-BF = "BF - Burkina Faso"
-CMR = "CM - Cameroun"
-RDC = "CG - Congo (Brazzaville)"
-GUI = "GN - Guinée"
-CON = "CD - Congo (Kinshasa)"
-NIG = "NE - Niger"
-BEN = "BN - Benin"
-MAL = "ML - Mali"
-COM = "KM - Comores"
+CIV = "Côte d'Ivoire"
+SEN = "Sénégal"
+TOG = "Togo"
+BF = "Burkina Faso"
+CMR = "Cameroun"
+RDC = "Congo (Brazzaville)"
+GUI = "Guinée"
+CON = "Congo (Kinshasa)"
+NIG = "Niger"
+BEN = "Benin"
+MAL = "Mali"
+COM = "Comores"
 
 COUNTRY = (
     (CIV, "CI - Côte d'Ivoire"),
@@ -27,8 +27,8 @@ COUNTRY = (
 )
 COUNTRY_DEFAULT = CIV
 
-XOF = "XOF - Franc CFA BCEAO"
-XAF = "XAF - Franc CFA BEAC"
+XOF = "XOF"
+XAF = "XAF"
 DEVISE = (
     (XOF, "XOF - CFA Franc BCEAO"),
     (XAF, "XAF - CFA Franc BEAC"),

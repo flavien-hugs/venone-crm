@@ -3,22 +3,23 @@
 		<a v-bind:href="house.house_url" class="badge bg-blue-soft text-blue">{ house.house_id }</a>
 	</td>
 	<td>
-		{ house.house_type } de { house.house_rent.toLocaleString() }/mois situé à { house.house_address }
+		{ house.house_type }, situé à { house.house_address }
 	</td>
-	<td><span class="badge bg-green-soft text-green">{ house.house_status }</span></td>
-	<td>{ house.created_at }</td>
+	<td>{ house.house_rent.toLocaleString() } { house.user.devise }</td>
+	<td>{ house.house_lease_start_date.toLocaleString() }</td>
+	<td><span class="badge bg-danger text-white p-2">{ house.house_status }</span></td>
 	<td>
 		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
 			<i class="text-primary" data-feather="eye"></i>
 		</button>
 
 		<button @click="updateHouse(house)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-secondary" data-feather="edit-2"></i>
+			<i class="text-success" data-feather="edit"></i>
 		</button>
 
-		<button @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+		<!--  <button @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
 			<i class="text-danger" data-feather="trash-2"></i>
-		</button>
+		</button> -->
 	</td>
 </tr>
 

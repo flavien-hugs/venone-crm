@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 
 from flask import jsonify
 from flask import request
@@ -18,7 +19,7 @@ from . import api
 def get_all_houseowners():
 
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 20, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
     pagination = VNHouseOwner.get_owners_list().paginate(
         page=page, per_page=per_page, error_out=False
@@ -132,14 +133,29 @@ def owner_create_tenant(owner_uuid):
         house.vn_house_month = house_data.get("house_month")
         house.vn_house_number_room = house_data.get("house_number_room")
         house.vn_house_address = house_data.get("house_address")
-        house_lease = house_data.get("house_lease_start_date")
+
+        lease_start_date = house_data.get("house_lease_start_date")
         house.vn_house_lease_start_date = (
-            datetime.strptime(house_lease, "%Y-%m-%d").date() if house_lease else None
+            datetime.strptime(lease_start_date, "%Y-%m-%d").date()
+            if lease_start_date
+            else None
         )
 
-        notice_period = timedelta(days=15)
-        due_date = datetime.strptime(house_lease, "%Y-%m-%d").date() + timedelta(days=45) - notice_period
-        house.vn_house_lease_end_date = due_date
+        notice_period_days = 15
+        lease_duration_days = 45
+
+        notice_period = timedelta(days=notice_period_days)
+
+        lease_end_date = (
+            lease_start_date + timedelta(days=lease_duration_days) - notice_period
+        )
+
+        if hasattr(house, "vn_house_lease_end_date"):
+            house.vn_house_lease_end_date = lease_end_date
+        else:
+            raise AttributeError(
+                "L'objet house doit avoir un attribut 'vn_house_lease_end_date'"
+            )
 
         house.vn_user_id = current_user.id
         house.vn_owner_id = owner.id
@@ -184,11 +200,9 @@ def get_houseowner_houses(owner_uuid):
     owner = VNHouseOwner.get_owner(owner_uuid)
 
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 20, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
-    pagination = owner.houses.query.paginate(
-        page=page, per_page=per_page, error_out=False
-    )
+    pagination = owner.houses.paginate(page=page, per_page=per_page, error_out=False)
 
     houses = pagination.items
     prev = None
@@ -221,11 +235,9 @@ def get_houseowner_tenants(owner_uuid):
     owner = VNHouseOwner.get_owner(owner_uuid)
 
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 20, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
-    pagination = owner.tenants.query.paginate(
-        page=page, per_page=per_page, error_out=False
-    )
+    pagination = owner.tenants.paginate(page=page, per_page=per_page, error_out=False)
 
     tenants = pagination.items
     prev = None

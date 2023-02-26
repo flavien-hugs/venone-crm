@@ -1,5 +1,3 @@
 from src.payment.models import VNPayment
 
-__all__ = (
-    "VNPayment",
-)
+__all__ = ("VNPayment",)

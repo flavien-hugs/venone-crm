@@ -1,48 +1,55 @@
 window.addEventListener('DOMContentLoaded', event => {
     const OWNER_DATA = {
-        owner_uuid: '',
-        fullname: '',
-        addr_email: '',
-        card_number: '',
-        location: '',
-        parent_name: '',
-        phonenumber_one: '',
-        phonenumber_two: '',
+        owner_uuid: null,
+        fullname: null,
+        addr_email: null,
+        card_number: null,
+        profession: null,
+        location: null,
+        parent_name: null,
+        parent_name: null,
+        phonenumber_one: null,
+        phonenumber_two: null
     };
 
     const HOUSE_DATA = {
-        house_uuid: '',
-        house_type: '',
-        house_rent: '',
-        house_guaranty: '',
-        house_month: '',
-        house_location: '',
-        house_number_room: '',
-        house_address: '',
-        house_lease_start_date: ''
+        house_uuid: null,
+        house_type: null,
+        house_rent: null,
+        house_guaranty: null,
+        house_month: null,
+        house_location: null,
+        house_number_room: null,
+        house_address: null,
+        house_lease_start_date: new Date().toISOString().substr(0, 10)
     };
 
     const TENANT_DATA = {
         tenant_uuid: '',
-        fullname: '',
-        addr_email: '',
-        card_number: '',
-        profession: '',
-        parent_name: '',
-        phonenumber_one: '',
-        phonenumber_two: '',
+        fullname: null,
+        addr_email: null,
+        card_number: null,
+        profession: null,
+        location: null,
+        parent_name: null,
+        parent_name: null,
+        phonenumber_one: null,
+        phonenumber_two: null
     };
 
     var app = Vue.createApp({
         data() {
             return {
-                tenants: [],
                 tenant: [],
-                perPage: 20,
+                tenants: [],
+
+                searchQuery: "",
+                perPage: 10,
                 currentStep: 1,
                 currentPage: 1,
                 totalPages: 1,
                 isLoading: false,
+
                 tenantUUID: null,
                 messageAlert: "",
                 showMessageAlert: false,
@@ -54,10 +61,6 @@ window.addEventListener('DOMContentLoaded', event => {
         delimiters: ["{", "}"],
         compilerOptions: {
             delimiters: ["{", "}"]
-        },
-
-        mounted() {
-            this.getTenants()
         },
 
         watch: {
@@ -88,6 +91,40 @@ window.addEventListener('DOMContentLoaded', event => {
             'houseData.house_guaranty': function (f){
                 this.houseData.house_guaranty = this.filterNumber(f);
             },
+
+            searchQuery: function() {
+                this.filteredTenants;
+            }
+        },
+
+        mounted() {
+            this.getTenants();
+        },
+
+        computed: {
+            filteredTenants() {
+                if (!this.searchQuery) {
+                    return this.tenants;
+                }
+
+                const searchRegex = new RegExp(this.searchQuery, 'i');
+
+                    return this.tenants.filter(tenant => {
+                        const fullnameMatch = searchRegex.test(tenant.fullname);
+                        const addrEmailMatch = searchRegex.test(tenant.addr_email);
+                        const phonenumberOneMatch = searchRegex.test(tenant.phonenumber_one);
+                        const phonenumberTwoMatch = searchRegex.test(tenant.phonenumber_two);
+                        const cardNumberMatch = searchRegex.test(tenant.card_number);
+
+                    return (
+                        fullnameMatch ||
+                        addrEmailMatch ||
+                        phonenumberOneMatch ||
+                        phonenumberTwoMatch ||
+                        cardNumberMatch
+                    );
+                });
+            },
         },
 
         methods: {
@@ -114,7 +151,7 @@ window.addEventListener('DOMContentLoaded', event => {
             async getTenants() {
                 try {
                     this.isLoading = true;
-                    const tenantURL = `/api/tenants/?page=${this.currentPage}`;
+                    const tenantURL = `/api/tenants/?page=${this.currentPage}&per_page=${this.perPage}&q=${this.searchQuery}`;
 
                     const response = await fetch(tenantURL, {
                         method: "GET",
@@ -123,17 +160,20 @@ window.addEventListener('DOMContentLoaded', event => {
                         }
                     });
 
-                    if (response.ok) {
+                    this.isLoading = false;
+                    console.log(response);
+
+                    if (response.status == 200) {
                         const data = await response.json();
                         this.tenants = data.tenants;
                         this.totalPages = Math.ceil(data.total / this.perPage);
-                        this.isLoading = false;
+                        this.currentPage = data.page;
                     } else {
-                        throw new Error("NETWORK RESPONSE ERROR");
+                        this.isLoading = false;
+                        console.log(error);
                     }
                 } catch (error) {
                     console.log("FETCH ERROR:", error);
-                    this.tenants = error;
                 }
             },
 
@@ -265,10 +305,10 @@ window.addEventListener('DOMContentLoaded', event => {
 
             nextPage() {
                 this.currentPage++;
-                    this.getTenants();
+                this.getTenants();
                 window.scrollTo({top: 0, behavior: 'smooth'});
             },
-        },
+        }
     })
 
     app.mount('#tenantTable');

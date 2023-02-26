@@ -153,26 +153,30 @@ class VNUser(
             "ip_address": self.vn_ip_address,
             "is_company": self.vn_company,
             "is_owner": self.vn_house_owner,
+            "is_admin": self.is_administrator(),
             "is_activated": self.vn_activated,
             "owner_count": self.houseowners.count(),
             "house_count": self.houses.count(),
             "tenant_count": self.tenants.count(),
             "payment": self.payments.count(),
             "last_seen": self.vn_last_seen,
+            "total_payment_month": self.total_payments_month(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "url": url_for("api.get_user", user_uuid=self.uuid, _external=True),
-            "owners": url_for(
-                "api.get_user_owners", user_uuid=self.uuid, _external=True
-            ),
-            "houses": url_for(
-                "api.get_user_houses", user_uuid=self.uuid, _external=True
-            ),
-            "tenants": url_for(
-                "api.get_user_tenants", user_uuid=self.uuid, _external=True
-            ),
-            "payments": url_for(
-                "api.get_user_payments", user_uuid=self.uuid, _external=True
-            ),
+            "_links": {
+                "url": url_for("api.get_user", user_uuid=self.uuid, _external=True),
+                "owners": url_for(
+                    "api.get_user_owners", user_uuid=self.uuid, _external=True
+                ),
+                "houses": url_for(
+                    "api.get_user_houses", user_uuid=self.uuid, _external=True
+                ),
+                "tenants": url_for(
+                    "api.get_user_tenants", user_uuid=self.uuid, _external=True
+                ),
+                "payments": url_for(
+                    "api.get_user_payments", user_uuid=self.uuid, _external=True
+                ),
+            },
         }
         return json_user
 
@@ -248,8 +252,40 @@ class VNUser(
         db.session.add(self)
 
     @staticmethod
-    def get_current_user():
-        return VNUser.query.filter_by(id=current_user.id).first()
+    def get_users_list():
+        return VNUser.query.filter_by(id=current_user.id, vn_activated=True)
+
+    @staticmethod
+    def get_user_logged():
+        return VNUser.query.filter_by(
+            id=current_user.id, uuid=current_user.uuid, vn_activated=True
+        ).first()
+
+    def total_payments_month(self):
+
+        from src.payment import VNPayment
+        from src.tenant import VNHouse, VNHouseOwner, VNTenant
+
+        now = datetime.now()
+        month = now.month
+        year = now.year
+
+        total_payments = (
+            db.session.query(db.func.sum(VNPayment.vn_pay_amount))
+            .join(VNHouse)
+            .join(VNTenant)
+            .join(VNHouseOwner)
+            .join(VNUser)
+            .filter(
+                VNUser.uuid == current_user.uuid,
+                VNUser.id == self.id,
+                db.extract("month", VNPayment.vn_pay_date) == month,
+                db.extract("year", VNPayment.vn_pay_date) == year,
+            )
+            .scalar()
+        )
+        total_payments = total_payments or 0
+        return total_payments
 
     @staticmethod
     def get_label(user):
@@ -260,14 +296,6 @@ class VNUser(
             return self.vn_fullname
         if self.vn_company:
             return self.vn_agencie_name
-
-    @staticmethod
-    def get_users_list():
-        return VNUser.query.filter_by(id=current_user.id, vn_activated=True)
-
-    @staticmethod
-    def get_user(user_uuid):
-        return VNUser.query.filter_by(id=current_user.id, uuid=user_uuid).first()
 
 
 class AnonymousUser(AnonymousUserMixin):

@@ -24,30 +24,49 @@
             </div>
         </div>
 
-        <div v-else-if="tenants.length > 0" class="card card-header-actions mx-auto">
+        <div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
+                </div>
+            </div>
+        </div>
 
+        <div v-else-if="tenants.length > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
-                <span class="fw-700">Locataires ({ tenants.length })</span>
-                <button @click="createTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700">
-                    <i class="me-2" data-feather="user-plus"></i>
-                    Enregistrer un locataire
-                </button>
+                <span class="fw-700">Locataire ({ tenants.length })</span>
+                <div>
+                    <button @click="createTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700">
+                        <i class="me-2" data-feather="user-plus"></i>Enregistrer un locataire
+                    </button>
+                </div>
             </div>
 
             <div class="card-body">
+                <div class="input-group input-group-joined input-group-solid shadow-none">
+                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                    <input
+                        type="text"
+                        placeholder="Rechercher un locataire ..."
+                        v-model="searchQuery"
+                        class="form-control shadow-none ps-0"
+                    >
+                </div>
+
                 <table class="table table-hover table-responsive">
                     <thead class="small">
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Nom &amp; prénoms / contact</th>
+                            <th scope="col">Nom &amp; prénoms / téléphone</th>
                             <th scope="col">Loyer du mois en cours</th>
-                            <th scope="col">Status paiement</th>
                             <th scope="col">Date de location</th>
+                            <th scope="col">Délais de paiement</th>
+                            <th scope="col">Status paiement</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <p v-if="isLoading">Loading...</p>
                         {% include "tenant/paths/_tenant.html" %}
                     </tbody>
                 </table>

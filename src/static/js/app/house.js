@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', event => {
             return {
                 houses: [],
                 house: [],
-                perPage: 20,
+                perPage: 10,
                 currentPage: 1,
                 totalPages: 1,
                 isLoading: false,
@@ -35,11 +35,10 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         methods: {
-
             async getHouses() {
                 try {
                     this.isLoading = true;
-                    const houseURL = `/api/houses/?page=${this.currentPage}`;
+                    const houseURL = `/api/houses/?pag=${this.currentPage}`;
 
                     const response = await fetch(houseURL, {
                         method: "GET",
@@ -144,7 +143,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             prevPage() {
                 this.currentPage--;
-                his.getHouses();
+                this.getHouses();
                 window.scrollTo({top: 0, behavior: 'smooth'});
             },
 
