@@ -13,13 +13,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Fusionner les branches
-        run: git merge origin dev
+        run: git merge dev
 
       - name: Vérifier la fusion
-        run: git diff --exit-code --quiet origin dev
+        run: git diff --exit-code --quiet dev
 
       - name: Pousser les modifications vers la branche cible
-        run: git push origin dev
+        run: git push dev
 
       - name: Envoyer une notification en cas d'échec
         if: failure()
