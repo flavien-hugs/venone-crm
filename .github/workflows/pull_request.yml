@@ -1,0 +1,26 @@
+name: Automatic Pull Request
+
+on:
+  push:
+    branches:
+      - tenant
+
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout référentiel
+        uses: actions/checkout@v2
+
+      - name: Fusionner les branches
+        run: git merge origin/dev
+
+      - name: Vérifier la fusion
+        run: git diff --exit-code --quiet origin/dev
+
+      - name: Pousser les modifications vers la branche cible
+        run: git push origin dev
+
+      - name: Envoyer une notification en cas d'échec
+        if: failure()
+        run: echo "La fusion a échoué."
