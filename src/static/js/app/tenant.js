@@ -38,11 +38,11 @@ window.addEventListener('DOMContentLoaded', event => {
             return {
                 tenants: [],
                 tenant: [],
-                perPage: 20,
+                perPage: 10,
                 currentStep: 1,
                 currentPage: 1,
                 totalPages: 1,
-                isLoading: false,
+                isLoading: "",
                 tenantUUID: null,
                 messageAlert: "",
                 showMessageAlert: false,

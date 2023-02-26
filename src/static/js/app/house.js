@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', event => {
             return {
                 houses: [],
                 house: [],
-                perPage: 20,
+                perPage: 10,
                 currentPage: 1,
                 totalPages: 1,
                 isLoading: false,
@@ -35,7 +35,6 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         methods: {
-
             async getHouses() {
                 try {
                     this.isLoading = true;
@@ -144,7 +143,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             prevPage() {
                 this.currentPage--;
-                his.getHouses();
+                this.getHouses();
                 window.scrollTo({top: 0, behavior: 'smooth'});
             },
 
