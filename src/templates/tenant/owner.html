@@ -21,10 +21,20 @@
         </div>
 
         <div v-else-if="owners.length > 0" class="card card-header-actions">
+
+            <div v-if="isLoading" class="preloader">
+                <div class="preloader-body">
+                    <p>Chargement en cours...</p>
+                    <div class="cssload-container">
+                        <div class="cssload-speeding-wheel"></div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="card-header">
                 <span class="fw-700">Bailleurs ({ owners.length })</span>
                 <form>
-                    <input class="form-control" placeholder="Rechercher">
+                    <input class="form-control form-control-sm" placeholder="Rechercher">
                 </form>
             </div>
 
@@ -42,7 +52,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <p v-if="isLoading">Loading...</p>
                         {% include "tenant/paths/_owner.html" %}
                     </tbody>
                 </table>

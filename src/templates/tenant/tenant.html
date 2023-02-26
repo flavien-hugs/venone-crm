@@ -26,8 +26,19 @@
 
         <div v-else-if="tenants.length > 0" class="card card-header-actions mx-auto">
 
+            <div v-if="isLoading" class="preloader">
+                <div class="preloader-body">
+                    <p>Chargement en cours...</p>
+                    <div class="cssload-container">
+                        <div class="cssload-speeding-wheel"></div>
+                    </div>
+                </div>
+            </div>
+        
             <div class="card-header">
-                <span class="fw-700">Locataires ({ tenants.length })</span>
+                <form>
+                    <input class="form-control form-control-sm w-70" placeholder="Rechercher">
+                </form>
                 <button @click="createTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700">
                     <i class="me-2" data-feather="user-plus"></i>
                     Enregistrer un locataire
@@ -47,7 +58,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <p v-if="isLoading">Loading...</p>
                         {% include "tenant/paths/_tenant.html" %}
                     </tbody>
                 </table>

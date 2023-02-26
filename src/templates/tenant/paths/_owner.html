@@ -4,8 +4,8 @@
 	</td>
 	<td>{ own.fullname } ({own.phonenumber_one})</td>
 	<td>100 0000</td>
-	<td>{ own.number_houses } <a v-if="own.number_houses > 0" v-bind:href="own._links.houses_url">(Afficher)</a></td>
-	<td>{ own.number_tenants } <a v-if="own.number_tenants > 0" v-bind:href="own._links.tenants_url">(Afficher)</a></td>
+	<td>{ own.number_houses } <span v-if="own.number_houses > 0">(Afficher)</span></td>
+	<td>{ own.number_tenants } <span v-if="own.number_tenants > 0">(Afficher)</span></td>
 	<td>{ own.created_at }</td>
 	<td>
 		<button @click="getOwner(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-primary me-2">
