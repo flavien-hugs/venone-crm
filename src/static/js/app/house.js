@@ -38,7 +38,7 @@ window.addEventListener('DOMContentLoaded', event => {
             async getHouses() {
                 try {
                     this.isLoading = true;
-                    const houseURL = `/api/houses/?page=${this.currentPage}`;
+                    const houseURL = `/api/houses/?pag=${this.currentPage}`;
 
                     const response = await fetch(houseURL, {
                         method: "GET",
