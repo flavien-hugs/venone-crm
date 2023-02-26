@@ -1,17 +1,15 @@
 import random
 import string
-import requests
-from decimal import Decimal
 from datetime import date
+from decimal import Decimal
 
-from flask import url_for, current_app
+import requests
+from cinetpay_sdk.s_d_k import Cinetpay
+from flask import current_app
 from flask_login import current_user
 from src import db
-
-from src.tenant.models import VNTenant
 from src.mixins.models import TimestampMixin
-
-from cinetpay_sdk.s_d_k import Cinetpay
+from src.tenant.models import VNTenant
 
 
 def id_generator():
@@ -45,26 +43,22 @@ class VNPayment(TimestampMixin):
         json_payment = {
             "user_uuid": current_user.uuid,
             "payment_uuid": self.uuid,
-
             "user_id": self.vn_payee_id,
             "owner_id": self.vn_owner_id,
             "tenant_id": self.vn_tenant_id,
             "house_id": self.vn_house_id,
-
             "amount": self.calculate_late_penalty(),
             "payment_date": self.vn_pay_date.strftime("%d-%m-%Y"),
             "payment_late_penalty": self.vn_pay_late_penalty,
             "payment_status": self.vn_pay_status,
             "house": self.house_payment.to_json(),
             "tenant": self.tenant_payment.to_json(),
-
             "make_payment": self.make_payment(),
             "payments": self.get_payments(),
             "payments_by_month": self.get_payments_by_month(),
             "payments_by_year": self.get_payments_by_year(),
             "outstanding_payments": self.get_outstanding_payments(),
             "total_payments": self.get_total_payments(),
-
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
         }
         return json_payment
@@ -75,7 +69,7 @@ class VNPayment(TimestampMixin):
     def __repr__(self):
         return f"Payment({self.id}, {self.vn_payment_id}, {self.vn_payment_date})"
 
-    def calculate_late_penalty(tenant_id):
+    def calculate_late_penalty(self):
         today = date.today()
         days_late = ((today - self.house_payment.vn_house_lease_start_date).days) + 3
         if days_late > 10 and not self.vn_pay_status:
@@ -123,13 +117,13 @@ class VNPayment(TimestampMixin):
         client = Cinetpay(API_KEY, SITE_ID)
 
         data = {
-            'amount': self.vn_pay_amount,
-            'currency': 'XOF',
-            'transaction_id': self.vn_payment_id,
-            'description': f'Paiement du loyer {tenant.house.vn_house_id}',
-            'return_url': 'https://venone.app',
-            'notify_url': 'https://venone.app',
-            'customer_surname': self.tenant.vn_fullname,
+            "amount": self.vn_pay_amount,
+            "currency": "XOF",
+            "transaction_id": self.vn_payment_id,
+            "description": f"Paiement du loyer {tenant.house.vn_house_id}",
+            "return_url": "https://venone.app",
+            "notify_url": "https://venone.app",
+            "customer_surname": self.tenant.vn_fullname,
         }
 
         response = client.PaymentInitialization(data)
@@ -137,7 +131,7 @@ class VNPayment(TimestampMixin):
         if response.status_code != 200:
             return None
 
-        payment_url = response['data']['payment_url']
+        payment_url = response["data"]["payment_url"]
         return payment_url
 
     def send_payment_link(payment_url, tenant_id):
@@ -149,10 +143,12 @@ class VNPayment(TimestampMixin):
 
         phone_number = tenant.vn_phonenumber_one
         message = f"""
-        Bonjour {tenant.vn_fullname}, Votre loyer du mois précédent est prêt. Veuillez cliquer sur ce lien:
+        Bonjour {tenant.vn_fullname}, Votre loyer du mois
+        précédent est prêt. Veuillez cliquer sur ce lien:
         {payment_url} pour procéder au paiement.
         """
-        sms_url = f"https://sms.lws.fr/sms/api?action=send-sms&api_key={SMS_APIKEY}&to={phone_number}&from={SMS_SENDER_ID}&sms={message}"
+        sms_url = f"https://sms.lws.fr/sms/api?action=send-sms&api_key={SMS_APIKEY}\
+            &to={phone_number}&from={SMS_SENDER_ID}&sms={message}"
 
         response = requests.post(sms_url)
 
