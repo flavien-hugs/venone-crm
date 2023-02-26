@@ -1,8 +1,6 @@
 import random
 import string
 from datetime import date
-from datetime import datetime
-from datetime import timedelta
 
 from flask import url_for
 from flask_login import current_user
@@ -61,6 +59,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         json_owner = {
             "owner_uuid": self.uuid,
             "user_uuid": current_user.uuid,
+            "user": current_user.to_json(),
             "owner_id": self.get_owner_id(),
             "gender": self.vn_gender,
             "fullname": self.vn_fullname,
@@ -207,6 +206,7 @@ class VNHouse(TimestampMixin):
     def to_json(self):
         json_house = {
             "house_uuid": self.uuid,
+            "user": current_user.to_json(),
             "user_uuid": current_user.uuid,
             "house_id": self.get_house_id(),
             "house_type": self.vn_house_type,
@@ -220,9 +220,7 @@ class VNHouse(TimestampMixin):
             "house_lease_start_date": self.vn_house_lease_start_date.strftime(
                 "%d-%m-%Y"
             ),
-            "house_lease_end_date": self.vn_house_lease_end_date.strftime(
-                "%d-%m-%Y"
-            ),
+            "house_lease_end_date": self.vn_house_lease_end_date.strftime("%d-%m-%Y"),
             "house_url": url_for("api.get_house", house_uuid=self.uuid, _external=True),
             "_links": {
                 "owner_url": url_for("api.get_houseowner", owner_uuid=self.uuid),
@@ -291,6 +289,7 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     def to_json(self):
         json_tenant = {
             "user_uuid": current_user.uuid,
+            "user": current_user.to_json(),
             "tenant_uuid": self.uuid,
             "tenant_id": self.get_tenant_id(),
             "owner": self.tenants.to_json(),
