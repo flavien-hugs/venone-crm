@@ -220,8 +220,9 @@ class VNHouse(TimestampMixin):
             "house_lease_start_date": self.vn_house_lease_start_date.strftime(
                 "%d-%m-%Y"
             ),
-            "house_lease_end_date": self.vn_house_lease_end_date,
-            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "house_lease_end_date": self.vn_house_lease_end_date.strftime(
+                "%d-%m-%Y"
+            ),
             "house_url": url_for("api.get_house", house_uuid=self.uuid, _external=True),
             "_links": {
                 "owner_url": url_for("api.get_houseowner", owner_uuid=self.uuid),
@@ -257,12 +258,6 @@ class VNHouse(TimestampMixin):
         return VNHouse.query.filter_by(
             uuid=house_uuid, vn_user_id=current_user.id
         ).first()
-
-    def lease_end_date(self):
-        start_date = self.vn_house_lease_start_date
-        notice_period = timedelta(days=15)
-        due_date = start_date + timedelta(days=45) - notice_period
-        return due_date
 
 
 class VNTenant(DefaultUserInfoModel, TimestampMixin):
