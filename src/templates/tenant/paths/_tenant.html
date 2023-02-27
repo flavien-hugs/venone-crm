@@ -38,28 +38,28 @@
 				</div>
 				<div class="modal-body">
 					<div class="row gx-3 mb-3">
-						<div class="col-md-6">
+						<div class="col-6">
 							<label for="fullname" class="form-label">Nom &amp; prénoms</label>
 							<input type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
 						</div>
 
-						<div class="col-md-6">
+						<div class="col-6">
 							<label for="card_number" class="form-label">N° CNI/Attestion/Passport</label>
 							<input type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
 						</div>
 					</div>
 
 					<div class="row gx-3 mb-3">
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="phonenumber_one" class="form-label">Téléphone I</label>
 							<input type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
 						</div>
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="phonenumber_two" class="form-label">Téléphone II</label>
 							<input type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
 						</div>
 
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="addr_email" class="form-label">Addresse e-mail</label>
 							<input type="email" class="form-control" id="addr_email" v-model="tenantData.addr_email">
 						</div>
@@ -99,12 +99,12 @@
 
 			<div class="modal-footer">
 				<div class="row">
-					<div class="col-xl-6 d-grid">
+					<div class="col-6 d-grid">
 						<button @click="tenantUUID = null; onDeleteTenant = false" class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
 						Annuler</button>
 					</div>
 
-					<div class="col-xl-6 d-grid">
+					<div class="col-6 d-grid">
 						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none">
 						Oui</button>
 					</div>

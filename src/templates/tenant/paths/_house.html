@@ -36,29 +36,29 @@
 
 				<div class="modal-body">
 					<div class="row gx-3 mb-4">
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
 			            </div>
 			        </div>
 
 			        <div class="row gx-3 mb-4">
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
 			            </div>
 			        </div>
@@ -88,11 +88,11 @@
 
 			<div class="modal-footer">
 				<div class="row">
-					<div class="col-xl-6 d-grid">
+					<div class="col-6 d-grid">
 						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-danger text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
 					</div>
 
-					<div class="col-xl-6 d-grid">
+					<div class="col-6 d-grid">
 						<button @click="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
 					</div>
 				</div>
