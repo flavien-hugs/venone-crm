@@ -151,7 +151,7 @@ def owner_create_tenant(owner_uuid):
         )
 
         if hasattr(house, "vn_house_lease_end_date"):
-            house.vn_house_lease_end_date = lease_end_date
+            house.vn_house_lease_start_date = lease_end_date
         else:
             raise AttributeError(
                 "L'objet house doit avoir un attribut 'vn_house_lease_end_date'"

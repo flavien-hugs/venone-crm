@@ -116,7 +116,7 @@ def register_tenant():
 
         notice_period = timedelta(days=notice_period_days)
         lease_end_date = (
-            lease_start_date + timedelta(days=lease_duration_days) - notice_period
+            house.vn_house_lease_start_date + timedelta(days=lease_duration_days) - notice_period
         )
 
         if hasattr(house, "vn_house_lease_end_date"):
