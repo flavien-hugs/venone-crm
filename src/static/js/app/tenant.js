@@ -1,40 +1,40 @@
 window.addEventListener('DOMContentLoaded', event => {
     const OWNER_DATA = {
-        owner_uuid: null,
-        fullname: null,
-        addr_email: null,
-        card_number: null,
-        profession: null,
-        location: null,
-        parent_name: null,
-        parent_name: null,
-        phonenumber_one: null,
-        phonenumber_two: null
+        owner_uuid: '',
+        fullname: '',
+        addr_email: '',
+        card_number: '',
+        profession: '',
+        location: '',
+        parent_name: '',
+        parent_name: '',
+        phonenumber_one: '',
+        phonenumber_two: ''
     };
 
     const HOUSE_DATA = {
-        house_uuid: null,
-        house_type: null,
-        house_rent: null,
-        house_guaranty: null,
-        house_month: null,
-        house_location: null,
-        house_number_room: null,
-        house_address: null,
-        house_lease_start_date: new Date().toISOString().substr(0, 10)
+        house_uuid: '',
+        house_type: '',
+        house_rent: '',
+        house_guaranty: '',
+        house_month: '',
+        house_location: '',
+        house_number_room: '',
+        house_address: '',
+        house_lease_start_date: new Date().toISOString().substring(0, 10)
     };
 
     const TENANT_DATA = {
         tenant_uuid: '',
-        fullname: null,
-        addr_email: null,
-        card_number: null,
-        profession: null,
-        location: null,
-        parent_name: null,
-        parent_name: null,
-        phonenumber_one: null,
-        phonenumber_two: null
+        fullname: '',
+        addr_email: '',
+        card_number: '',
+        profession: '',
+        location: '',
+        parent_name: '',
+        parent_name: '',
+        phonenumber_one: '',
+        phonenumber_two: ''
     };
 
     var app = Vue.createApp({
@@ -161,7 +161,6 @@ window.addEventListener('DOMContentLoaded', event => {
                     });
 
                     this.isLoading = false;
-                    console.log(response);
 
                     if (response.status == 200) {
                         const data = await response.json();
