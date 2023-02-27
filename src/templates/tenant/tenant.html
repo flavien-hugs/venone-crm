@@ -54,22 +54,24 @@
                     >
                 </div>
 
-                <table class="table table-hover table-responsive">
-                    <thead class="small">
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Nom &amp; prénoms / téléphone</th>
-                            <th scope="col">Loyer du mois en cours</th>
-                            <th scope="col">Date de location</th>
-                            <th scope="col">Délais de paiement</th>
-                            <th scope="col">Status paiement</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% include "tenant/paths/_tenant.html" %}
-                    </tbody>
-                </table>
+                <div class="table-responsive-sm">
+                    <table class="table table-hover">
+                        <thead class="small">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Nom &amp; prénoms / téléphone</th>
+                                <th scope="col">Loyer du mois en cours</th>
+                                <th scope="col">Date de location</th>
+                                <th scope="col">Délais de paiement</th>
+                                <th scope="col">Status paiement</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% include "tenant/paths/_tenant.html" %}
+                        </tbody>
+                    </table>
+                </div>
 
                 {% include "tenant/paths/_paginate.html" %}
             </div>

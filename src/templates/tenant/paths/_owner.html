@@ -1,5 +1,5 @@
 <tr v-for="own in owners" :key="own.owner_uuid">
-	<td>
+	<td scope="row">
 		<a title="Détail du bailleur" type="button" @click="getOwner(own.owner_uuid)" class="badge bg-blue-soft text-blue">{ own.owner_id }</a>
 	</td>
 	<td>{ own.fullname } ({own.phonenumber_one})</td>
