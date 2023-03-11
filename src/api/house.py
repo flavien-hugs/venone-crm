@@ -1,6 +1,7 @@
 from flask import jsonify
 from flask import request
 from flask import url_for
+from flask_login import current_user
 from flask_login import login_required
 from src.tenant import VNHouse
 
@@ -34,6 +35,7 @@ def get_all_houses():
             "page": page,
             "per_page": per_page,
             "total": pagination.total,
+            "user": current_user.to_json(),
         }
     )
 

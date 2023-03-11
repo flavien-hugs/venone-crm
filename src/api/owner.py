@@ -41,6 +41,7 @@ def get_all_houseowners():
             "page": page,
             "per_page": per_page,
             "total": pagination.total,
+            "user": current_user.to_json(),
         }
     )
 
@@ -117,6 +118,11 @@ def update_houseowner(owner_uuid):
 @api.post("/owner/<string:owner_uuid>/create_tenant/")
 @login_required
 def owner_create_tenant(owner_uuid):
+
+    """
+    Vue permettant la création d'un locataire
+    pour un compte entreprise
+    """
 
     owner = VNHouseOwner.get_owner(owner_uuid)
 
