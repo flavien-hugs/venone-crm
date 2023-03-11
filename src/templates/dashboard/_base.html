@@ -1,0 +1,67 @@
+{% extends "_base.html" %}
+
+{% block other_css_src %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock other_css_src %}
+
+{% block head_title %}
+    {{ current_user.get_name() }} &smid; {{ super() }}
+{% endblock head_title %}
+
+{% block body_content %}
+    <section class="nav-fixed">
+        {% include "dashboard/partials/_sidenav.html" %}
+
+        <section id="layoutSidenav">
+            
+            {% include "dashboard/partials/_layoutsidenav.html" %}
+
+            <section id="layoutSidenav_content">
+                <main>
+                    <header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
+                        <div class="container-xl px-4">
+                            <div class="page-header-content">
+                                <div class="row align-items-center justify-content-between pt-3">
+                                    <div class="col-auto mb-3">
+                                        <h1 class="page-header-title">
+                                            <div class="page-header-icon"><i data-feather="user"></i></div>
+                                            {{ page_title | e }}
+                                        </h1>
+                                    </div>
+
+                                    {% block breadcrmub_plus %}
+                                    {% endblock breadcrmub_plus %}
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="container-xl px-4 mt-4">
+                        {% block dashboard_content %}
+                        {% endblock dashboard_content %}
+                    </div>
+                </main>
+
+                <footer class="footer-admin mt-auto footer-light">
+                    <div class="container-xl px-4">
+                        <div class="row">
+                            <div class="col-md-6 small">&copy; {{ moment().format('YYYY') }} Venone, filiale CGIC GROUP</div>
+                            <div class="col-md-6 text-md-end small">
+                                <a href="#!">Politique de confidentialité</a>
+                                <a href="#!">Conditions générales d'utilisation</a>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </section>
+        </section>
+    </section>
+{% endblock body_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app/vue.global.prod.js') }}"></script>
+{% endblock other_js_src %}

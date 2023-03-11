@@ -1,0 +1,97 @@
+<div class="mb-3">
+    <label>Votre adresse e-mail</label>
+    <span class="form-control bg-light">{{ current_user.vn_addr_email }}</span>
+    <small>Pour changer votre adresse e-mail cliquer <a href="~">ici</a></small>
+</div>
+
+<div class="row gx-3 mb-3">
+    <div class="col-2">
+        {{ form.gender.label(class="small mb-1") }}
+        {{ form.gender(class="form-select") }}
+    </div>
+
+    <div class="col-5">
+        {{ form.fullname.label(class="small mb-1") }}
+        {% if form.fullname.errors %}
+            {{ form.fullname(class="form-control", placeholder=form.fullname.label.text) }}
+            <div class="invalid-feedback">
+                {% for error in form.fullname.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.fullname(class="form-control", placeholder=form.fullname.label.text) }}
+        {% endif %}
+    </div>
+
+    <div class="col-5">
+        {{ form.cni_number.label(class="small mb-1") }}
+        {% if form.cni_number.errors %}
+            {{ form.cni_number(class="form-control", placeholder=form.cni_number.label.text) }}
+            <div class="invalid-feedback">
+                {% for error in form.cni_number.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.cni_number(class="form-control", placeholder=form.cni_number.label.text) }}
+        {% endif %}
+    </div>
+</div>
+
+<div class="row gx-3 mb-3">
+    <div class="col-md-6">
+        {{ form.agencie_name.label(class="small mb-1") }}
+        {% if form.agencie_name.errors %}
+            {{ form.agencie_name(class="form-control", placeholder=form.agencie_name.label.text) }}
+            <div class="invalid-feedback">
+                {% for error in form.agencie_name.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.agencie_name(class="form-control", placeholder=form.agencie_name.label.text) }}
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        {{ form.business_number.label(class="small mb-1") }}
+        {% if form.business_number.errors %}
+            {{ form.business_number(class="form-control", placeholder=form.business_number.label.text) }}
+            <div class="invalid-feedback">
+                {% for error in form.business_number.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.business_number(class="form-control", placeholder=form.business_number.label.text) }}
+        {% endif %}
+    </div>
+</div>
+
+<div class="row gx-3 mb-3">
+    <div class="col-md-6">
+        <label>Numéro de téléphone 1</label>
+        <span class="form-control bg-light">{{ current_user.vn_phonenumber_one }}</span>
+    </div>
+    <div class="col-md-6">
+        {{ form.phonenumber_two.label(class="small mb-1") }}
+        {{ form.phonenumber_two(class="form-control", placeholder=form.phonenumber_two.label.text) }}
+    </div>
+</div>
+
+<div class="row gx-3 mb-3">
+    <div class="col-md-4">
+        <label>Pays/Région</label>
+        <span class="form-control bg-light">{{ current_user.vn_country }}</span>
+    </div>
+    <div class="col-md-4">
+        {{ form.location.label(class="small mb-1") }}
+        {{ form.location(class="form-control", placeholder=form.location.label.text) }}
+    </div>
+    <div class="col-md-4">
+        {{ form.devise.label(class="small mb-1") }}
+        {{ form.devise(class="form-control", placeholder=form.devise.label.text) }}
+    </div>
+</div>
+
+{{ form.submit(class="btn btn-primary shadow-none") }}
