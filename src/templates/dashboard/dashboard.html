@@ -20,23 +20,23 @@
 
         <kpi-component :user="user"></kpi-component>
         
-        <div class="row mb-4">
-            <div class="col-12">
+        <div class="row">
+            <div class="col-12 mb-4">
                 <div class="card card-header-actions h-auto">
                     <div class="card-header text-muted">
                         Tendances des coûts de location
                     </div>
                     <div class="card-body">
                         <div class="chart-area">
-                            <canvas id="trendPriceChart" width="100%" height="30"></canvas>
+                            <canvas id="trendPriceChart" width="100%" height="50"></canvas>
                         </div>
                     </div>
                 </div>
-            </div>    
+            </div>  
         </div>
 
         <div class="row">
-            <div class="col-xl-6 mb-4">
+            <div class="col-xl-4 mb-4">
                 <div class="card card-header-actions h-auto">
                     <div class="card-header text-muted">
                         Nombre de bailleurs par mois
@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-6 mb-4">
+            <div class="col-xl-4 mb-4">
                 <div class="card card-header-actions h-auto">
                     <div class="card-header text-muted">
                         Nombre de locataires par mois
@@ -61,6 +61,19 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-xl-4 mb-4">
+                <div class="card card-header-actions h-auto">
+                    <div class="card-header text-muted">
+                        Disponibilté de vos propriétés
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie">
+                            <canvas id="openHouseChart" width="100%" height="50"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>  
         </div>
     </section>
 {% endblock dashboard_content %}
