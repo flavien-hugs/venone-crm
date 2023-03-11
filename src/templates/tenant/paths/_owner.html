@@ -1,33 +1,31 @@
-<tr v-for="own in owners" :key="own.owner_uuid">
-	<td scope="row">
-		<a title="Détail du bailleur" type="button" @click="getOwner(own.owner_uuid)" class="badge bg-blue-soft text-blue">{ own.owner_id }</a>
-	</td>
-	<td>{ own.fullname } ({own.phonenumber_one})</td>
-	<td>100 0000 { own.user.devise }</td>
-	<td>{ own.number_houses } <span v-if="own.number_houses > 0">(Afficher)</span></td>
-	<td>{ own.number_tenants } <span v-if="own.number_tenants > 0">(Afficher)</span></td>
-	<td>{ own.created_at }</td>
-	<td>
-		<button @click="getOwner(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-primary me-2">
-			<i class="text-primary" data-feather="eye"></i>
-		</button>
+<template v-for="own in owners" :key="own.owner_uuid">
+	<tr v-if='own.user_uuid'>
+		<td scope="row">
+			<span class="badge bg-blue-soft text-blue">{ own.owner_id }</span>
+		</td>
+		<td>{ own.fullname } ({own.phonenumber_one})</td>
+		<td>100 0000 { own.devise }</td>
+		<td>{ own.number_houses } <span v-if="own.number_houses > 0"></span></td>
+		<td>{ own.number_tenants } <span v-if="own.number_tenants > 0"></span></td>
+		<td>{ own.created_at }</td>
+		<td>
+			<button @click="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+				<i class="text-secondary fa fa-edit"></i>
+			</button>
 
-		<button @click="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-secondary" data-feather="edit"></i>
-		</button>
+			<button @click="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+				<i class="text-success fa fa-user-plus"></i>
+			</button>
 
-		<button @click="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">
-			<i class="text-success" data-feather="user-plus"></i>
-		</button>
-
-		<button @click="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
-			<i class="text-danger" data-feather="trash-2"></i>
-		</button>
-	</td>
-</tr>
+			<button @click="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+				<i class="text-danger fa fa-trash"></i>
+			</button>
+		</td>
+	</tr>
+</template>
 
 <!-- modal delete ownern -->
-<div class="modal fade" data-bs-backdrop="static" id="confirmModal">
+<div class="modal fade" data-bs-backdrop="static" id="deleteModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -42,12 +40,12 @@
 			<div class="modal-footer">
 				<div class="row">
 					<div class="col-6 d-grid">
-						<button @click="ownerUUID = null; onDeleteOwner = false" class="btn btn-outline-primary text-uppercase shadow-none me-3" type="button" data-bs-dismiss="modal">
+						<button @click.prevent="ownerUUID = null; onDeleteOwner = false" class="btn btn-outline-primary text-uppercase shadow-none me-3" type="button" data-bs-dismiss="modal">
 						Annuler</button>
 					</div>
 
 					<div class="col-6 d-grid">
-						<button type="sumbit" @click="onDeleteOwner" class="btn btn-danger text-uppercase shadow-none">
+						<button type="sumbit" @click.prevent="onDeleteOwner" class="btn btn-danger text-uppercase shadow-none">
 						Oui</button>
 					</div>
 				</div>
@@ -140,7 +138,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
-					<button type="button" @click="onUpdateOwner" class="btn btn-success shadow-none">Mettre à jour</button>
+					<button data-bs-dismiss="modal" type="button" @click.prevent="onUpdateOwner" class="btn btn-success shadow-none">Mettre à jour</button>
 				</div>
 			</form>
 		</div>

@@ -33,11 +33,7 @@
         <div v-else-if="owners.length > 0" class="card card-header-actions">
 
             <div class="card-header">
-                <span class="fw-700">Bailleurs ({{ current_user.houseowners.count() }})</span>
-                <button class="btn btn-sm btn-success text-white text-uppercase fw-700">
-                    <i class="me-2" data-feather="user-plus"></i>
-                    Enregistrer un Bailleur
-                </button>
+                <span class="fw-700">{{ current_user.houseowners.count() }} bailleurs</span>
             </div>
 
             <div class="card-body">

@@ -1,5 +1,5 @@
 <template v-for="tn in filteredTenants" v-bind:key="tn.tenant_uuid">
-	<tr>
+	<tr v-if='tn.user_uuid'>
 		<td scope="row">
 			<a v-bind:href="tn.tenant_url"
 				class="badge bg-blue-soft text-blue">
@@ -7,10 +7,9 @@
 			</a>
 		</td>
 		<td>{ tn.fullname } ({ tn.phonenumber_one })</td>
-		<td>{ tn.monthly_rent } { tn.user.devise } </td>
+		<td>{ tn.house.house_type } / { tn.monthly_rent } { tn.user.devise }</td>
 		<td>{ tn.house.house_lease_start_date.toLocaleString() }</td>
-		<td>{ tn.house.house_lease_end_date.toLocaleString() }</td>
-		<td ><span class="badge bg-danger text-white p-2">Impayé</span></td>
+		<!--  <td>{ tn.house.house_lease_end_date.toLocaleString() }</td>-->
 		<td>
 			<button @click.prevent="updateTenant(tn)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
 				<i class="feather text-secondary fa fa-edit"></i>
@@ -98,12 +97,12 @@
 			<div class="modal-footer">
 				<div class="row">
 					<div class="col-6 d-grid">
-						<button @click.prevent="tenantUUID = null; onDeleteTenant = false" class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
+						<button @click.prevent="tenantUUID = null; onDeleteTenant = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">
 						Annuler</button>
 					</div>
 
 					<div class="col-6 d-grid">
-						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none" data-bs-dismiss="modal">
+						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-danger text-uppercase shadow-none" data-bs-dismiss="modal">
 						Oui</button>
 					</div>
 				</div>

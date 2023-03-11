@@ -1,5 +1,5 @@
 <template v-for="hs in houses" :key="hs.house_uuid">
-	<tr>
+	<tr v-if="hs.user_uuid">
 		<td>
 			<a href="~" class="badge bg-blue-soft text-blue">{ hs.house_id }</a>
 		</td>
@@ -7,7 +7,9 @@
 			{ hs.house_type } <br>
 			<small>{ hs.house_address }</small>
 		</td>
-		<td>{ hs.house_rent.toLocaleString() } { hs.user.devise }</td>
+		<td>{ hs.house_rent.toLocaleString() } { hs.devise } <br>
+			<small>{ hs.tenant }</small>
+		</td>
 		<td>{ hs.house_lease_start_date.toLocaleString() }</td>
 		<td><span :class="{'badge': true, 'bg-warning': hs.house_is_open, 'bg-primary': !hs.house_is_open}" class="text-white text-uppercase small p-2 fw-700">{ hs.house_status }</span></td>
 
@@ -78,7 +80,7 @@
 </div>
 
 <!-- delete house modal -->
-<div v-if="user.is_admin" class="modal fade" data-bs-backdrop="static" id="deleteHouseModal">
+<div class="modal fade" data-bs-backdrop="static" id="deleteHouseModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -93,11 +95,11 @@
 			<div class="modal-footer">
 				<div class="row">
 					<div class="col-6 d-grid">
-						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-danger text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
+						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
 					</div>
 
 					<div class="col-6 d-grid">
-						<button @click="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
+						<button data-bs-dismiss="modal" @click="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
 					</div>
 				</div>
 			</div>

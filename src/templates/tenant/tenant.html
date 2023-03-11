@@ -41,7 +41,7 @@
 
         <div v-else-if="user.tenant_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
-                <span class="fw-700">({ user.tenant_count }) locataires actifs</span>
+                <span class="fw-700">{ user.tenant_count } locataires</span>
                 <div>
                     <button v-if="user.is_company" @click.prevent="createCompanyTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700">
                         <i class="me-2" data-feather="user-plus"></i>
@@ -74,8 +74,6 @@
                                 <th scope="col">Nom &amp; prénoms / téléphone</th>
                                 <th scope="col">Loyer du mois en cours</th>
                                 <th scope="col">Date de location</th>
-                                <th scope="col">Délais de paiement</th>
-                                <th scope="col">Status paiement</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>

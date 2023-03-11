@@ -19,7 +19,6 @@
         </div>
 
         <div v-else-if="user.house_count > 0" class="card card-header-actions">
-
             <div v-if="isLoading" class="preloader">
                 <div class="preloader-body">
                     <p>Chargement en cours...</p>
@@ -30,7 +29,7 @@
             </div>
 
             <div class="card-header">
-                <span class="fw-700">Propriétés ({ user.house_count })</span>
+                <span class="fw-700">{ user.house_count } propriétés</span>
             </div>
 
             <div class="card-body">
@@ -51,7 +50,7 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">Proprité &amp; Localisation</th>
                                 <th scope="col">Loyer/mois</th>
-                                <th scope="col">Date mise en location</th>
+                                <th scope="col">Ajouté le</th>
                                 <th scope="col">Status location</th>
                                 <th>Actions</th>
                             </tr>
