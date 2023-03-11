@@ -75,7 +75,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "tenants": [t.to_json() for t in self.tenants],
             "payments": [p.to_json() for p in self.payments],
             "number_houses": self.houses.count(),
-            "number_tenants": self.tenants.count(),
+            "number_tenants": self.tenants.filter_by(vn_activated=True).count(),
             "number_payments": self.payments.count(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
             "_links": {
@@ -237,6 +237,7 @@ class VNHouse(TimestampMixin):
 
     def house_disable(self):
         self.vn_house_is_open = False
+        db.session.add(self)
         db.session.commit()
 
     def get_house_open(self):
