@@ -19,7 +19,7 @@ from src.auth.forms.owner_form import OwnerHouseSignupForm
 from src.auth.models import VNUser
 from src.mixins.email import send_email
 
-auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/customer/")
+auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/")
 
 
 @auth_bp.get("/unactivated/")
