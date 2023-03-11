@@ -32,26 +32,18 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         "VNHouse",
         lazy="dynamic",
         backref="owner_houses",
-        single_parent=True,
-        passive_deletes=True,
-        cascade="all,delete,delete-orphan",
         order_by="desc(VNHouse.vn_created_at)",
     )
-
     tenants = db.relationship(
         "VNTenant",
         lazy="dynamic",
         backref="owner_tenants",
-        single_parent=True,
-        passive_deletes=True,
-        cascade="all,delete,delete-orphan",
         order_by="desc(VNTenant.vn_created_at)",
     )
-
     payments = db.relationship(
         "VNPayment",
-        backref="owner_payment",
         lazy="dynamic",
+        backref="owner_payment",
         order_by="desc(VNPayment.vn_pay_date)",
     )
 
@@ -59,7 +51,6 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         json_owner = {
             "owner_uuid": self.uuid,
             "user_uuid": current_user.uuid,
-            "user": current_user.to_json(),
             "owner_id": self.get_owner_id(),
             "gender": self.vn_gender,
             "fullname": self.vn_fullname,
@@ -71,22 +62,15 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "phonenumber_one": self.vn_phonenumber_one,
             "phonenumber_two": self.vn_phonenumber_two,
             "activated": self.get_owner_available(),
-            "houses": [h.to_json() for h in self.houses],
-            "tenants": [t.to_json() for t in self.tenants],
-            "payments": [p.to_json() for p in self.payments],
+
+            "devise": current_user.vn_device,
+
             "number_houses": self.houses.count(),
-            "number_tenants": self.tenants.filter_by(vn_activated=True).count(),
+            "number_tenants": self.tenants.count(),
             "number_payments": self.payments.count(),
+
+            "is_activated": self.vn_activated,
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "_links": {
-                "self": url_for("api.get_houseowner", owner_uuid=self.uuid),
-                "houses_url": url_for(
-                    "api.get_houseowner_houses", owner_uuid=self.uuid
-                ),
-                "tenants_url": url_for(
-                    "api.get_houseowner_tenants", owner_uuid=self.uuid
-                ),
-            },
         }
         return json_owner
 
@@ -186,8 +170,6 @@ class VNHouse(TimestampMixin):
     vn_house_address = db.Column(db.String(120), nullable=False)
     vn_house_is_open = db.Column(db.Boolean, nullable=False, default=True)
 
-    vn_activated = db.Column(db.Boolean, nullable=False, default=True)
-
     vn_house_lease_start_date = db.Column(db.Date, nullable=False)
     vn_house_lease_end_date = db.Column(db.Date, nullable=False)
 
@@ -206,8 +188,9 @@ class VNHouse(TimestampMixin):
     def to_json(self):
         json_house = {
             "house_uuid": self.uuid,
-            "user": current_user.to_json(),
+            "owner_id": self.vn_owner_id,
             "user_uuid": current_user.uuid,
+            "devise": current_user.vn_device,
             "house_id": self.get_house_id(),
             "house_type": self.vn_house_type,
             "house_rent": self.vn_house_rent,
@@ -220,12 +203,7 @@ class VNHouse(TimestampMixin):
             "house_lease_start_date": self.vn_house_lease_start_date.strftime(
                 "%d-%m-%Y"
             ),
-            "house_lease_end_date": self.vn_house_lease_end_date.strftime("%d-%m-%Y"),
-            "house_url": url_for("api.get_house", house_uuid=self.uuid, _external=True),
-            "_links": {
-                "owner_url": url_for("api.get_houseowner", owner_uuid=self.uuid),
-                "tenant_url": url_for("api.get_house_tenant", house_uuid=self.uuid),
-            },
+            "house_lease_end_date": self.vn_house_lease_end_date.strftime("%d-%m-%Y")
         }
         return json_house
 
@@ -250,13 +228,13 @@ class VNHouse(TimestampMixin):
 
     @staticmethod
     def get_houses_list():
-        return VNHouse.query.filter_by(vn_user_id=current_user.id)
+        houses = VNHouse.query.filter_by(vn_user_id=current_user.id)
+        return houses
 
     @staticmethod
     def get_house(house_uuid):
-        return VNHouse.query.filter_by(
-            uuid=house_uuid, vn_user_id=current_user.id
-        ).first()
+        house = VNHouse.query.filter_by(uuid=house_uuid, vn_user_id=current_user.id).first()
+        return house
 
 
 class VNTenant(DefaultUserInfoModel, TimestampMixin):
@@ -290,10 +268,9 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     def to_json(self):
         json_tenant = {
             "user_uuid": current_user.uuid,
-            "user": current_user.to_json(),
+            "devise": current_user.vn_device,
             "tenant_uuid": self.uuid,
             "tenant_id": self.get_tenant_id(),
-            "owner": self.tenants.to_json(),
             "house": self.house_tenant.to_json(),
             "gender": self.vn_gender,
             "fullname": self.vn_fullname,
@@ -307,9 +284,6 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
             "activated": self.vn_activated,
             "monthly_rent": self.get_monthly_rent(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "_links": {
-                "tenant_url": url_for("api.get_tenant", tenant_uuid=self.uuid),
-            },
         }
         return json_tenant
 
@@ -328,13 +302,13 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
 
     @staticmethod
     def get_tenants_list():
-        return VNTenant.query.filter_by(vn_user_id=current_user.id, vn_activated=True)
+        tenants = VNTenant.query.filter_by(vn_user_id=current_user.id)
+        return tenants
 
     @staticmethod
     def get_tenant(tenant_uuid):
-        return VNTenant.query.filter_by(
-            uuid=tenant_uuid, vn_user_id=current_user.id
-        ).first()
+        tenant = VNTenant.query.filter_by(uuid=tenant_uuid, vn_user_id=current_user.id).first()
+        return tenant
 
     def get_monthly_rent(self):
 
