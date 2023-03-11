@@ -47,6 +47,7 @@ class CRUDMixin(object):
 
     def disable(self):
         self.vn_activated = False
+        db.session.add(self)
         db.session.commit()
 
 
