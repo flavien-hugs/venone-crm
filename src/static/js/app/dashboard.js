@@ -15,9 +15,6 @@ var app = Vue.createApp({
         return {
             user: [],
             isLoading: false,
-
-            notOpenValues: '',
-            isOpenValues: '',
         };
     },
 
@@ -193,8 +190,8 @@ var app = Vue.createApp({
                 if (response.ok) {
                     const data = await response.json();
                     
-                    this.notOpenValues = data.map((d) => d.isOpen);
-                    this.isOpenValues = data.map((d) => d.isOpen);
+                    const notOpenValues = data.map((d) => d.notOpen);
+                    const isOpenValues = data.map((d) => d.isOpen);
 
                     const ctx = document.getElementById("openHouseChart");
 
@@ -204,7 +201,7 @@ var app = Vue.createApp({
                             labels: ["Disponible", "Indisponible"],
                             datasets: [
                                 {
-                                    data: [this.notOpenValues , this.isOpenValues],
+                                    data: [notOpenValues , isOpenValues],
                                     backgroundColor: [
                                         "rgba(0, 97, 242, 1)",
                                         "rgba(0, 172, 105, 1)",
