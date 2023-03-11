@@ -353,8 +353,6 @@ class VNUser(
         return available_properties
 
 
-
-
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
         return False
