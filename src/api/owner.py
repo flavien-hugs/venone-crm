@@ -58,7 +58,9 @@ def get_houseowner(owner_uuid):
 def delete_houseowner(owner_uuid):
     owner = VNHouseOwner.get_owner(owner_uuid)
     if owner is not None:
-        owner.disable()
+        [h.remove() for h in owner.houses]
+        [t.remove() for t in owner.tenants]
+        owner.remove()
         return jsonify(
             {
                 "success": True,

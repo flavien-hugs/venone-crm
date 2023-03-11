@@ -90,8 +90,7 @@ def update_house(house_uuid):
 def delete_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
     if house is not None:
-        house.disable()
-        house.house_disable()
+        house.remove()
         return jsonify(
             {
                 "success": True,

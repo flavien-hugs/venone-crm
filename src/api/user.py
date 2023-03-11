@@ -37,13 +37,12 @@ def get_all_users():
 
     return jsonify(
         {
-            "houseowners": [user.to_json() for user in users],
+            "users": [user.to_json() for user in users],
             "prev": prev,
             "next": next,
             "page": page,
             "per_page": per_page,
-            "total": pagination.total,
-            "user": current_user.to_json(),
+            "total": pagination.total
         }
     )
 
@@ -51,20 +50,18 @@ def get_all_users():
 @api.get("/user/")
 @login_required
 def get_user():
-    user = VNUser.get_user_logged()
+    user = current_user.get_user_logged()
     return jsonify({"user": user.to_json()})
 
 
-@api.route("/user/<string:user_uuid>/owners/")
+@api.get("/user/<string:user_uuid>/owners/")
 @login_required
 def get_user_owners(user_uuid):
-
-    user = VNUser.get_user(user_uuid)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = user.houseowners.paginate(
+    pagination = current_user.houseowners.paginate(
         page=page, per_page=per_page, error_out=False
     )
     owners = pagination.items
@@ -87,16 +84,14 @@ def get_user_owners(user_uuid):
     )
 
 
-@api.route("/user/<string:user_uuid>/tenants/")
+@api.get("/user/<string:user_uuid>/tenants/")
 @login_required
 def get_user_tenants(user_uuid):
-
-    user = VNUser.get_user(user_uuid)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = user.tenants.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = current_user.tenants.paginate(page=page, per_page=per_page, error_out=False)
     tenants = pagination.items
     prev = None
     if pagination.has_prev:
@@ -117,16 +112,14 @@ def get_user_tenants(user_uuid):
     )
 
 
-@api.route("/user/<string:user_uuid>/houses/")
+@api.get("/user/<string:user_uuid>/houses/")
 @login_required
 def get_user_houses(user_uuid):
-
-    user = VNUser.get_user(user_uuid)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = user.houses.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = current_user.houses.paginate(page=page, per_page=per_page, error_out=False)
     houses = pagination.items
     prev = None
     if pagination.has_prev:
@@ -146,16 +139,14 @@ def get_user_houses(user_uuid):
         }
     )
 
-@api.route("/user/<string:user_uuid>/payments/")
+@api.get("/user/<string:user_uuid>/payments/")
 @login_required
 def get_user_payments(user_uuid):
-
-    user = VNUser.get_user(user_uuid)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = user.payments.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = current_user.payments.paginate(page=page, per_page=per_page, error_out=False)
     payments = pagination.items
     prev = None
     if pagination.has_prev:
@@ -176,7 +167,7 @@ def get_user_payments(user_uuid):
     )
 
 
-@api.route("/owner/tenant_register/", methods=["POST"])
+@api.post("/owner/tenant_register/")
 @login_required
 @owner_required
 def user_owner_register_tenant():
@@ -248,7 +239,7 @@ def user_owner_register_tenant():
     return jsonify({"success": False, "message": "Erreur"})
 
 
-@api.route("/company/tenant_register/", methods=["POST"])
+@api.post("/company/tenant_register/")
 @login_required
 @agency_required
 def user_company_register_tenant():
