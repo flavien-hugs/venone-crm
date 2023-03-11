@@ -1,6 +1,4 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileAllowed
-from flask_wtf.file import FileField
 from src.dashboard.forms.default_form import DefaultForm
 from wtforms import DateField
 from wtforms import StringField
@@ -15,7 +13,4 @@ class OwnerSettingForm(DefaultForm, FlaskForm):
     location = StringField(label="Lieu de résidence", validators=[DataRequired()])
     birthdate = DateField(label="Date de naissance")
     cni_number = StringField(label="N° de votre CNI", validators=[DataRequired()])
-    picture = FileField(
-        "Update Avatar", validators=[FileAllowed(["jpg", "jpeg", "png", "svg"])]
-    )
     submit = SubmitField(label="Enregistrer les modifications")
