@@ -69,9 +69,9 @@ def delete_tenant(tenant_uuid):
     tenant = VNTenant.get_tenant(tenant_uuid)
 
     if tenant is not None:
-        tenant.disable()
         tenant.house_tenant.disable()
         tenant.house_tenant.house_disable()
+        tenant.remove()
         return jsonify(
             {
                 "success": True,
