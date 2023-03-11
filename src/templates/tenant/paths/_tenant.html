@@ -1,29 +1,27 @@
-<tr v-for="tenant in filteredTenants" v-bind:key="tenant.tenant_uuid">
-	<td scope="row">
-		<a v-bind:href="tenant.tenant_url"
-			class="badge bg-blue-soft text-blue">
-			{ tenant.tenant_id }
-		</a>
-	</td>
-	<td>{ tenant.fullname } ({ tenant.phonenumber_one })</td>
-	<td>{ tenant.monthly_rent } { tenant.user.devise } </td>
-	<td>{ tenant.house.house_lease_start_date.toLocaleString() }</td>
-	<td>{ tenant.house.house_lease_end_date.toLocaleString() }</td>
-	<td ><span class="badge bg-danger text-white p-2">Impayé</span></td>
-	<td>
-		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
-			<i class="text-primary" data-feather="eye"></i>
-		</button>
+<template v-for="tn in filteredTenants" v-bind:key="tn.tenant_uuid">
+	<tr>
+		<td scope="row">
+			<a v-bind:href="tn.tenant_url"
+				class="badge bg-blue-soft text-blue">
+				{ tn.tenant_id }
+			</a>
+		</td>
+		<td>{ tn.fullname } ({ tn.phonenumber_one })</td>
+		<td>{ tn.monthly_rent } { tn.user.devise } </td>
+		<td>{ tn.house.house_lease_start_date.toLocaleString() }</td>
+		<td>{ tn.house.house_lease_end_date.toLocaleString() }</td>
+		<td ><span class="badge bg-danger text-white p-2">Impayé</span></td>
+		<td>
+			<button @click.prevent="updateTenant(tn)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+				<i class="feather text-secondary fa fa-edit"></i>
+			</button>
 
-		<button @click.prevent="updateTenant(tenant)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="feather text-secondary" data-feather="edit"></i>
-		</button>
-
-		<button @click.prevent="deleteTenantConfirm(tenant.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
-			<i class="feather text-danger" data-feather="trash-2"></i>
-		</button>
-	</td>
-</tr>
+			<button @click.prevent="deleteTenantConfirm(tn.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
+				<i class="feather text-danger fa fa-trash"></i>
+			</button>
+		</td>
+	</tr>
+</template>
 
 <!-- update tenant modal -->
 <div class="modal fade" data-bs-backdrop="static" id="updateTenantConfirm">

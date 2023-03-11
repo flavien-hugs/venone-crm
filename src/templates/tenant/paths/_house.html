@@ -1,27 +1,31 @@
-<tr v-for="house in houses" :key="house.house_uuid">
-	<td>
-		<a v-bind:href="house.house_url" class="badge bg-blue-soft text-blue">{ house.house_id }</a>
-	</td>
-	<td>
-		{ house.house_type }, situé à { house.house_address }
-	</td>
-	<td>{ house.house_rent.toLocaleString() } { house.user.devise }</td>
-	<td>{ house.house_lease_start_date.toLocaleString() }</td>
-	<td><span class="badge bg-danger text-white p-2">{ house.house_status }</span></td>
-	<td>
-		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
-			<i class="text-primary" data-feather="eye"></i>
-		</button>
+<template v-for="hs in houses" :key="hs.house_uuid">
+	<tr>
+		<td>
+			<a href="~" class="badge bg-blue-soft text-blue">{ hs.house_id }</a>
+		</td>
+		<td>
+			{ hs.house_type } <br>
+			<small>{ hs.house_address }</small>
+		</td>
+		<td>{ hs.house_rent.toLocaleString() } { hs.user.devise }</td>
+		<td>{ hs.house_lease_start_date.toLocaleString() }</td>
+		<td><span :class="{'badge': true, 'bg-warning': hs.house_is_open, 'bg-primary': !hs.house_is_open}" class="text-white text-uppercase small p-2 fw-700">{ hs.house_status }</span></td>
 
-		<button @click="updateHouse(house)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-success" data-feather="edit"></i>
-		</button>
+		<td>
+			<button v-if="!hs.house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+				<i class="text-success fa fa-user-plus"></i>
+			</button>
 
-		<button v-if="house.user.is_admin" @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
-			<i class="text-danger" data-feather="trash-2"></i>
-		</button>
-	</td>
-</tr>
+			<button @click="updateHouse(hs)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+				<i class="text-primary fa fa-edit"></i>
+			</button>
+
+			<button v-if="!hs.house_is_open" @click="deleteHouseConfirm(hs.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+				<i class="text-danger fa fa-trash"></i>
+			</button>
+		</td>
+	</tr>
+</template>
 
 <!-- updat house modal -->
 <div class="modal fade" data-bs-backdrop="static" id="updateHouseConfirm">

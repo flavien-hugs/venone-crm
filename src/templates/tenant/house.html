@@ -45,13 +45,22 @@
                 </div>
 
                 <div class="table-responsive">
-                    <house-component
-                        :houses="houses"
-                        :update-house="updateHouse"
-                        :delete-house-confirm="deleteHouseConfirm"
-                    >    
-                    </house-component>
+                   <table class="table table-hover">
+                        <thead class="small">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Proprité &amp; Localisation</th>
+                                <th scope="col">Loyer/mois</th>
+                                <th scope="col">Date mise en location</th>
+                                <th scope="col">Status location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
 
+                        <tbody>
+                            {% include "tenant/paths/_house.html" %}
+                        </tbody>
+                    </table>
                 </div>
 
                 <paginate-component
