@@ -17,9 +17,9 @@
 			<i class="text-success" data-feather="edit"></i>
 		</button>
 
-		<!--  <button @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+		<button v-if="house.user.is_admin" @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
 			<i class="text-danger" data-feather="trash-2"></i>
-		</button> -->
+		</button>
 	</td>
 </tr>
 
@@ -74,7 +74,7 @@
 </div>
 
 <!-- delete house modal -->
-<div class="modal fade" data-bs-backdrop="static" id="deleteHouseModal">
+<div v-if="user.is_admin" class="modal fade" data-bs-backdrop="static" id="deleteHouseModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">

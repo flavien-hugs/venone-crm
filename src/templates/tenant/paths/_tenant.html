@@ -16,11 +16,11 @@
 		</button>
 
 		<button @click.prevent="updateTenant(tenant)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-secondary" data-feather="edit"></i>
+			<i class="feather text-secondary" data-feather="edit"></i>
 		</button>
 
 		<button @click.prevent="deleteTenantConfirm(tenant.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
-			<i class="text-danger" data-feather="trash-2"></i>
+			<i class="feather text-danger" data-feather="trash-2"></i>
 		</button>
 	</td>
 </tr>
@@ -77,7 +77,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
-					<button type="button" @click="onUpdateTenant" class="btn btn-success shadow-none">Mettre à jour</button>
+					<button type="button" @click.prevent="onUpdateTenant" class="btn btn-success shadow-none">Mettre à jour</button>
 				</div>
 			</form>
 		</div>
@@ -85,7 +85,7 @@
 </div>
 
 <!-- delete tenant modal -->
-<div class="modal fade" data-bs-backdrop="static" id="confirmModal">
+<div class="modal fade" data-bs-backdrop="static" id="delTenantConfirmModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -100,12 +100,12 @@
 			<div class="modal-footer">
 				<div class="row">
 					<div class="col-6 d-grid">
-						<button @click="tenantUUID = null; onDeleteTenant = false" class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
+						<button @click.prevent="tenantUUID = null; onDeleteTenant = false" class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
 						Annuler</button>
 					</div>
 
 					<div class="col-6 d-grid">
-						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none">
+						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none" data-bs-dismiss="modal">
 						Oui</button>
 					</div>
 				</div>

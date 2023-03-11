@@ -1,13 +1,14 @@
-{% extends "tenant/_base.html" %}
+{% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
 
     <section id="houseOwnerTable">
 
         <!-- Alert message -->
-        <div v-if="showMessageAlert" class="alert alert-success" role="alert">
-            { messageAlert }
-        </div>
+        <message-component
+            :show-message-alert="showMessageAlert"
+            :message-alert="messageAlert">    
+        </message-component>
 
         <div v-if="owners.length == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
@@ -20,16 +21,16 @@
             </div>
         </div>
 
-        <div v-else-if="owners.length > 0" class="card card-header-actions">
-
-            <div v-if="isLoading" class="preloader">
-                <div class="preloader-body">
-                    <p>Chargement en cours...</p>
-                    <div class="cssload-container">
-                        <div class="cssload-speeding-wheel"></div>
-                    </div>
+        <div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
                 </div>
             </div>
+        </div>
+
+        <div v-else-if="owners.length > 0" class="card card-header-actions">
 
             <div class="card-header">
                 <span class="fw-700">Bailleurs ({{ current_user.houseowners.count() }})</span>
@@ -70,7 +71,12 @@
                     </table>
                 </div>
 
-                {% include "tenant/paths/_paginate.html" %}
+                <paginate-component
+                    :current-page="currentPage"
+                    :total-pages="totalPages"
+                    :next-page="nextPage"
+                    :prev-page="prevPage"
+                ></paginate-component>
             </div>
         </div>
     </section>
@@ -78,5 +84,5 @@
 
 {% block other_js_src %}
     {{ super() }}
-    <script src="{{ url_for('static', filename="js/app/owner.js") }}"></script>
+    <script type="module" src="{{ url_for('static', filename="js/app/owner.js") }}"></script>
 {% endblock other_js_src %}
