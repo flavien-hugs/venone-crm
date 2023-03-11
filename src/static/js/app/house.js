@@ -1,8 +1,5 @@
-// import houseComponent from './components/houseComponent.js';
-
 import paginateComponent from './components/paginateComponent.js';
 import messageComponent from './components/messageComponent.js';
-import houseComponent from './components/houseComponent.js';
 
 window.addEventListener('DOMContentLoaded', event => {
     const HOUSE_DATA = {
@@ -20,14 +17,13 @@ window.addEventListener('DOMContentLoaded', event => {
         components: {
             paginateComponent,
             messageComponent,
-            houseComponent,
         },
 
         data() {
             return {
-                houses: [],
-                house: [],
                 user: [],
+                house: [],
+                houses: [],
 
                 perPage: 10,
                 currentPage: 1,
@@ -45,8 +41,8 @@ window.addEventListener('DOMContentLoaded', event => {
             delimiters: ["{", "}"]
         },
 
-        mounted() {
-            this.getHouses()
+        async mounted() {
+            await this.getHouses()
         },
 
         methods: {
@@ -65,7 +61,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     if (response.status == 200) {
                         this.isLoading = false;
                         const data = await response.json();
-                        this.houses = data.houses;    
+                        this.houses = data.houses;
                         this.user = data.user;
                         this.totalPages = Math.ceil(data.total / this.perPage);
                         this.currentPage = data.page;

@@ -7,21 +7,23 @@ const months = Array.from({ length: 12 }, (_, i) => {
 });
 
 var app = Vue.createApp({
-
     components: {
-        'kpi-component': KpiComponent,
+        "kpi-component": KpiComponent,
     },
 
     data() {
         return {
             user: [],
             isLoading: false,
-        }
+
+            notOpenValues: '',
+            isOpenValues: '',
+        };
     },
 
     delimiters: ["{", "}"],
     compilerOptions: {
-        delimiters: ["{", "}"]
+        delimiters: ["{", "}"],
     },
 
     async mounted() {
@@ -29,6 +31,7 @@ var app = Vue.createApp({
 
         await this.getOwnerData();
         await this.getTenantData();
+        await this.getOpenHousesData();
         await this.getTrendPriceData();
     },
 
@@ -41,8 +44,8 @@ var app = Vue.createApp({
                 const response = await fetch(userURL, {
                     method: "GET",
                     headers: {
-                        'Content-type': 'application/json'
-                    }
+                        "Content-type": "application/json",
+                    },
                 });
 
                 this.isLoading = false;
@@ -66,43 +69,50 @@ var app = Vue.createApp({
                 const response = await fetch(ownerDataURL, {
                     method: "GET",
                     headers: {
-                        'Content-type': 'application/json'
-                    }
+                        "Content-type": "application/json",
+                    },
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    const values = data.map(d => d.count);
+                    const values = data.map((d) => d.count);
 
-                    const ctx = document.getElementById("ownerChart").getContext('2d');
+                    const ctx = document
+                        .getElementById("ownerChart")
+                        .getContext("2d");
                     const chart = new Chart(ctx, {
                         type: "bar",
                         data: {
                             labels: months,
-                            datasets: [{
-                                data: values,
-                                backgroundColor: "rgba(0, 97, 242, 1)",
-                                hoverBackgroundColor: "rgba(0, 97, 242, 0.9)",
-                                borderColor: "#4e73df",
-                                borderWidth: 1,
-                                maxBarThickness: 25
-                            }],
+                            datasets: [
+                                {
+                                    data: values,
+                                    backgroundColor: "rgba(0, 97, 242, 1)",
+                                    hoverBackgroundColor:
+                                        "rgba(0, 97, 242, 0.9)",
+                                    borderColor: "#4e73df",
+                                    borderWidth: 1,
+                                    maxBarThickness: 25,
+                                },
+                            ],
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
                             scales: {
-                                yAxes: [{
-                                    ticks: {
-                                      beginAtZero: true
-                                    }
-                                }],
+                                yAxes: [
+                                    {
+                                        ticks: {
+                                            beginAtZero: true,
+                                        },
+                                    },
+                                ],
                             },
                             legend: {
                                 display: false,
                             },
                         },
-                    })
+                    });
                 } else {
                     throw new Error("NETWORK RESPONSE ERROR");
                 }
@@ -118,43 +128,106 @@ var app = Vue.createApp({
                 const response = await fetch(tenantDataURL, {
                     method: "GET",
                     headers: {
-                        'Content-type': 'application/json'
-                    }
+                        "Content-type": "application/json",
+                    },
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    const values = data.map(d => d.count);
+                    const values = data.map((d) => d.count);
 
-                    const ctx = document.getElementById("tenantChart").getContext('2d');
+                    const ctx = document
+                        .getElementById("tenantChart")
+                        .getContext("2d");
                     const chart = new Chart(ctx, {
                         type: "bar",
                         data: {
                             labels: months,
-                            datasets: [{
-                                data: values,
-                                backgroundColor: "rgba(0, 97, 242, 1)",
-                                hoverBackgroundColor: "rgba(0, 97, 242, 0.9)",
-                                borderColor: "#4e73df",
-                                borderWidth: 1,
-                                maxBarThickness: 25
-                            }],
+                            datasets: [
+                                {
+                                    data: values,
+                                    backgroundColor: "rgba(0, 97, 242, 1)",
+                                    hoverBackgroundColor: "rgba(0, 97, 242, 0.9)",
+                                    borderColor: "#4e73df",
+                                    borderWidth: 1,
+                                    maxBarThickness: 25,
+                                },
+                            ],
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
                             scales: {
-                                yAxes: [{
-                                    ticks: {
-                                      beginAtZero: true
-                                    }
-                                }],
+                                yAxes: [
+                                    {
+                                        ticks: {
+                                            beginAtZero: true,
+                                        },
+                                    },
+                                ],
                             },
                             legend: {
                                 display: false,
                             },
                         },
-                    })
+                    });
+                } else {
+                    throw new Error("NETWORK RESPONSE ERROR");
+                }
+            } catch (error) {
+                console.error("FETCH ERROR:", error);
+            }
+        },
+
+        async getOpenHousesData() {
+            try {
+                const houseOpenDataURL = `/api/available_properties/data/`;
+
+                const response = await fetch(houseOpenDataURL, {
+                    method: "GET",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    this.notOpenValues = data.map((d) => d.isOpen);
+                    this.isOpenValues = data.map((d) => d.isOpen);
+
+                    const ctx = document.getElementById("openHouseChart");
+
+                    const chart = new Chart(ctx, {
+                        type: "pie",
+                        data: {
+                            labels: ["Disponible", "Indisponible"],
+                            datasets: [
+                                {
+                                    data: [this.notOpenValues , this.isOpenValues],
+                                    backgroundColor: [
+                                        "rgba(0, 97, 242, 1)",
+                                        "rgba(0, 172, 105, 1)",
+                                    ],
+                                    hoverOffset: 4
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                r: {
+                                    pointLabels: {
+                                        display: true,
+                                        centerPointLables: true,
+                                        font: {
+                                            size: 18
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                    });
                 } else {
                     throw new Error("NETWORK RESPONSE ERROR");
                 }
@@ -170,48 +243,52 @@ var app = Vue.createApp({
                 const response = await fetch(trendPriceDataURL, {
                     method: "GET",
                     headers: {
-                        'Content-type': 'application/json'
-                    }
+                        "Content-type": "application/json",
+                    },
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    const values = data.map(d => d.price);
 
-                    const ctx = document.getElementById("trendPriceChart").getContext("2d");
+                    const prices = data.map(d => d.price);
+
+                    const ctx = document.getElementById("trendPriceChart");
+                    
                     const chart = new Chart(ctx, {
                         type: "line",
                         data: {
                             labels: months,
-                            datasets: [{
-                                data: values,
-                                fill: false,
-                                backgroundColor: "rgba(54, 162, 235, 0.2)",
-                                borderColor: 'rgb(75, 192, 192)',
-                                borderWidth: 1,
-                                tension: 0.1,
-                            }]
+                            datasets: [
+                                {
+                                    data: prices,
+                                    fill: false,
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1
+                                },
+                            ],
                         },
                         options: {
                             scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true
-                                    }
-                                }]
+                                yAxes: [
+                                    {
+                                        ticks: {
+                                            beginAtZero: true,
+                                        },
+                                    },
+                                ],
                             },
                             legend: {
                                 display: false,
                             },
-                        }
-                    })
+                        },
+                    });
                 } else {
                     throw new Error("NETWORK RESPONSE ERROR");
                 }
             } catch (error) {
                 console.error("FETCH ERROR:", error);
             }
-        }
+        },
     },
 });
 
