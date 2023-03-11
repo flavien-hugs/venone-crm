@@ -1,3 +1,6 @@
+import paginateComponent from './components/paginateComponent.js';
+import messageComponent from './components/messageComponent.js';
+
 window.addEventListener('DOMContentLoaded', event => {
     const OWNER_DATA = {
         owner_uuid: '',
@@ -38,10 +41,18 @@ window.addEventListener('DOMContentLoaded', event => {
     };
 
     var app = Vue.createApp({
+
+        components: {
+            paginateComponent,
+            messageComponent,
+        },
+        
         data() {
             return {
                 tenant: [],
                 tenants: [],
+
+                user: [],
 
                 searchQuery: "",
                 perPage: 10,
@@ -165,18 +176,24 @@ window.addEventListener('DOMContentLoaded', event => {
                     if (response.status == 200) {
                         const data = await response.json();
                         this.tenants = data.tenants;
+                        this.user = data.user;
                         this.totalPages = Math.ceil(data.total / this.perPage);
                         this.currentPage = data.page;
                     } else {
                         this.isLoading = false;
-                        console.log(error);
+                        throw new Error("NETWORK RESPONSE ERROR");
                     }
                 } catch (error) {
-                    console.log("FETCH ERROR:", error);
+                    console.error("FETCH ERROR:", error);
                 }
             },
 
-            createTenant() {
+            createOwnerTenant() {
+                const modal = new bootstrap.Modal(document.getElementById('addOwnerTenantModal'));
+                modal.show();
+            },
+
+            createCompanyTenant() {
                 const modal = new bootstrap.Modal(document.getElementById('createTenantModal'));
                 modal.show();
             },
@@ -189,8 +206,45 @@ window.addEventListener('DOMContentLoaded', event => {
 
             deleteTenantConfirm(tenantUUID) {
                 this.tenantUUID = tenantUUID;
-                const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                const modal = new bootstrap.Modal(document.getElementById('delTenantConfirmModal'));
                 modal.show();
+            },
+
+            async onCreateOwnerTenant() {
+                try {
+                    const ownerTenantRegisterURL = `/api/owner/create_tenant/`;
+                    const response = await fetch(ownerTenantRegisterURL, {
+                        method: "POST",
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            house_data: this.houseData,
+                            tenant_data: this.tenantData
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        await this.getOwners();
+                        this.tenantData = { ...TENANT_DATA };
+                        this.houseData = { ...HOUSE_DATA };
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                        setTimeout(() => {
+                            this.showMessageAlert = false;
+                        }, 3000);
+                    } else {
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                    }
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addOwnerTenantModal'));
+                    modal.hide();
+                }
             },
 
             async onUpdateTenant() {
@@ -216,6 +270,7 @@ window.addEventListener('DOMContentLoaded', event => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
+                        this.showMessageAlert = true;
                         this.messageAlert = data.message;
                     }
                 } catch (error) {
@@ -227,9 +282,9 @@ window.addEventListener('DOMContentLoaded', event => {
                 }
             },
 
-            async onCreateTenant() {
+            async onCreateComapnyTenant() {
                 try {
-                    const registerURL = `/api/tenant/register/`;
+                    const registerURL = `/api/company/tenant_register/`;
                     const response = await fetch(registerURL, {
                         method: "POST",
                         headers: {
@@ -254,6 +309,7 @@ window.addEventListener('DOMContentLoaded', event => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
+                        this.showMessageAlert = true;
                         this.messageAlert = data.message;
                     }
                 } catch (error) {
@@ -285,13 +341,14 @@ window.addEventListener('DOMContentLoaded', event => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
+                        this.showMessageAlert = true;
                         this.messageAlert = data.message;
                     }
                 } catch (error) {
                     console.log(error);
                 } finally {
                     this.tenantUUID = null;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('delTenantConfirmModal'));
                     modal.hide();
                 }
             },

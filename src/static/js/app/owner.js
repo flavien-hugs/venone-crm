@@ -1,3 +1,6 @@
+import paginateComponent from './components/paginateComponent.js';
+import messageComponent from './components/messageComponent.js';
+
 window.addEventListener('DOMContentLoaded', event => {
     const OWNER_DATA = {
         owner_uuid: '',
@@ -35,6 +38,12 @@ window.addEventListener('DOMContentLoaded', event => {
     };
 
     var app = Vue.createApp({
+
+        components: {
+            paginateComponent,
+            messageComponent,
+        },
+
         data() {
             return {
                 owners: [],
