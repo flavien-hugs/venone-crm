@@ -12,7 +12,5 @@ checkout_bp = Blueprint("checkout_bp", __name__, url_prefix="/dashboard/")
 def checkout():
     page_title = "Loyers"
     return render_template(
-        "checkout/checkout.html",
-        page_title=page_title,
-        current_user=current_user
+        "checkout/checkout.html", page_title=page_title, current_user=current_user
     )
