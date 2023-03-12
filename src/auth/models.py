@@ -3,7 +3,6 @@ from datetime import datetime
 import jwt
 from flask import current_app
 from flask import request
-from flask import url_for
 from flask_login import AnonymousUserMixin
 from flask_login import current_user
 from flask_login import UserMixin
@@ -11,10 +10,11 @@ from src import db
 from src import login_manager
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
+from src.tenant.models import VNHouse
+from src.tenant.models import VNHouseOwner
+from src.tenant.models import VNTenant
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
-
-from src.tenant.models import VNHouseOwner, VNHouse, VNTenant
 
 
 class Permission:
@@ -157,15 +157,17 @@ class VNUser(
             "is_owner": self.vn_house_owner,
             "is_admin": self.is_administrator(),
             "is_activated": self.vn_activated,
-
             "total_payment_month": self.total_payments_month(),
-            "payment_count": self.payments.filter_by(vn_payee_id=current_user.id).count(),
+            "payment_count": self.payments.filter_by(
+                vn_payee_id=current_user.id
+            ).count(),
             "house_count": self.houses.filter_by(vn_user_id=current_user.id).count(),
-            "owner_count": self.houseowners.filter_by(vn_user_id=current_user.id).count(),
+            "owner_count": self.houseowners.filter_by(
+                vn_user_id=current_user.id
+            ).count(),
             "tenant_count": self.tenants.filter_by(vn_user_id=current_user.id).count(),
-            
             "last_seen": self.vn_last_seen,
-            "created_at": self.vn_created_at.strftime("%d-%m-%Y")
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
         }
         return json_user
 
@@ -288,54 +290,88 @@ class VNUser(
 
     @staticmethod
     def get_ownerbymonth():
-        count_by_month = db.session.query(
-            db.extract('year', VNHouseOwner.vn_created_at),
-            db.extract('month', VNHouseOwner.vn_created_at),
-            db.func.count(VNHouseOwner.id))\
-            .join(VNUser, VNHouseOwner.vn_user_id == VNUser.id)\
-            .filter(VNUser.id == current_user.id)\
+        count_by_month = (
+            db.session.query(
+                db.extract("year", VNHouseOwner.vn_created_at),
+                db.extract("month", VNHouseOwner.vn_created_at),
+                db.func.count(VNHouseOwner.id),
+            )
+            .join(VNUser, VNHouseOwner.vn_user_id == VNUser.id)
+            .filter(VNUser.id == current_user.id)
             .group_by(
-                db.extract('year', VNHouseOwner.vn_created_at),
-                db.extract('month', VNHouseOwner.vn_created_at)
-            ).all()
+                db.extract("year", VNHouseOwner.vn_created_at),
+                db.extract("month", VNHouseOwner.vn_created_at),
+            )
+            .all()
+        )
         return count_by_month
 
     @staticmethod
     def get_tenantbymonth():
-        count_by_month = db.session.query(
-            db.extract('year', VNTenant.vn_created_at),
-            db.extract('month', VNTenant.vn_created_at),
-            db.func.count(VNTenant.id))\
-            .join(VNUser, VNTenant.vn_user_id == VNUser.id)\
-            .filter(VNUser.id == current_user.id)\
+        count_by_month = (
+            db.session.query(
+                db.extract("year", VNTenant.vn_created_at),
+                db.extract("month", VNTenant.vn_created_at),
+                db.func.count(VNTenant.id),
+            )
+            .join(VNUser, VNTenant.vn_user_id == VNUser.id)
+            .filter(VNUser.id == current_user.id)
             .group_by(
-                db.extract('year', VNTenant.vn_created_at),
-                db.extract('month', VNTenant.vn_created_at)
-            ).all()
+                db.extract("year", VNTenant.vn_created_at),
+                db.extract("month", VNTenant.vn_created_at),
+            )
+            .all()
+        )
         return count_by_month
 
     @staticmethod
     def get_trendprices():
-        rent_prices = db.session.query(
-            db.extract('year', VNHouse.vn_created_at),
-            db.extract('month', VNHouse.vn_created_at),
-            db.func.avg(VNHouse.vn_house_rent))\
-            .join(VNUser, VNHouse.vn_user_id == VNUser.id)\
-            .filter(VNUser.id == current_user.id)\
+        rent_prices = (
+            db.session.query(
+                db.extract("year", VNHouse.vn_created_at),
+                db.extract("month", VNHouse.vn_created_at),
+                db.func.avg(VNHouse.vn_house_rent),
+            )
+            .join(VNUser, VNHouse.vn_user_id == VNUser.id)
+            .filter(VNUser.id == current_user.id)
             .group_by(
-                db.extract('year', VNHouse.vn_created_at),
-                db.extract('month', VNHouse.vn_created_at)
-            ).all()
+                db.extract("year", VNHouse.vn_created_at),
+                db.extract("month", VNHouse.vn_created_at),
+            )
+            .all()
+        )
         return rent_prices
 
     @staticmethod
     def count_available_properties():
-        available_properties = db.session.query(
-            db.func.sum(db.case(((VNHouse.vn_house_is_open == True) & (
-                VNUser.id == current_user.id), 1), else_=0)),
-            db.func.sum(db.case(((VNHouse.vn_house_is_open == False) & (
-                VNUser.id == current_user.id), 1), else_=0))
-        ).join(VNUser).all()
+        vn_house_is_open = VNHouse.vn_house_is_open
+        current_user_id = current_user.id
+
+        available_properties = (
+            db.session.query(
+                db.func.sum(
+                    db.case(
+                        (
+                            (vn_house_is_open == True) & (VNUser.id == current_user_id),
+                            1,
+                        ),
+                        else_=0,
+                    )
+                ),
+                db.func.sum(
+                    db.case(
+                        (
+                            (vn_house_is_open == False)
+                            & (VNUser.id == current_user_id),
+                            1,
+                        ),
+                        else_=0,
+                    )
+                ),
+            )
+            .join(VNUser)
+            .all()
+        )
 
         return available_properties
 
