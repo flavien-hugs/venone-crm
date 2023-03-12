@@ -189,7 +189,7 @@ var app = Vue.createApp({
 
                 if (response.ok) {
                     const data = await response.json();
-                    
+
                     const notOpenValues = data.map((d) => d.notOpen);
                     const isOpenValues = data.map((d) => d.isOpen);
 
@@ -250,7 +250,7 @@ var app = Vue.createApp({
                     const prices = data.map(d => d.price);
 
                     const ctx = document.getElementById("trendPriceChart");
-                    
+
                     const chart = new Chart(ctx, {
                         type: "line",
                         data: {

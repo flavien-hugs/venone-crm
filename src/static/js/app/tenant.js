@@ -24,7 +24,7 @@ window.addEventListener('DOMContentLoaded', event => {
         house_location: '',
         house_number_room: '',
         house_address: '',
-        house_lease_start_date: new Date().toISOString().substring(0, 10)
+        house_lease_start_date: new Date().toISOString().substring(0, 10),
     };
 
     const TENANT_DATA = {
@@ -46,7 +46,7 @@ window.addEventListener('DOMContentLoaded', event => {
             paginateComponent,
             messageComponent,
         },
-        
+
         data() {
             return {
                 tenant: [],
@@ -61,7 +61,7 @@ window.addEventListener('DOMContentLoaded', event => {
                 totalPages: 1,
                 isLoading: false,
 
-                tenantUUID: null,
+                deleteTenantUUID: null,
                 messageAlert: "",
                 showMessageAlert: false,
                 ownerData: { ...OWNER_DATA },
@@ -205,7 +205,7 @@ window.addEventListener('DOMContentLoaded', event => {
             },
 
             deleteTenantConfirm(tenantUUID) {
-                this.tenantUUID = tenantUUID;
+                this.deleteTenantUUID = tenantUUID;
                 const modal = new bootstrap.Modal(document.getElementById('delTenantConfirmModal'));
                 modal.show();
             },
@@ -241,6 +241,8 @@ window.addEventListener('DOMContentLoaded', event => {
                     }
                 } catch (error) {
                     console.log(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = "Une erreur est survenue lors de l'ajout de ce locataire";
                 } finally {
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addOwnerTenantModal'));
                     modal.hide();
@@ -275,6 +277,8 @@ window.addEventListener('DOMContentLoaded', event => {
                     }
                 } catch (error) {
                     console.log(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = "Une erreur est survenue lors de la mise à jour de ce locataire";
                 } finally {
                     this.tenantData.tenant_uuid = null;
                     const modal = bootstrap.Modal.getInstance(document.getElementById('updateTenantConfirm'));
@@ -314,6 +318,8 @@ window.addEventListener('DOMContentLoaded', event => {
                     }
                 } catch (error) {
                     console.log(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = "Une erreur est survenue lors de l'ajout du locataire";
                 } finally {
                     const modal = bootstrap.Modal.getInstance(document.getElementById('createTenantModal'));
                     modal.hide();
@@ -322,7 +328,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onDeleteTenant() {
                 try {
-                    const deleteURL = `/api/tenant/${this.tenantUUID}/delete/`;
+                    const deleteURL = `/api/tenant/${this.deleteTenantUUID}/delete/`;
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {
@@ -333,7 +339,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     const data = await response.json();
 
                     if (data.success) {
-                        this.tenants = this.tenants.filter(tenant => tenant.tenant_uuid !== this.tenantUUID);
+                        this.tenants = this.tenants.filter(tenant => tenant.tenant_uuid !== this.deleteTenantUUID);
                         await this.getTenants();
                         this.showMessageAlert = true;
                         this.messageAlert = data.message;
@@ -346,8 +352,10 @@ window.addEventListener('DOMContentLoaded', event => {
                     }
                 } catch (error) {
                     console.log(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = "Une erreur est survenue lors de la suppression de ce locataire";
                 } finally {
-                    this.tenantUUID = null;
+                    this.deleteTenantUUID = null;
                     const modal = bootstrap.Modal.getInstance(document.getElementById('delTenantConfirmModal'));
                     modal.hide();
                 }

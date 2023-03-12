@@ -2,6 +2,7 @@ import paginateComponent from './components/paginateComponent.js';
 import messageComponent from './components/messageComponent.js';
 
 window.addEventListener('DOMContentLoaded', event => {
+
     const OWNER_DATA = {
         owner_uuid: '',
         gender: '',
@@ -23,6 +24,7 @@ window.addEventListener('DOMContentLoaded', event => {
         house_month: '',
         house_number_room: '',
         house_address: '',
+        house_lease_start_date: new Date().toISOString().substring(0, 10),
     };
 
     const TENANT_DATA = {
@@ -119,7 +121,6 @@ window.addEventListener('DOMContentLoaded', event => {
 
                     const data = await response.json();
                     this.owner = data.owner;
-                    console.log(data)
                     const modal = new bootstrap.Modal(document.getElementById('detailModal'));
                     modal.show();
                 } catch (error) {
@@ -162,22 +163,28 @@ window.addEventListener('DOMContentLoaded', event => {
                     });
 
                     const data = await response.json();
+
                     if (data.success) {
                         await this.getOwners();
-                        this.houseData = { ...HOUSE_DATA };
                         this.tenantData = { ...TENANT_DATA };
+                        this.houseData = { ...HOUSE_DATA };
                         this.showMessageAlert = true;
                         this.messageAlert = data.message;
+
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
+                        this.showMessageAlert = true;
                         this.messageAlert = data.message;
                     }
                 } catch (error) {
                     console.error(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = 'Une erreur est survenue lors de la création du locataire.';
                 } finally {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addOwnerTenantModal'));
+                    const modelElement = document.getElementById('addOwnerTenantModal');
+                    const modal = bootstrap.Modal.getInstance(modelElement);
                     modal.hide();
                 }
             },
@@ -205,10 +212,13 @@ window.addEventListener('DOMContentLoaded', event => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
-                        console.log(data.message);
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
                     }
                 } catch (error) {
                     console.error(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = 'Une erreur est survenue lors de la mise à du compte propriétaire.';
                 } finally {
                     this.ownerData.owner_uuid = null;
                     const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
@@ -237,10 +247,13 @@ window.addEventListener('DOMContentLoaded', event => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
-                        console.log(data.message);
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
                     }
                 } catch (error) {
                     console.error(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = 'Une erreur est survenue lors de la suppresion de ce propriétaire.';
                 } finally {
                     this.ownerUUID = null;
                     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
