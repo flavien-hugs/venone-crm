@@ -1,14 +1,23 @@
 <template v-for="tn in filteredTenants" v-bind:key="tn.tenant_uuid">
 	<tr v-if='tn.user_uuid'>
 		<td scope="row">
-			<a v-bind:href="tn.tenant_url"
+			<span
 				class="badge bg-blue-soft text-blue">
 				{ tn.tenant_id }
-			</a>
+			</span>
+		</td>
+		<td scope="row">
+			<span
+				class="badge bg-purple-soft text-purple">
+				{ tn.owner }
+			</span>
 		</td>
 		<td>{ tn.fullname } ({ tn.phonenumber_one })</td>
-		<td>{ tn.house.house_type } / { tn.monthly_rent } { tn.user.devise }</td>
-		<td>{ tn.house.house_lease_start_date.toLocaleString() }</td>
+		<td>
+			<span class="badge bg-red-soft text-red ms-2">{ tn.house.house_id }</span>
+			{ tn.house.house_type } &smid; { tn.monthly_rent } { tn.devise }
+		</td>
+		<td>{ tn.created_at.toLocaleString() }</td>
 		<!--  <td>{ tn.house.house_lease_end_date.toLocaleString() }</td>-->
 		<td>
 			<button @click.prevent="updateTenant(tn)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
@@ -86,7 +95,7 @@
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">Retirer le locataire { tenant.tenannt } de maison ?</h5>
+				<h5 class="modal-title">Retirer ce locataire ?</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 

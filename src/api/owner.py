@@ -82,7 +82,7 @@ def update_houseowner(owner_uuid):
     owner = VNHouseOwner.get_owner(owner_uuid)
 
     if not owner:
-        return jsonify({"message": "owner not found"}), 404
+        return jsonify({"message": "Oups ! L'élément n'a pas été trouvé."}), 404
 
     data = request.get_json()
     fullname = data.get("fullname")
@@ -109,7 +109,7 @@ def update_houseowner(owner_uuid):
         jsonify(
             {
                 "success": True,
-                "message": f"Propriétaire #{owner.vn_owner_id} mise à jour avec succès !",
+                "message": f"Propriétaire #{owner.vn_owner_id} mise à jour avec succès.",
                 "owner": owner.to_json(),
             }
         ),
@@ -141,29 +141,29 @@ def owner_create_tenant(owner_uuid):
         house.vn_house_month = house_data.get("house_month")
         house.vn_house_number_room = house_data.get("house_number_room")
         house.vn_house_address = house_data.get("house_address")
-
         lease_start_date = house_data.get("house_lease_start_date")
+
         house.vn_house_lease_start_date = (
             datetime.strptime(lease_start_date, "%Y-%m-%d").date()
             if lease_start_date
             else None
         )
 
-        notice_period_days = 15
-        lease_duration_days = 45
+        notice_period = timedelta(days=15)
 
-        notice_period = timedelta(days=notice_period_days)
+        if lease_start_date:
+            lease_end_date = (
+                datetime.strptime(lease_start_date, "%Y-%m-%d")
+                + timedelta(days=45)
+                - notice_period
+            ).date()
 
-        lease_end_date = (
-            lease_start_date + timedelta(days=lease_duration_days) - notice_period
-        )
-
-        if hasattr(house, "vn_house_lease_end_date"):
-            house.vn_house_lease_start_date = lease_end_date
-        else:
-            raise AttributeError(
-                "L'objet house doit avoir un attribut 'vn_house_lease_end_date'"
-            )
+            if hasattr(house, "vn_house_lease_end_date"):
+                house.vn_house_lease_end_date = lease_end_date
+            else:
+                raise AttributeError(
+                    "L'objet house doit avoir un attribut 'vn_house_lease_end_date'"
+                )
 
         house.vn_user_id = current_user.id
         house.vn_owner_id = owner.id
@@ -199,7 +199,7 @@ def owner_create_tenant(owner_uuid):
             201,
         )
 
-    return jsonify({"success": False, "message": "Erreur"})
+    return jsonify({"success": False, "message": "Une erreur s'est lors de l'ajout !"})
 
 
 @api.get("/owner/<string:owner_uuid>/houses/")
@@ -236,7 +236,7 @@ def get_houseowner_houses(owner_uuid):
     )
 
 
-@api.route("/owner/<string:owner_uuid>/tenants/")
+@api.get("/owner/<string:owner_uuid>/tenants/")
 @login_required
 def get_houseowner_tenants(owner_uuid):
 

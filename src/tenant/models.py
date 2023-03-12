@@ -2,7 +2,6 @@ import random
 import string
 from datetime import date
 
-from flask import url_for
 from flask_login import current_user
 from src import db
 from src.mixins.models import DefaultUserInfoModel
@@ -61,14 +60,13 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "location": self.vn_location,
             "phonenumber_one": self.vn_phonenumber_one,
             "phonenumber_two": self.vn_phonenumber_two,
-            "activated": self.get_owner_available(),
-
             "devise": current_user.vn_device,
-
+            "amount": self.get_owner_property_values(),
+            "houses": [h.vn_house_id for h in self.houses],
+            "tenants": [t.vn_tenant_id for t in self.tenants],
             "number_houses": self.houses.count(),
             "number_tenants": self.tenants.count(),
             "number_payments": self.payments.count(),
-
             "is_activated": self.vn_activated,
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
         }
@@ -106,48 +104,55 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         return f"#{self.vn_owner_id}"
 
     @staticmethod
-    def get_houseowner_name(houseowner):
+    def get_houseowner_name(houseowner) -> str:
         return houseowner.vn_fullname
 
-    def get_owner_available(self):
-        if self.vn_activated:
-            return "Compte actif"
-        return "Compte inactif"
+    def get_owner_available(self) -> bool:
+        return "Compte actif" if self.vn_activated else "Compte inactif"
 
     @staticmethod
-    def get_owners_list():
-        return VNHouseOwner.query.filter_by(
+    def get_owners_list() -> list:
+        query = VNHouseOwner.query.filter_by(
             vn_user_id=current_user.id, vn_activated=True
         )
+        return query
 
     @staticmethod
-    def get_owner(owner_uuid):
-        return VNHouseOwner.query.filter_by(
+    def get_owner(owner_uuid) -> dict:
+        query = VNHouseOwner.query.filter_by(
             vn_user_id=current_user.id, uuid=owner_uuid
-        ).first()
+        )
+        return query.first()
 
     @staticmethod
-    def get_houses_list():
-        return VNHouse.query.filter_by(vn_user_id=current_user.id, vn_activated=True)
+    def get_houses_list() -> list:
+        query = VNHouse.query.filter_by(vn_user_id=current_user.id)
+        return query
 
     @staticmethod
     def get_house(owner_uuid):
-        return VNHouse.query.filter_by(
-            vn_user_id=current_user.id,
-            uuid=owner_uuid,
-        ).first()
+        query = VNHouse.query.filter_by(vn_user_id=current_user.id, uuid=owner_uuid)
+        return query.first()
 
     @staticmethod
     def get_tenants(owner_uuid):
-        return VNTenant.query.filter_by(
+        query = VNTenant.query.filter_by(
             uuid=owner_uuid.uuid, vn_user_id=current_user.uuid
-        ).first()
+        )
+        return query.first()
 
     @staticmethod
     def get_tenant(owner_uuid):
-        return VNTenant.query.filter_by(
+        query = VNTenant.query.filter_by(
             uuid=owner_uuid.uuid, vn_user_id=current_user.uuid
-        ).first()
+        )
+        return query.first()
+
+    def get_owner_property_values(self) -> float:
+        house_value = 0.0
+        for house in self.houses.filter_by(vn_house_is_open=True):
+            house_value += house.vn_house_rent
+        return house_value
 
 
 class VNHouse(TimestampMixin):
@@ -188,14 +193,15 @@ class VNHouse(TimestampMixin):
     def to_json(self):
         json_house = {
             "house_uuid": self.uuid,
-            "owner_id": self.vn_owner_id,
+            "owner_id": self.get_owner_id(),
+            "tenant_id": self.get_current_tenant(),
             "user_uuid": current_user.uuid,
             "devise": current_user.vn_device,
             "house_id": self.get_house_id(),
             "house_type": self.vn_house_type,
             "house_rent": self.vn_house_rent,
-            "house_guaranty": self.vn_house_guaranty,
             "house_month": self.vn_house_month,
+            "house_guaranty": self.vn_house_guaranty,
             "house_number_room": self.vn_house_number_room,
             "house_address": self.vn_house_address,
             "house_is_open": self.vn_house_is_open,
@@ -203,7 +209,7 @@ class VNHouse(TimestampMixin):
             "house_lease_start_date": self.vn_house_lease_start_date.strftime(
                 "%d-%m-%Y"
             ),
-            "house_lease_end_date": self.vn_house_lease_end_date.strftime("%d-%m-%Y")
+            "house_lease_end_date": self.vn_house_lease_end_date.strftime("%d-%m-%Y"),
         }
         return json_house
 
@@ -218,23 +224,34 @@ class VNHouse(TimestampMixin):
         db.session.add(self)
         db.session.commit()
 
-    def get_house_open(self):
-        if self.vn_house_is_open:
-            return "Indisponible"
-        return "Disponible"
+    def get_house_open(self) -> bool:
+        return "indisponible" if self.vn_house_is_open else "disponible"
 
-    def get_house_id(self):
+    def get_house_id(self) -> str:
         return f"#{self.vn_house_id}"
 
     @staticmethod
-    def get_houses_list():
+    def get_houses_list() -> list:
         houses = VNHouse.query.filter_by(vn_user_id=current_user.id)
         return houses
 
     @staticmethod
-    def get_house(house_uuid):
-        house = VNHouse.query.filter_by(uuid=house_uuid, vn_user_id=current_user.id).first()
-        return house
+    def get_house(house_uuid) -> dict:
+        house = VNHouse.query.filter_by(uuid=house_uuid, vn_user_id=current_user.id)
+        return house.first()
+
+    def get_owner_id(self):
+        owners = VNHouseOwner.query.filter_by(
+            id=self.vn_owner_id, vn_user_id=current_user.id
+        )
+        return next((own.get_owner_id() for own in owners), None)
+
+    def get_current_tenant(self):
+        house = VNHouse.query.filter_by(id=self.id, vn_user_id=current_user.id).first()
+        for tenant in house.tenants:
+            if tenant is None:
+                return None
+            return tenant.get_tenant_id()
 
 
 class VNTenant(DefaultUserInfoModel, TimestampMixin):
@@ -270,6 +287,7 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
             "user_uuid": current_user.uuid,
             "devise": current_user.vn_device,
             "tenant_uuid": self.uuid,
+            "owner": self.get_owner_id(),
             "tenant_id": self.get_tenant_id(),
             "house": self.house_tenant.to_json(),
             "gender": self.vn_gender,
@@ -293,24 +311,32 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     def __repr__(self):
         return f"VNTenant({self.id}, {self.vn_tenant_id})"
 
-    def get_tenant_id(self):
+    def get_owner_id(self):
+        owners = VNHouseOwner.query.filter_by(
+            id=self.vn_owner_id, vn_user_id=current_user.id
+        )
+        return next((own.get_owner_id() for own in owners), None)
+
+    def get_tenant_id(self) -> str:
         return f"#{self.vn_tenant_id}"
 
     @staticmethod
-    def get_tenant_name(tenant):
+    def get_tenant_name(tenant) -> str:
         return tenant.vn_fullname
 
     @staticmethod
-    def get_tenants_list():
+    def get_tenants_list() -> list:
         tenants = VNTenant.query.filter_by(vn_user_id=current_user.id)
         return tenants
 
     @staticmethod
-    def get_tenant(tenant_uuid):
-        tenant = VNTenant.query.filter_by(uuid=tenant_uuid, vn_user_id=current_user.id).first()
+    def get_tenant(tenant_uuid) -> dict:
+        tenant = VNTenant.query.filter_by(
+            uuid=tenant_uuid, vn_user_id=current_user.id
+        ).first()
         return tenant
 
-    def get_monthly_rent(self):
+    def get_monthly_rent(self) -> float:
 
         from src.payment import VNPayment
 

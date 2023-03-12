@@ -8,7 +8,8 @@ from flask_login import current_user
 from flask_login import login_required
 from src import db
 from src.auth.models import VNUser
-from src.mixins.decorators import owner_required, agency_required
+from src.mixins.decorators import agency_required
+from src.mixins.decorators import owner_required
 from src.tenant import VNHouse
 from src.tenant import VNHouseOwner
 from src.tenant import VNTenant
@@ -42,7 +43,7 @@ def get_all_users():
             "next": next,
             "page": page,
             "per_page": per_page,
-            "total": pagination.total
+            "total": pagination.total,
         }
     )
 
@@ -91,7 +92,9 @@ def get_user_tenants(user_uuid):
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = current_user.tenants.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = current_user.tenants.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     tenants = pagination.items
     prev = None
     if pagination.has_prev:
@@ -119,7 +122,9 @@ def get_user_houses(user_uuid):
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = current_user.houses.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = current_user.houses.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     houses = pagination.items
     prev = None
     if pagination.has_prev:
@@ -139,6 +144,7 @@ def get_user_houses(user_uuid):
         }
     )
 
+
 @api.get("/user/<string:user_uuid>/payments/")
 @login_required
 def get_user_payments(user_uuid):
@@ -146,7 +152,9 @@ def get_user_payments(user_uuid):
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = current_user.payments.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = current_user.payments.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     payments = pagination.items
     prev = None
     if pagination.has_prev:

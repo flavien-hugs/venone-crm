@@ -1,12 +1,12 @@
 const paginateComponent = {
-	
+
 	props: [
 		"currentPage",
         "totalPages",
         "prevPage",
         "nextPage",
 	],
-	
+
 	template: `
 		<nav v-if="totalPages > 1" class="my-2">
 			<ul class="pagination justify-content-center text-center">

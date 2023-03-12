@@ -4,9 +4,17 @@
 			<span class="badge bg-blue-soft text-blue">{ own.owner_id }</span>
 		</td>
 		<td>{ own.fullname } ({own.phonenumber_one})</td>
-		<td>100 0000 { own.devise }</td>
-		<td>{ own.number_houses } <span v-if="own.number_houses > 0"></span></td>
-		<td>{ own.number_tenants } <span v-if="own.number_tenants > 0"></span></td>
+		<td>{ own.amount } { own.devise }</td>
+		<td>
+			<span v-for="h in own.houses" class="badge bg-green-soft text-green me-1" v-if="own.number_houses > 0">
+			#{ h }</span>
+			({ own.number_houses })
+		</td>
+		<td>
+			<span v-for="t in own.tenants" class="badge bg-purple-soft text-purple me-1" v-if="own.number_houses > 0">
+			#{ t }</span>
+			({ own.number_tenants })
+		</td>
 		<td>{ own.created_at }</td>
 		<td>
 			<button @click="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
@@ -24,7 +32,7 @@
 	</tr>
 </template>
 
-<!-- modal delete ownern -->
+<!-- modal delete owner -->
 <div class="modal fade" data-bs-backdrop="static" id="deleteModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -152,7 +160,7 @@
 			<form>
 				<div class="modal-header">
 					<h4 class="modal-title">
-						Ajouter un locataire pour ce propriétaire : {owner.owner_id}
+						Ajouter un locataire pour ce propriétaire
 					</h4>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 				</div>
@@ -248,9 +256,9 @@
 					            </div>
 
 					            <div class="col-3">
-					                <input v-bind:placeholder="houseData.house_lease_start_date" type="date" class="form-control" id="house_lease_start_date" v-model="houseData.house_lease_start_date">
-					                <span class="text-muted small">Date de location</span>
-					            </div>
+					            	<input v-bind:placeholder="houseData.house_lease_start_date" type="date" class="form-control" id="house_lease_start_date" v-model="houseData.house_lease_start_date">
+					            	<span class="text-muted small">Date de location</span>
+                                </div>
 					        </div>
 					    </div>
 					</div>

@@ -1,6 +1,7 @@
 import random
 import string
-from datetime import datetime, date
+from datetime import date
+from datetime import datetime
 from decimal import Decimal
 
 import requests
@@ -8,10 +9,10 @@ from cinetpay_sdk.s_d_k import Cinetpay
 from flask import current_app
 from flask_login import current_user
 from src import db
-from src.mixins.models import TimestampMixin
-
 from src.auth.models import VNUser
-from src.tenant.models import VNTenant, VNHouse
+from src.mixins.models import TimestampMixin
+from src.tenant.models import VNHouse
+from src.tenant.models import VNTenant
 
 
 def id_generator():
@@ -79,22 +80,25 @@ class VNPayment(TimestampMixin):
         current_month = date.today().month
         current_year = date.today().year
 
-        paid = db.session.query(VNTenant)\
-            .join(VNTenant.payments)\
+        paid = (
+            db.session.query(VNTenant)
+            .join(VNTenant.payments)
             .filter(
                 VNTenant.vn_payee_id == current_user.id,
-                db.extract('month', VNPayment.vn_pay_date) == current_month,
-                db.extract('year', VNPayment.vn_pay_date) == current_year,
-            ).all()
+                db.extract("month", VNPayment.vn_pay_date) == current_month,
+                db.extract("year", VNPayment.vn_pay_date) == current_year,
+            )
+            .all()
+        )
 
         return paid
 
     @staticmethod
     def tenants_paids():
         available_houses = VNHouse.query.filter(
-            VNHouse.vn_house_is_open == True,
+            VNHouse.vn_house_is_open is True,
             VNHouse.vn_house_lease_end_date >= date.today(),
-            VNHouse.vn_user_id == current_user.id
+            VNHouse.vn_user_id == current_user.id,
         ).all()
 
         print(available_houses)
@@ -103,8 +107,9 @@ class VNPayment(TimestampMixin):
             VNPayment.query.filter(
                 VNPayment.vn_house_id == house.vn_house_id,
                 VNPayment.vn_pay_date < house.vn_house_lease_end_date,
-                VNPayment.vn_payee_id == current_user.id
-            ).all() for house in available_houses
+                VNPayment.vn_payee_id == current_user.id,
+            ).all()
+            for house in available_houses
         ]
 
         print(payments)
@@ -118,11 +123,15 @@ class VNPayment(TimestampMixin):
 
         today = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-        not_paid = db.session.query(VNTenant)\
-            .join(VNPayment).join(VNUser)\
-            .filter(VNTenant.vn_payee_id == current_user.id)\
-            .filter(VNPayment.vn_pay_date < today)\
-            .filter(db.and_(VNPayment.vn_pay_date != VNHouse.vn_house_lease_start_date)).all()
+        not_paid = (
+            db.session.query(VNTenant)
+            .join(VNPayment)
+            .join(VNUser)
+            .filter(VNTenant.vn_payee_id == current_user.id)
+            .filter(VNPayment.vn_pay_date < today)
+            .filter(db.and_(VNPayment.vn_pay_date != VNHouse.vn_house_lease_start_date))
+            .all()
+        )
         return not_paid
 
     def calculate_late_penalty(self):
