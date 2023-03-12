@@ -1,5 +1,7 @@
-window.addEventListener('DOMContentLoaded', event => {
+import paginateComponent from './components/paginateComponent.js';
+import messageComponent from './components/messageComponent.js';
 
+window.addEventListener('DOMContentLoaded', event => {
     const HOUSE_DATA = {
         house_uuid: '',
         house_type: '',
@@ -8,13 +10,21 @@ window.addEventListener('DOMContentLoaded', event => {
         house_month: '',
         house_number_room: '',
         house_address: '',
-    };
+    }
 
     var app = Vue.createApp({
+
+        components: {
+            paginateComponent,
+            messageComponent,
+        },
+
         data() {
             return {
-                houses: [],
+                user: [],
                 house: [],
+                houses: [],
+
                 perPage: 10,
                 currentPage: 1,
                 totalPages: 1,
@@ -25,20 +35,21 @@ window.addEventListener('DOMContentLoaded', event => {
                 houseData: { ...HOUSE_DATA },
             }
         },
+
         delimiters: ["{", "}"],
         compilerOptions: {
             delimiters: ["{", "}"]
         },
 
-        mounted() {
-            this.getHouses()
+        async mounted() {
+            await this.getHouses()
         },
 
         methods: {
             async getHouses() {
                 try {
                     this.isLoading = true;
-                    const houseURL = `/api/houses/?pag=${this.currentPage}`;
+                    const houseURL = `/api/houses/?page=${this.currentPage}`;
 
                     const response = await fetch(houseURL, {
                         method: "GET",
@@ -47,17 +58,19 @@ window.addEventListener('DOMContentLoaded', event => {
                         }
                     });
 
-                    if (response.ok) {
+                    if (response.status == 200) {
+                        this.isLoading = false;
                         const data = await response.json();
                         this.houses = data.houses;
+                        this.user = data.user;
                         this.totalPages = Math.ceil(data.total / this.perPage);
-                        this.isLoading = false;
+                        this.currentPage = data.page;
                     } else {
+                        this.isLoading = false;
                         throw new Error("NETWORK RESPONSE ERROR");
                     }
                 } catch (error) {
                     console.error("FETCH ERROR:", error);
-                    this.houses = error;
                 }
             },
 
@@ -153,7 +166,7 @@ window.addEventListener('DOMContentLoaded', event => {
                 window.scrollTo({top: 0, behavior: 'smooth'});
             },
         },
-    })
+    });
 
-    app.mount('#houseTable');
+    app.mount("#houseApp");
 });

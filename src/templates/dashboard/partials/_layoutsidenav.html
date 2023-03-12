@@ -20,24 +20,19 @@
                     <span class="badge bg-success-soft text-success ms-auto">2 New!</span>
                 </a>
 
-                <div class="sidenav-menu-heading">Menu</div>
+                <div class="sidenav-menu-heading">Menu Venone</div>
 
                 <a class="nav-link" href="{{ url_for('owner_bp.dashboard', uuid=current_user.uuid) }}">
                     <div class="nav-link-icon">
                         <i data-feather="home"></i>
-                    </div> Dashboard
+                    </div> Tableau de board
                 </a>
 
                 <div class="sidenav-menu-heading">Gestion Loyers</div>
-                <a class="nav-link" href="#!">
+                <a class="nav-link" href="{{ url_for('checkout_bp.checkout') }}">
                     <div class="nav-link-icon">
-                        <i data-feather="activity"></i>
-                    </div> Payés
-                </a>
-                <a class="nav-link" href="#!">
-                    <div class="nav-link-icon">
-                        <i data-feather="repeat"></i>
-                    </div> Impayés
+                        <i data-feather="dollar-sign"></i>
+                    </div> Loyers
                 </a>
 
                 {% if current_user.vn_company %}
@@ -72,7 +67,7 @@
 
                 {% if current_user.vn_house_owner %}
                     <div class="sidenav-menu-heading">Gestion locataires</div>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{{ url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid) }}">
                         <div class="nav-link-icon">
                             <i data-feather="users"></i>
                         </div>

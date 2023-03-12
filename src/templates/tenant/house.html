@@ -1,14 +1,14 @@
-{% extends "tenant/_base.html" %}
+{% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-    <section id="houseTable">
+    <section id="houseApp">
 
-        <!-- Alert message -->
-        <div v-if="showMessageAlert" class="alert alert-success" role="alert">
-            { messageAlert }
-        </div>
+        <message-component
+            :show-message-alert="showMessageAlert"
+            :message-alert="messageAlert">    
+        </message-component>
 
-        <div v-if="houses.length == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div v-if="user.house_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
                 <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
 
@@ -18,8 +18,7 @@
             </div>
         </div>
 
-        <div v-else-if="houses.length > 0" class="card card-header-actions">
-
+        <div v-else-if="user.house_count > 0" class="card card-header-actions">
             <div v-if="isLoading" class="preloader">
                 <div class="preloader-body">
                     <p>Chargement en cours...</p>
@@ -30,7 +29,7 @@
             </div>
 
             <div class="card-header">
-                <span class="fw-700">Propriétés ({ houses.total })</span>
+                <span class="fw-700">{ user.house_count } propriétés</span>
             </div>
 
             <div class="card-body">
@@ -44,23 +43,32 @@
                     >
                 </div>
 
-                <table class="table table-hover table-responsive">
-                    <thead class="small">
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Proprité &amp; Localisation</th>
-                            <th scope="col">Loyer/mois</th>
-                            <th scope="col">Date mise en location</th>
-                            <th scope="col">Status location</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% include "tenant/paths/_house.html" %}
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                   <table class="table table-hover">
+                        <thead class="small">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Proprité &amp; Localisation</th>
+                                <th scope="col">Loyer/mois</th>
+                                <th scope="col">Ajouté le</th>
+                                <th scope="col">Status location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
 
-                {% include "tenant/paths/_paginate.html" %}
+                        <tbody>
+                            {% include "tenant/paths/_house.html" %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <paginate-component
+                    :current-page="currentPage"
+                    :total-pages="totalPages"
+                    :next-page="nextPage"
+                    :prev-page="prevPage"
+                ></paginate-component>
+
             </div>
         </div>
     </section>
@@ -69,5 +77,5 @@
 
 {% block other_js_src %}
     {{ super() }}
-    <script src="{{ url_for('static', filename="js/app/house.js") }}"></script>
+    <script type="module" src="{{ url_for('static', filename="js/app/house.js") }}"></script>
 {% endblock other_js_src %}

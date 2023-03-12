@@ -1,29 +1,26 @@
-<tr v-for="tenant in filteredTenants" v-bind:key="tenant.tenant_uuid">
-	<td scope="row">
-		<a v-bind:href="tenant.tenant_url"
-			class="badge bg-blue-soft text-blue">
-			{ tenant.tenant_id }
-		</a>
-	</td>
-	<td>{ tenant.fullname } ({ tenant.phonenumber_one })</td>
-	<td>{ tenant.monthly_rent } { tenant.user.devise } </td>
-	<td>{ tenant.house.house_lease_start_date.toLocaleString() }</td>
-	<td>{ tenant.house.house_lease_end_date.toLocaleString() }</td>
-	<td ><span class="badge bg-danger text-white p-2">Impayé</span></td>
-	<td>
-		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
-			<i class="text-primary" data-feather="eye"></i>
-		</button>
+<template v-for="tn in filteredTenants" v-bind:key="tn.tenant_uuid">
+	<tr v-if='tn.user_uuid'>
+		<td scope="row">
+			<a v-bind:href="tn.tenant_url"
+				class="badge bg-blue-soft text-blue">
+				{ tn.tenant_id }
+			</a>
+		</td>
+		<td>{ tn.fullname } ({ tn.phonenumber_one })</td>
+		<td>{ tn.house.house_type } / { tn.monthly_rent } { tn.user.devise }</td>
+		<td>{ tn.house.house_lease_start_date.toLocaleString() }</td>
+		<!--  <td>{ tn.house.house_lease_end_date.toLocaleString() }</td>-->
+		<td>
+			<button @click.prevent="updateTenant(tn)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+				<i class="feather text-secondary fa fa-edit"></i>
+			</button>
 
-		<button @click.prevent="updateTenant(tenant)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-secondary" data-feather="edit"></i>
-		</button>
-
-		<button @click.prevent="deleteTenantConfirm(tenant.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
-			<i class="text-danger" data-feather="trash-2"></i>
-		</button>
-	</td>
-</tr>
+			<button @click.prevent="deleteTenantConfirm(tn.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
+				<i class="feather text-danger fa fa-trash"></i>
+			</button>
+		</td>
+	</tr>
+</template>
 
 <!-- update tenant modal -->
 <div class="modal fade" data-bs-backdrop="static" id="updateTenantConfirm">
@@ -38,28 +35,28 @@
 				</div>
 				<div class="modal-body">
 					<div class="row gx-3 mb-3">
-						<div class="col-md-6">
+						<div class="col-6">
 							<label for="fullname" class="form-label">Nom &amp; prénoms</label>
 							<input type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
 						</div>
 
-						<div class="col-md-6">
+						<div class="col-6">
 							<label for="card_number" class="form-label">N° CNI/Attestion/Passport</label>
 							<input type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
 						</div>
 					</div>
 
 					<div class="row gx-3 mb-3">
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="phonenumber_one" class="form-label">Téléphone I</label>
 							<input type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
 						</div>
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="phonenumber_two" class="form-label">Téléphone II</label>
 							<input type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
 						</div>
 
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="addr_email" class="form-label">Addresse e-mail</label>
 							<input type="email" class="form-control" id="addr_email" v-model="tenantData.addr_email">
 						</div>
@@ -77,7 +74,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
-					<button type="button" @click="onUpdateTenant" class="btn btn-success shadow-none">Mettre à jour</button>
+					<button type="button" @click.prevent="onUpdateTenant" class="btn btn-success shadow-none">Mettre à jour</button>
 				</div>
 			</form>
 		</div>
@@ -85,7 +82,7 @@
 </div>
 
 <!-- delete tenant modal -->
-<div class="modal fade" data-bs-backdrop="static" id="confirmModal">
+<div class="modal fade" data-bs-backdrop="static" id="delTenantConfirmModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -99,13 +96,13 @@
 
 			<div class="modal-footer">
 				<div class="row">
-					<div class="col-xl-6 d-grid">
-						<button @click="tenantUUID = null; onDeleteTenant = false" class="btn btn-danger text-uppercase" type="button" data-bs-dismiss="modal">
+					<div class="col-6 d-grid">
+						<button @click.prevent="tenantUUID = null; onDeleteTenant = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">
 						Annuler</button>
 					</div>
 
-					<div class="col-xl-6 d-grid">
-						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-success text-uppercase shadow-none">
+					<div class="col-6 d-grid">
+						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-danger text-uppercase shadow-none" data-bs-dismiss="modal">
 						Oui</button>
 					</div>
 				</div>

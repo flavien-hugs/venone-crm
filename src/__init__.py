@@ -90,12 +90,13 @@ def create_venone_app(config_name):
     with venone_app.app_context():
 
         from src.auth import auth_bp
-        from src.dashboard.routes import owner_bp, agency_bp, admin_bp
+        from src.dashboard.routes import owner_bp, agency_bp, admin_bp, checkout_bp
         from src.api import api
 
         venone_app.register_blueprint(auth_bp)
         venone_app.register_blueprint(owner_bp)
         venone_app.register_blueprint(agency_bp)
+        venone_app.register_blueprint(checkout_bp)
         venone_app.register_blueprint(admin_bp)
 
         venone_app.register_blueprint(api)

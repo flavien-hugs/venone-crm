@@ -41,6 +41,7 @@ def get_all_houseowners():
             "page": page,
             "per_page": per_page,
             "total": pagination.total,
+            "user": current_user.to_json(),
         }
     )
 
@@ -57,7 +58,9 @@ def get_houseowner(owner_uuid):
 def delete_houseowner(owner_uuid):
     owner = VNHouseOwner.get_owner(owner_uuid)
     if owner is not None:
-        owner.disable()
+        [h.remove() for h in owner.houses]
+        [t.remove() for t in owner.tenants]
+        owner.remove()
         return jsonify(
             {
                 "success": True,
@@ -118,6 +121,11 @@ def update_houseowner(owner_uuid):
 @login_required
 def owner_create_tenant(owner_uuid):
 
+    """
+    Vue permettant la création d'un locataire
+    pour un compte entreprise
+    """
+
     owner = VNHouseOwner.get_owner(owner_uuid)
 
     if request.method == "POST":
@@ -151,7 +159,7 @@ def owner_create_tenant(owner_uuid):
         )
 
         if hasattr(house, "vn_house_lease_end_date"):
-            house.vn_house_lease_end_date = lease_end_date
+            house.vn_house_lease_start_date = lease_end_date
         else:
             raise AttributeError(
                 "L'objet house doit avoir un attribut 'vn_house_lease_end_date'"

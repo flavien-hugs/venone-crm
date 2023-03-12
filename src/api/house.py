@@ -1,6 +1,7 @@
 from flask import jsonify
 from flask import request
 from flask import url_for
+from flask_login import current_user
 from flask_login import login_required
 from src.tenant import VNHouse
 
@@ -34,6 +35,7 @@ def get_all_houses():
             "page": page,
             "per_page": per_page,
             "total": pagination.total,
+            "user": current_user.to_json(),
         }
     )
 
@@ -88,8 +90,7 @@ def update_house(house_uuid):
 def delete_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
     if house is not None:
-        house.disable()
-        house.house_disable()
+        house.remove()
         return jsonify(
             {
                 "success": True,

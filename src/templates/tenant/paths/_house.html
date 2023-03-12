@@ -1,27 +1,33 @@
-<tr v-for="house in houses" :key="house.house_uuid">
-	<td>
-		<a v-bind:href="house.house_url" class="badge bg-blue-soft text-blue">{ house.house_id }</a>
-	</td>
-	<td>
-		{ house.house_type }, situé à { house.house_address }
-	</td>
-	<td>{ house.house_rent.toLocaleString() } { house.user.devise }</td>
-	<td>{ house.house_lease_start_date.toLocaleString() }</td>
-	<td><span class="badge bg-danger text-white p-2">{ house.house_status }</span></td>
-	<td>
-		<button class="btn btn-datatable btn-icon btn-transparent-primary me-2">
-			<i class="text-primary" data-feather="eye"></i>
-		</button>
+<template v-for="hs in houses" :key="hs.house_uuid">
+	<tr v-if="hs.user_uuid">
+		<td>
+			<a href="~" class="badge bg-blue-soft text-blue">{ hs.house_id }</a>
+		</td>
+		<td>
+			{ hs.house_type } <br>
+			<small>{ hs.house_address }</small>
+		</td>
+		<td>{ hs.house_rent.toLocaleString() } { hs.devise } <br>
+			<small>{ hs.tenant }</small>
+		</td>
+		<td>{ hs.house_lease_start_date.toLocaleString() }</td>
+		<td><span :class="{'badge': true, 'bg-warning': hs.house_is_open, 'bg-primary': !hs.house_is_open}" class="text-white text-uppercase small p-2 fw-700">{ hs.house_status }</span></td>
 
-		<button @click="updateHouse(house)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-success" data-feather="edit"></i>
-		</button>
+		<td>
+			<button v-if="!hs.house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+				<i class="text-success fa fa-user-plus"></i>
+			</button>
 
-		<!--  <button @click="deleteHouseConfirm(house.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
-			<i class="text-danger" data-feather="trash-2"></i>
-		</button> -->
-	</td>
-</tr>
+			<button @click="updateHouse(hs)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+				<i class="text-primary fa fa-edit"></i>
+			</button>
+
+			<button v-if="!hs.house_is_open" @click="deleteHouseConfirm(hs.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+				<i class="text-danger fa fa-trash"></i>
+			</button>
+		</td>
+	</tr>
+</template>
 
 <!-- updat house modal -->
 <div class="modal fade" data-bs-backdrop="static" id="updateHouseConfirm">
@@ -36,29 +42,29 @@
 
 				<div class="modal-body">
 					<div class="row gx-3 mb-4">
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
 			            </div>
 			        </div>
 
 			        <div class="row gx-3 mb-4">
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
 			            </div>
 
-			            <div class="col-md-4">
+			            <div class="col-4">
 			                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
 			            </div>
 			        </div>
@@ -88,12 +94,12 @@
 
 			<div class="modal-footer">
 				<div class="row">
-					<div class="col-xl-6 d-grid">
-						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-danger text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
+					<div class="col-6 d-grid">
+						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
 					</div>
 
-					<div class="col-xl-6 d-grid">
-						<button @click="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
+					<div class="col-6 d-grid">
+						<button data-bs-dismiss="modal" @click="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
 					</div>
 				</div>
 			</div>

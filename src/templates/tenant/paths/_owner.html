@@ -1,33 +1,31 @@
-<tr v-for="own in owners" :key="own.owner_uuid">
-	<td>
-		<a title="Détail du bailleur" type="button" @click="getOwner(own.owner_uuid)" class="badge bg-blue-soft text-blue">{ own.owner_id }</a>
-	</td>
-	<td>{ own.fullname } ({own.phonenumber_one})</td>
-	<td>100 0000 { own.user.devise }</td>
-	<td>{ own.number_houses } <span v-if="own.number_houses > 0">(Afficher)</span></td>
-	<td>{ own.number_tenants } <span v-if="own.number_tenants > 0">(Afficher)</span></td>
-	<td>{ own.created_at }</td>
-	<td>
-		<button @click="getOwner(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-primary me-2">
-			<i class="text-primary" data-feather="eye"></i>
-		</button>
+<template v-for="own in owners" :key="own.owner_uuid">
+	<tr v-if='own.user_uuid'>
+		<td scope="row">
+			<span class="badge bg-blue-soft text-blue">{ own.owner_id }</span>
+		</td>
+		<td>{ own.fullname } ({own.phonenumber_one})</td>
+		<td>100 0000 { own.devise }</td>
+		<td>{ own.number_houses } <span v-if="own.number_houses > 0"></span></td>
+		<td>{ own.number_tenants } <span v-if="own.number_tenants > 0"></span></td>
+		<td>{ own.created_at }</td>
+		<td>
+			<button @click="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+				<i class="text-secondary fa fa-edit"></i>
+			</button>
 
-		<button @click="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-			<i class="text-secondary" data-feather="edit"></i>
-		</button>
+			<button @click="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+				<i class="text-success fa fa-user-plus"></i>
+			</button>
 
-		<button @click.prevent="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">
-			<i class="text-success" data-feather="user-plus"></i>
-		</button>
-
-		<button @click="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
-			<i class="text-danger" data-feather="trash-2"></i>
-		</button>
-	</td>
-</tr>
+			<button @click="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+				<i class="text-danger fa fa-trash"></i>
+			</button>
+		</td>
+	</tr>
+</template>
 
 <!-- modal delete ownern -->
-<div class="modal fade" data-bs-backdrop="static" id="confirmModal">
+<div class="modal fade" data-bs-backdrop="static" id="deleteModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -41,13 +39,13 @@
 
 			<div class="modal-footer">
 				<div class="row">
-					<div class="col-xl-6 d-grid">
-						<button @click="ownerUUID = null; onDeleteOwner = false" class="btn btn-outline-primary text-uppercase shadow-none me-3" type="button" data-bs-dismiss="modal">
+					<div class="col-6 d-grid">
+						<button @click.prevent="ownerUUID = null; onDeleteOwner = false" class="btn btn-outline-primary text-uppercase shadow-none me-3" type="button" data-bs-dismiss="modal">
 						Annuler</button>
 					</div>
 
-					<div class="col-xl-6 d-grid">
-						<button type="sumbit" @click="onDeleteOwner" class="btn btn-danger text-uppercase shadow-none">
+					<div class="col-6 d-grid">
+						<button type="sumbit" @click.prevent="onDeleteOwner" class="btn btn-danger text-uppercase shadow-none">
 						Oui</button>
 					</div>
 				</div>
@@ -95,28 +93,28 @@
 				</div>
 				<div class="modal-body">
 					<div class="row gx-3 mb-3">
-						<div class="col-md-6">
+						<div class="col-6">
 							<label for="fullname" class="form-label">Nom &amp; prénoms</label>
 							<input type="text" class="form-control" id="fullname" v-model="ownerData.fullname">
 						</div>
 
-						<div class="col-md-6">
+						<div class="col-6">
 							<label for="card_number" class="form-label">N° CNI/Attestion/Passport</label>
 							<input type="text" class="form-control" id="card_number" v-model="ownerData.card_number">
 						</div>
 					</div>
 
 					<div class="row gx-3 mb-3">
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="phonenumber_one" class="form-label">Téléphone I</label>
 							<input type="tel" class="form-control" id="phonenumber_one" v-model="ownerData.phonenumber_one">
 						</div>
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="phonenumber_two" class="form-label">Téléphone II</label>
 							<input type="tel" class="form-control" id="phonenumber_two" v-model="ownerData.phonenumber_two">
 						</div>
 
-						<div class="col-md-4">
+						<div class="col-4">
 							<label for="addr_email" class="form-label">Addresse e-mail</label>
 							<input type="email" class="form-control" id="addr_email" v-model="ownerData.addr_email">
 						</div>
@@ -140,14 +138,14 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
-					<button type="button" @click="onUpdateOwner" class="btn btn-success shadow-none">Mettre à jour</button>
+					<button data-bs-dismiss="modal" type="button" @click.prevent="onUpdateOwner" class="btn btn-success shadow-none">Mettre à jour</button>
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
 
-<!-- modal owner create tenant -->
+<!-- modal owner add tenant -->
 <div class="modal fade" data-bs-backdrop="static" id="addOwnerTenantModal">
 	<div class="modal-dialog modal-xl modal-dialog-centered">
 		<div class="modal-content">
@@ -187,35 +185,35 @@
 					<div class="tab-content">
 						<div :class="{ active: currentStep === 1 }"class="tab-pane fade show">
 					        <div class="row gx-3 mb-3">
-					            <div class="col-md-6">
+					            <div class="col-6">
 					                <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
 					            </div>
 
-					            <div class="col-md-6 mb-3">
+					            <div class="col-6 mb-3">
 					                <input placeholder="Numéro de Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
 					            </div>
 					        </div>
 
 					        <div class="row gx-3 mb-3">
-					            <div class="col-md-6">
+					            <div class="col-6">
 					                <input placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
 					            </div>
 
-					            <div class="col-md-6">
+					            <div class="col-6">
 					                <input placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
 					            </div>
 					        </div>
 
 					        <div class="row gx-3 mb-3">
-					            <div class="col-md-4">
+					            <div class="col-4">
 					                <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="tenantData.profession">
 					            </div>
 
-					            <div class="col-md-4">
+					            <div class="col-4">
 					                <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model="tenantData.addr_email">
 					            </div>
 
-					            <div class="col-md-4">
+					            <div class="col-4">
 					                <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
 					            </div>
 					        </div>
@@ -223,33 +221,33 @@
 
 					    <div :class="{ active: currentStep === 2 }" class="tab-pane fade show">
 					    	<div class="row gx-3 mb-4">
-					            <div class="col-md-3">
+					            <div class="col-3">
 					                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
 					            </div>
 
-					            <div class="col-md-3">
+					            <div class="col-3">
 					                <input placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
 					            </div>
 
-					            <div class="col-md-3">
+					            <div class="col-3">
 					                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
 					            </div>
 
-					            <div class="col-md-3">
+					            <div class="col-3">
 					                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
 					            </div>
 					        </div>
 
 					        <div class="row gx-3 mb-4">
-					            <div class="col-md-3">
+					            <div class="col-3">
 					                <input placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
 					            </div>
 
-					            <div class="col-md-3">
+					            <div class="col-3">
 					                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
 					            </div>
 
-					            <div class="col-md-3">
+					            <div class="col-3">
 					                <input v-bind:placeholder="houseData.house_lease_start_date" type="date" class="form-control" id="house_lease_start_date" v-model="houseData.house_lease_start_date">
 					                <span class="text-muted small">Date de location</span>
 					            </div>

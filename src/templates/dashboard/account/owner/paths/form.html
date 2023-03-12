@@ -99,18 +99,4 @@
     {{ form.birthdate(class="form-control", placeholder=form.birthdate.label.text) }}
 </div>
 
-<div class="mb-3">
-    {% if form.picture.errors %}
-        {{ form.picture(class="form-control shadow-none is-invalid mb-4", type='file') }}
-        <div class="invalid-feedback">
-            {% for error in form.picture.errors %}
-            <span>{{ error }}</span>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="small font-italic text-muted mb-4">JPG, PNG ou SVG ne dépassant pas 5 MB</div>
-        {{ form.picture(class="form-control shadow-none mb-4", type='file') }}
-    {% endif %}
-</div>
-
 {{ form.submit(class="btn btn-primary shadow-none") }}

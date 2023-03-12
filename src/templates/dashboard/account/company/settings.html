@@ -1,4 +1,4 @@
-{% extends "auth/admin/pages/owner/settings.html" %}
+{% extends "dashboard/account/owner/settings.html" %}
 
 {% block settings_content %}
 	<div class="col-xl-4">
@@ -14,9 +14,9 @@
 		<div class="card mb-4">
 			<div class="card-header">Informations sur votre compte</div>
 			<div class="card-body">
-				<form action="{{ url_for("agency_bp.agency_setting", uuid=current_user.uuid) }}" method="POST">
+				<form action="." method="POST">
 					{{ form.hidden_tag() }}
-					{% include "auth/admin/pages/company/paths/form.html" %}
+					{% include "dashboard/account/company/paths/form.html" %}
 				</form>
 			</div>
 		</div>

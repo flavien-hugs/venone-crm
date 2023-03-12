@@ -1,3 +1,6 @@
+import paginateComponent from './components/paginateComponent.js';
+import messageComponent from './components/messageComponent.js';
+
 window.addEventListener('DOMContentLoaded', event => {
     const OWNER_DATA = {
         owner_uuid: '',
@@ -35,6 +38,12 @@ window.addEventListener('DOMContentLoaded', event => {
     };
 
     var app = Vue.createApp({
+
+        components: {
+            paginateComponent,
+            messageComponent,
+        },
+
         data() {
             return {
                 owners: [],
@@ -110,7 +119,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
                     const data = await response.json();
                     this.owner = data.owner;
-
+                    console.log(data)
                     const modal = new bootstrap.Modal(document.getElementById('detailModal'));
                     modal.show();
                 } catch (error) {
@@ -126,7 +135,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             deleteOwnerConfirm(ownerUUID) {
                 this.ownerUUID = ownerUUID;
-                const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
                 modal.show();
             },
 
@@ -234,7 +243,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     console.error(error);
                 } finally {
                     this.ownerUUID = null;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                     modal.hide();
                 }
             },

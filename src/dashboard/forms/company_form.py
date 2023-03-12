@@ -1,6 +1,4 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileAllowed
-from flask_wtf.file import FileField
 from src.dashboard.forms.default_form import DefaultForm
 from wtforms import StringField
 from wtforms import SubmitField
@@ -22,9 +20,6 @@ class CompanySettingForm(DefaultForm, FlaskForm):
         label="N° de votre CNI", validators=[DataRequired(), InputRequired()]
     )
     location = StringField(label="Situation géographique", validators=[InputRequired()])
-    picture = FileField(
-        "Update Avatar", validators=[FileAllowed(["jpg", "jpeg", "png", "svg"])]
-    )
     submit = SubmitField(label="Enregistrer les modifications")
 
     def validate_fullname(self, fullname):

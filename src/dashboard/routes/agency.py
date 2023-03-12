@@ -19,7 +19,7 @@ agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(agency_bp)
 
 
-@agency_bp.route("/<string:uuid>/settings/", methods=["GET", "POST"])
+@agency_bp.route("/<string:uuid>/parametres/", methods=["GET", "POST"])
 @login_required
 @agency_required
 def agency_setting(uuid):
@@ -57,7 +57,7 @@ def agency_setting(uuid):
         form.devise.data = current_user.vn_device
 
     return render_template(
-        "auth/admin/pages/company/settings.html",
+        "dashboard/account/company/settings.html",
         page_title=page_title,
         form=form,
         current_user=current_user,
@@ -66,7 +66,6 @@ def agency_setting(uuid):
 
 @agency_bp.get("/<string:uuid>/tenants/")
 @login_required
-@agency_required
 def agency_create_tenant(uuid):
     page_title = "Vos locataires"
 
@@ -79,7 +78,6 @@ def agency_create_tenant(uuid):
 
 @agency_bp.get("/<string:uuid>/houses/")
 @login_required
-@agency_required
 def agency_house_list(uuid):
     page_title = "Propriétés"
 
@@ -90,7 +88,7 @@ def agency_house_list(uuid):
     )
 
 
-@agency_bp.get("/<string:uuid>/houseowners/")
+@agency_bp.get("/<string:uuid>/homeowners/")
 @login_required
 @agency_required
 def agency_owner_list(uuid):
