@@ -6,7 +6,7 @@
         <!-- Alert message -->
         <message-component
             :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">    
+            :message-alert="messageAlert">
         </message-component>
 
         <div v-if="user.tenant_count == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
@@ -31,7 +31,7 @@
 
         <div v-else-if="user.tenant_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
-                <span class="fw-700">{ user.tenant_count } locataires</span>
+                <span class="fw-700">Loyers en cours</span>
             </div>
 
             <div class="card-body">
@@ -91,7 +91,7 @@
                 ></paginate-component>
             </div>
         </div>
-        
+
     </section>
 {% endblock dashboard_content %}
 
