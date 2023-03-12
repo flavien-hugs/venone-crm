@@ -7,7 +7,7 @@ from flask_login import login_required
 checkout_bp = Blueprint("checkout_bp", __name__, url_prefix="/dashboard/")
 
 
-@checkout_bp.get("/checkout/")
+@checkout_bp.get("/rents/")
 @login_required
 def checkout():
     page_title = "Loyers"
