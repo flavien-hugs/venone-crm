@@ -5,7 +5,7 @@
 
         <message-component
             :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">    
+            :message-alert="messageAlert">
         </message-component>
 
         <div v-if="user.house_count == 0" class="card card-body shadow-none bg-transparent border-0">
@@ -48,7 +48,9 @@
                         <thead class="small">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col">Proprité &amp; Localisation</th>
+                                <th scope="col">ID Propriétaire</th>
+                                <th scope="col">ID locataire</th>
+                                <th scope="col">Propriété &amp; Localisation</th>
                                 <th scope="col">Loyer/mois</th>
                                 <th scope="col">Ajouté le</th>
                                 <th scope="col">Status location</th>

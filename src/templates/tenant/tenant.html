@@ -6,7 +6,7 @@
         <!-- Alert message -->
         <message-component
             :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">    
+            :message-alert="messageAlert">
         </message-component>
 
         <div v-if="user.tenant_count == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
@@ -71,9 +71,10 @@
                         <thead class="small">
                             <tr>
                                 <th scope="col">ID</th>
+                                <th scope="col">ID Propriétaire</th>
                                 <th scope="col">Nom &amp; prénoms / téléphone</th>
                                 <th scope="col">Loyer du mois en cours</th>
-                                <th scope="col">Date de location</th>
+                                <th scope="col">Date d'ajout</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -380,9 +381,9 @@
                             <div class="col-12">
                                 <div class="d-flex justify-content-between">
                                     <button :class="{ disabled: currentStep === 1 }" @click.prevent="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
-                                    
+
                                     <button v-if="currentStep < 2" @click.prevent="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
-                                    
+
                                     <button v-if="currentStep === 2" @click.prevent="onCreateOwnerTenant" class="btn btn-success shadow-none">Valider</button>
                                 </div>
                             </div>

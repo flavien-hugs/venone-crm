@@ -1,20 +1,29 @@
 <template v-for="hs in houses" :key="hs.house_uuid">
 	<tr v-if="hs.user_uuid">
 		<td>
-			<a href="~" class="badge bg-blue-soft text-blue">{ hs.house_id }</a>
+			<span class="badge bg-green-soft text-green">{ hs.house_id }</span>
 		</td>
 		<td>
-			{ hs.house_type } <br>
+			<span class="badge bg-red-soft text-red">{ hs.owner_id }</span>
+		</td>
+		<td>
+			<span v-if="hs.tenant_id" class="badge bg-red-soft text-red">{ hs.tenant_id }</span>
+			<span v-else-if="!hs.tenant_id" class="small text-muted">
+				Aucun locataire
+			</span>
+		</td>
+		<td>
+			{ hs.house_type },
 			<small>{ hs.house_address }</small>
 		</td>
 		<td>{ hs.house_rent.toLocaleString() } { hs.devise } <br>
 			<small>{ hs.tenant }</small>
 		</td>
 		<td>{ hs.house_lease_start_date.toLocaleString() }</td>
-		<td><span :class="{'badge': true, 'bg-warning': hs.house_is_open, 'bg-primary': !hs.house_is_open}" class="text-white text-uppercase small p-2 fw-700">{ hs.house_status }</span></td>
+		<td><span :class="{'badge': true, 'bg-green': hs.house_is_open, 'bg-primary': !hs.house_is_open}" class="text-white text-uppercase small p-2">{ hs.house_status }</span></td>
 
 		<td>
-			<button v-if="!hs.house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+			<button @click="assignHouseToTenantConfirm(hs)" v-if="!hs.house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
 				<i class="text-success fa fa-user-plus"></i>
 			</button>
 
@@ -29,7 +38,7 @@
 	</tr>
 </template>
 
-<!-- updat house modal -->
+<!-- update house modal -->
 <div class="modal fade" data-bs-backdrop="static" id="updateHouseConfirm">
 	<div class="modal-dialog modal-xl modal-dialog-centered">
 		<div class="modal-content">
@@ -103,6 +112,130 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- assign house to tenant modal -->
+<div class="modal fade" data-bs-backdrop="static" id="assignHouseToTenantModal">
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">
+					<h4 class="modal-title">
+						Ajouter un locataire pour cette propriété : {houseData.house_id}
+					</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body">
+					<div class="nav nav-pills nav-justified nav-wizard" role="tablist">
+						<div :class="{ active: currentStep === 1 }" class="nav-item nav-link p-3">
+							<div class="wizard-step-icon">2</div>
+							<div class="wizard-step-text">
+								<div class="modal-title wizard-step-text-name fw-700">
+									Propriété
+								</div>
+								<small class="wizard-step-text-details">Informations sur la propriété</small>
+							</div>
+						</div>
+						<div :class="{ active: currentStep === 2 }" class="nav-item nav-link p-3">
+							<div class="wizard-step-icon">3</div>
+							<div class="wizard-step-text">
+								<div class="modal-title wizard-step-text-name fw-700">
+									Locataire
+								</div>
+								<small class="wizard-step-text-details">Informations sur le locataire</small>
+							</div>
+						</div>
+					</div>
+
+					<hr class="my-3">
+
+					<div class="tab-content">
+					    <div :class="{ active: currentStep === 1 }" class="tab-pane fade show">
+					    	<div class="row gx-3 mb-4">
+					            <div class="col-3">
+					                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
+					            </div>
+
+					            <div class="col-3">
+					                <input @input.number="calculateGuaranty" placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
+					            </div>
+
+					            <div class="col-3">
+					                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
+					            </div>
+
+					            <div class="col-3">
+					                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
+					            </div>
+					        </div>
+
+					        <div class="row gx-3 mb-4">
+					            <div class="col-3">
+					                <input @input="calculateGuaranty" placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model.number="houseData.house_month">
+					            </div>
+
+					            <div class="col-3">
+					                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model.number="houseData.house_guaranty">
+					            </div>
+
+					            <div class="col-3">
+					            	<input type="date" id="lease_start_date" class="form-control" v-model="houseData.lease_start_date">
+					            	<span class="text-muted small">Mettre à jour la date de location</span>
+                                </div>
+					        </div>
+					    </div>
+						<div :class="{ active: currentStep === 2 }"class="tab-pane fade show">
+					        <div class="row gx-3 mb-3">
+					            <div class="col-6">
+					                <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
+					            </div>
+
+					            <div class="col-6 mb-3">
+					                <input placeholder="Numéro de Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
+					            </div>
+					        </div>
+
+					        <div class="row gx-3 mb-3">
+					            <div class="col-6">
+					                <input placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
+					            </div>
+
+					            <div class="col-6">
+					                <input placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
+					            </div>
+					        </div>
+
+					        <div class="row gx-3 mb-3">
+					            <div class="col-4">
+					                <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="tenantData.profession">
+					            </div>
+
+					            <div class="col-4">
+					                <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model="tenantData.addr_email">
+					            </div>
+
+					            <div class="col-4">
+					                <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
+					            </div>
+					        </div>
+					    </div>
+					</div>
+				</div>
+
+				<div class="row modal-footer justify-content-center">
+					<div class="col-12">
+						<div class="d-flex justify-content-between">
+							<button :class="{ disabled: currentStep === 1 }" @click="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
+							<button v-if="currentStep < 2" @click="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
+							<button v-if="currentStep === 2" @click="onAssignHouseToTenant" class="btn btn-success shadow-none" type="submit">Valider</button>
+						</div>
+					</div>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
