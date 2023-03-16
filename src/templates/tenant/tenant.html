@@ -18,12 +18,12 @@
                     Vous n'avez aucun locataire enregistré en ce moment.
                 </h4>
 
-                <button v-if="user.is_owner" @click.prevent="createOwnerTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                <button v-if="user.is_owner" @click="createOwnerTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
                     <i class="me-2" data-feather="user-plus"></i>
                     Enregistrer un locataire
                 </button>
 
-                <button v-if="user.is_company" @click.prevent="createComapnyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                <button v-if="user.is_company" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
                     <i class="me-2" data-feather="user-plus"></i>
                     Enregistrer un locataire
                 </button>
@@ -141,40 +141,48 @@
                             <div :class="{ active: currentStep === 1 }"class="tab-pane fade show">
                                 <div class="row gx-3 mb-3">
                                     <div class="col-6">
+                                        <label for="fullname" class="form-label small">Nom &amp; prénoms</label>
                                         <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="ownerData.fullname">
                                     </div>
 
                                     <div class="col-6">
-                                        <input placeholder="Numéro de Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model.trim="ownerData.card_number">
+                                        <label for="card_number" class="form-label small">N° Carte Nationale d'Identité/Attestion/Passport</label>
+                                        <input placeholder="N° Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model.trim="ownerData.card_number">
                                     </div>
                                 </div>
 
                                 <div class="row gx-3 mb-3">
                                     <div class="col-6">
+                                        <label for="phonenumber_one" class="form-label small">Numéro de téléphone I</label>
                                         <input placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="ownerData.phonenumber_one" placeholder="01-5157-1393">
                                     </div>
 
                                     <div class="col-6">
+                                        <label for="phonenumber_two" class="form-label small">Numéro de téléphone II</label>
                                         <input placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="ownerData.phonenumber_two">
                                     </div>
                                 </div>
 
                                 <div class="row gx-3 mb-3">
                                     <div class="col-6">
+                                        <label for="profession" class="form-label small">Profession</label>
                                         <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="ownerData.profession">
                                     </div>
 
                                     <div class="col-6">
+                                        <label for="addr_email" class="form-label small">Adresse e-mail</label>
                                         <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model.trim="ownerData.addr_email">
                                     </div>
                                 </div>
 
                                 <div class="row gx-3 mb-3">
                                     <div class="col-6">
+                                        <label for="location" class="form-label small">Lieu d'habitation</label>
                                         <input placeholder="Lieu d'habitation" type="text" class="form-control" id="location" v-model="ownerData.location">
                                     </div>
 
                                     <div class="col-6">
+                                        <label for="parent_name" class="form-label small">Nom d'un parent</label>
                                         <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="ownerData.parent_name">
                                     </div>
                                 </div>
@@ -218,34 +226,41 @@
                             <div :class="{ active: currentStep === 3 }" class="tab-pane fade show">
                                 <div class="row gx-3 mb-3">
                                     <div class="col-6">
+                                        <label for="fullname" class="form-label small">Nom &amp; prénoms</label>
                                         <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
                                     </div>
 
                                     <div class="col-6 mb-3">
-                                        <input placeholder="Numéro de Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
+                                        <label for="card_number" class="form-label small">N° Carte Nationale d'Identité/Attestion/Passport</label>
+                                        <input placeholder="N° Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
                                     </div>
                                 </div>
 
                                 <div class="row gx-3 mb-3">
                                     <div class="col-6">
-                                        <input @input="formatPhoneNumber(tenantData.phonenumber_one)" placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
+                                        <label for="phonenumber_one" class="form-label small">Numéro de téléphone I</label>
+                                        <input placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
                                     </div>
 
                                     <div class="col-6">
-                                        <input @input="formatPhoneNumber(tenantData.phonenumber_two)" placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
+                                        <label for="phonenumber_two" class="form-label small">Numéro de téléphone II</label>
+                                        <input placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
                                     </div>
                                 </div>
 
                                 <div class="row gx-3 mb-3">
                                     <div class="col-4">
+                                        <label for="profession" class="form-label small">Profession</label>
                                         <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="tenantData.profession">
                                     </div>
 
                                     <div class="col-4">
+                                        <label for="addr_email" class="form-label small">Adresse e-mail</label>
                                         <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model="tenantData.addr_email">
                                     </div>
 
                                     <div class="col-4">
+                                        <label for="parent_name" class="form-label small">Nom d'un parent</label>
                                         <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
                                     </div>
                                 </div>

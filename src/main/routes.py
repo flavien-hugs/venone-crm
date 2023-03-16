@@ -23,6 +23,7 @@ def process_payment(house_uuid):
     client = Cinetpay(CINETPAY_APIKEY, CINETPAY_SITEID)
 
     house = VNHouse.query.filter_by(uuid=house_uuid).first()
+    print(house)
 
     if house is not None:
         transaction_id = "".join(random.choices(string.digits, k=8))

@@ -223,15 +223,6 @@ class VNHouse(TimestampMixin):
     def __str__(self):
         return self.vn_house_type
 
-    def __getattr__(self, name):
-        """
-        Appeler update_expired_lease_end_dates()
-        si l'attribut demandé n'est pas trouvé
-        """
-        if name != "update_expired_lease_end_date()":
-            self.update_expired_lease_end_date()
-        return super().__getattr__(name)
-
     def __repr__(self):
         return f"VNHouse({self.id}, {self.vn_house_type})"
 
