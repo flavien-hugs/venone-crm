@@ -15,6 +15,8 @@ var app = Vue.createApp({
         return {
             user: [],
             isLoading: false,
+            messageAlert: "",
+            showMessageAlert: false,
         };
     },
 
@@ -56,6 +58,8 @@ var app = Vue.createApp({
                 }
             } catch (error) {
                 console.log("FETCH ERROR:", error);
+                this.showMessageAlert = true;
+                this.messageAlert = 'Oops, problème de connexion au serveur.';
             }
         },
 
@@ -115,6 +119,8 @@ var app = Vue.createApp({
                 }
             } catch (error) {
                 console.error("FETCH ERROR:", error);
+                this.showMessageAlert = true;
+                this.messageAlert = 'Oops, problème de connexion au serveur.';
             }
         },
 
@@ -173,6 +179,8 @@ var app = Vue.createApp({
                 }
             } catch (error) {
                 console.error("FETCH ERROR:", error);
+                this.showMessageAlert = true;
+                this.messageAlert = 'Oops, problème de connexion au serveur.';
             }
         },
 
@@ -230,6 +238,8 @@ var app = Vue.createApp({
                 }
             } catch (error) {
                 console.error("FETCH ERROR:", error);
+                this.showMessageAlert = true;
+                this.messageAlert = 'Oops, problème de connexion au serveur.';
             }
         },
 
@@ -259,8 +269,9 @@ var app = Vue.createApp({
                                 {
                                     data: prices,
                                     fill: false,
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    tension: 0.1
+                                    borderColor: "rgb(75, 192, 192)",
+                                    tension: 0.1,
+                                    lineTension: 0.1
                                 },
                             ],
                         },
@@ -284,6 +295,8 @@ var app = Vue.createApp({
                 }
             } catch (error) {
                 console.error("FETCH ERROR:", error);
+                this.showMessageAlert = true;
+                this.messageAlert = 'Oops, problème de connexion au serveur.';
             }
         },
     },

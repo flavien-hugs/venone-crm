@@ -75,18 +75,6 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         watch: {
-            'ownerData.phonenumber_one': function(n) {
-                this.ownerData.phonenumber_one = this.formatPhoneNumber(n);
-            },
-            'ownerData.phonenumber_two': function(n) {
-                this.ownerData.phonenumber_two = this.formatPhoneNumber(n);
-            },
-            'tenantData.phonenumber_one': function(n) {
-                this.tenantData.phonenumber_one = this.formatPhoneNumber(n);
-            },
-            'tenantData.phonenumber_two': function(n) {
-                this.tenantData.phonenumber_two = this.formatPhoneNumber(n);
-            },
             'houseData.house_rent': function (f){
                 this.houseData.house_rent = this.filterNumber(f);
             },
