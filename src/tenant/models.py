@@ -266,20 +266,14 @@ class VNHouse(TimestampMixin):
         return house.tenants
 
     def get_current_tenant(self):
-        house = VNHouse.query.filter_by(id=self.id).first()
-        for tenant in house.tenants:
-            if tenant is None:
-                return None
-            return tenant.vn_fullname
+        tenant = self.tenants[0] if len(self.tenants) > 0 else None
+        return tenant.vn_fullname if tenant is not None else None
 
     def get_tenant_phone_number(self):
-        house = VNHouse.query.filter_by(id=self.id).first()
-        for tenant in house.tenants:
-            if tenant is None:
-                return None
-            return tenant.vn_phonenumber_one
+        tenant = self.tenants[0] if len(self.tenants) > 0 else None
+        return tenant.vn_phonenumber_one if tenant is not None else None
 
-    def is_rent_paid(tenant):
+    def is_rent_paid(house):
         """
         vérifie si le loyer du mois en cours
         avant la date d'échéance a été effectué ou pas
@@ -292,7 +286,7 @@ class VNHouse(TimestampMixin):
         last_payment = (
             VNHouse.query.join(VNPayment, VNHouse.id == VNPayment.vn_house_id)
             .filter(
-                VNPayment.id == tenant.id,
+                VNPayment.vn_house_id == house.id,
                 db.extract("month", VNPayment.vn_pay_date) < current_month,
                 db.extract("year", VNPayment.vn_pay_date) < current_year,
             )

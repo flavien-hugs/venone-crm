@@ -20,5 +20,5 @@ def send_payment_reminders():
     houses = VNHouse.query.filter_by(vn_house_is_open=True).all()
 
     for house in houses:
-        for tenant in house.tenants:
-            send_sms_reminder(house, tenant)
+        tenant = house.get_current_tenant()
+        send_sms_reminder(house, tenant)
