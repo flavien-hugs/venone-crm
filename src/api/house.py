@@ -50,7 +50,11 @@ def get_all_houses():
 def get_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
     return jsonify(
-        {"house": house.to_json(), "house_tenant": [t.to_json() for t in house.tenants]}
+        {
+            "house": house.to_json(),
+            "house_tenant": [t.to_json() for t in house.tenants],
+            "house_payment": [p.to_json() for p in house.payments],
+        }
     )
 
 
@@ -146,7 +150,7 @@ def update_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return jsonify({"message": "maison introuvable"}), 404
+        return jsonify({"message": "Oops : propriété introuvable"}), 404
 
     data = request.json
 
@@ -196,3 +200,25 @@ def delete_house(house_uuid):
             "message": "Oups ! L'élément n'a pas été trouvé.",
         }
     )
+
+
+@api.get("/house/<string:house_uuid>/payments/")
+@login_required
+def list_payments_for_house(house_uuid):
+
+    house = VNHouse.get_house(house_uuid)
+
+    if not house:
+        return jsonify({"message": "Oops! propriété introuvable"}), 404
+
+    payments = []
+    for payment in house.payments:
+        payments.append(
+            {
+                "id": payment.vn_pay_id,
+                "amount": payment.vn_pay_amount,
+                "date": payment.vn_pay_date.isoformat(),
+                "tenant": payment.tenant.vn_tenant_full_name,
+            }
+        )
+    return jsonify({"payments": payments}), 200

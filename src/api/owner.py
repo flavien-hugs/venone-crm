@@ -50,7 +50,14 @@ def get_all_houseowners():
 @login_required
 def get_houseowner(owner_uuid):
     owner = VNHouseOwner.get_owner(owner_uuid)
-    return jsonify({"owner": owner.to_json()})
+    return jsonify(
+        {
+            "owner": owner.to_json(),
+            "owner_houses": [h.to_json() for h in owner.houses],
+            "owner_tenants": [t.to_json() for t in owner.tenants],
+            "owner_payments": [p.to_json() for p in owner.payments],
+        }
+    )
 
 
 @api.delete("/owner/<string:owner_uuid>/delete/")
