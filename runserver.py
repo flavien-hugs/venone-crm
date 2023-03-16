@@ -19,6 +19,8 @@ if os.path.exists(dotenv_path):
 
 
 venone_app = create_venone_app(os.getenv("FLASK_CONFIG") or "dev")
+celery_app = venone_app.extensions["celery"]
+celery_app.conf.update(venone_app.config)
 migrate = Migrate(venone_app, db, render_as_batch=True)
 
 
