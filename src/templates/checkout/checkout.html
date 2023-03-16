@@ -31,7 +31,7 @@
 
         <div v-else-if="user.tenant_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
-                <span class="fw-700">Loyers en cours</span>
+                <span class="fw-700">Vos loyers</span>
             </div>
 
             <div class="card-body">
@@ -50,32 +50,27 @@
                         <thead class="small">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col">Nom &amp; prénoms / téléphone</th>
+                                <th scope="col">ID Locataire</th>
                                 <th scope="col">Loyer du mois en cours</th>
                                 <th scope="col">Date de location</th>
-                                <th scope="col">Paiement en cours</th>
+                                <th scope="col">Prochain paiement</th>
                                 <th scope="col">Status</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-for="tn in filteredTenants" v-bind:key="tn.tenant_uuid">
-                                <tr>
+                            <template v-for="h in houses" v-bind:key="h.house_uuid">
+                                <tr v-if="h.house_is_open">
                                     <td scope="row">
-                                        <a v-bind:href="tn.tenant_url"
-                                            class="badge bg-blue-soft text-blue">
-                                            { tn.tenant_id }
-                                        </a>
+                                        <span class="badge bg-blue-soft text-blue">{ h.house_id }</span>
                                     </td>
-                                    <td>{ tn.fullname } ({ tn.phonenumber_one })</td>
-                                    <td>{ tn.house.house_type } / { tn.monthly_rent } { tn.devise }</td>
-                                    <td>{ tn.house.house_lease_start_date.toLocaleString() }</td>
-                                    <td>{ tn.house.house_lease_end_date.toLocaleString() }</td>
-                                    <td><span :class="{'badge': true, 'bg-warning': tn.house_is_open, 'bg-primary': !tn.house_is_open}" class="text-white text-uppercase small p-2 fw-700">{ tn.house_status }</span></td>
+                                    <td>{ h.tenant_id }</td>
+                                    <td>{ h.house_type } &smid; { h.house_rent } { h.devise }</td>
+                                    <td>{ h.house_lease_start_date.toLocaleString() }</td>
+                                    <td>{ h.house_lease_end_date.toLocaleString() }</td>
                                     <td>
-                                        <button class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-                                            <i class="text-primary fa fa-envelope"></i>
-                                        </button>
+                                        <span :class="{'bg-red-soft': !h.status_payment, 'bg-red': h.status_payment}"
+                                        class="badge text-white">{ h.status_payment }</span>
                                     </td>
                                 </tr>
                             </template>

@@ -7,8 +7,8 @@
 			<span class="badge bg-red-soft text-red">{ hs.owner_id }</span>
 		</td>
 		<td>
-			<span v-if="hs.tenant_id" class="badge bg-red-soft text-red">{ hs.tenant_id }</span>
-			<span v-else-if="!hs.tenant_id" class="small text-muted">
+			<span v-if="hs.tenant_id">{ hs.tenant_id }</span>
+			<span v-else-if="!hs.tenant_id">
 				Aucun locataire
 			</span>
 		</td>
@@ -20,7 +20,7 @@
 			<small>{ hs.tenant }</small>
 		</td>
 		<td>{ hs.house_lease_start_date.toLocaleString() }</td>
-		<td><span :class="{'badge': true, 'bg-green': hs.house_is_open, 'bg-primary': !hs.house_is_open}" class="text-white text-uppercase small p-2">{ hs.house_status }</span></td>
+		<td><span :class="{'bg-red': hs.house_is_open, 'bg-blue': !hs.house_is_open}" class="badge text-white text-uppercase">{ hs.house_status }</span></td>
 
 		<td>
 			<button @click="assignHouseToTenantConfirm(hs)" v-if="!hs.house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
