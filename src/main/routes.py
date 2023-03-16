@@ -33,6 +33,7 @@ def process_payment(house_uuid):
         tenant = house.get_current_tenant()
         device = house.user_houses.vn_device
         phonenumber_one = house.get_tenant_phone_number()
+        print(phonenumber_one)
 
         notify_url = redirect(url_for('main_bp.payment_success', _external=True))
         print(notify_url)
@@ -46,8 +47,6 @@ def process_payment(house_uuid):
             "notify_url": notify_url,
             "customer_name": tenant,
             "customer_surname": tenant,
-            "customer_phone_number": phonenumber_one,
-            "lock_phone_number": True
         }
         response = client.PaymentInitialization(data)
 
@@ -67,8 +66,8 @@ def send_sms_reminder(house, tenant):
     SMS_SENDER_ID = os.getenv("SMS_SENDERID")
     SMS_API_TOKEN = os.getenv("SMS_APITOKEN")
 
-    fullname = tenant.vn_fullname
-    phone_number = tenant.vn_phonenumber_one
+    fullname = house.get_current_tenant()
+    phone_number = house.get_tenant_phone_number()
     house_lease_end = house.vn_house_lease_end_date
 
     payment_response = redirect(
@@ -90,8 +89,8 @@ def send_sms_reminder(house, tenant):
     &apitoken={SMS_API_TOKEN}&type=sms&from={SMS_SENDER_ID}&to={phone_number}&text={message}"
 
     if (
-        current_date == house_lease_end
-        and not VNHouse.is_rent_paid(tenant)
+        current_date <= house_lease_end
+        and not VNHouse.is_rent_paid(house)
     ):
         requests.request("POST", reqUrl)
 
