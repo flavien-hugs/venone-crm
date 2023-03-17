@@ -13,6 +13,8 @@ from src import csrf
 from src.auth.forms.auth_form import ChangePasswordForm
 from src.dashboard.forms import OwnerSettingForm
 from src.mixins.decorators import owner_required
+from src.tenant import tasks
+from src.tenant import VNHouse
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(owner_bp)
@@ -22,6 +24,8 @@ csrf.exempt(owner_bp)
 @login_required
 def dashboard(uuid):
     page_title = "Tableau de board"
+    VNHouse.update_expired_lease_end_dates()
+    tasks.send_payment_reminders.delay()
     return render_template(
         "dashboard/dashboard.html", page_title=page_title, current_user=current_user
     )

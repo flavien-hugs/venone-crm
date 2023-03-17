@@ -1,18 +1,11 @@
 import random
 import string
 from datetime import date
-from datetime import datetime
 from decimal import Decimal
 
-import requests
-from cinetpay_sdk.s_d_k import Cinetpay
-from flask import current_app
 from flask_login import current_user
 from src import db
-from src.auth.models import VNUser
 from src.mixins.models import TimestampMixin
-from src.tenant.models import VNHouse
-from src.tenant.models import VNTenant
 
 
 def id_generator():
@@ -32,6 +25,7 @@ class VNPayment(TimestampMixin):
     vn_payment_id = db.Column(
         db.String(5), nullable=True, unique=True, default=id_generator
     )
+    vn_transaction_id = db.db.Column(db.String(10), nullable=True, unique=True)
     vn_pay_amount = db.Column(db.Float, nullable=False)
     vn_pay_late_penalty = db.Column(db.Float, nullable=True)
     vn_pay_date = db.Column(db.Date, nullable=False)
@@ -72,68 +66,6 @@ class VNPayment(TimestampMixin):
     def __repr__(self):
         return f"Payment({self.id}, {self.vn_payment_id}, {self.vn_payment_date})"
 
-    @staticmethod
-    def tenants_paid():
-        # récupérer les locataires qui ont
-        # effectué un paiement pour le mois en cours
-
-        current_month = date.today().month
-        current_year = date.today().year
-
-        paid = (
-            db.session.query(VNTenant)
-            .join(VNTenant.payments)
-            .filter(
-                VNTenant.vn_payee_id == current_user.id,
-                db.extract("month", VNPayment.vn_pay_date) == current_month,
-                db.extract("year", VNPayment.vn_pay_date) == current_year,
-            )
-            .all()
-        )
-
-        return paid
-
-    @staticmethod
-    def tenants_paids():
-        available_houses = VNHouse.query.filter(
-            VNHouse.vn_house_is_open is True,
-            VNHouse.vn_house_lease_end_date >= date.today(),
-            VNHouse.vn_user_id == current_user.id,
-        ).all()
-
-        print(available_houses)
-
-        payments = [
-            VNPayment.query.filter(
-                VNPayment.vn_house_id == house.vn_house_id,
-                VNPayment.vn_pay_date < house.vn_house_lease_end_date,
-                VNPayment.vn_payee_id == current_user.id,
-            ).all()
-            for house in available_houses
-        ]
-
-        print(payments)
-
-        return payments
-
-    @staticmethod
-    def tenants_not_paid():
-        # récupérer les locataires qui n'ont pas
-        # effectué de paiement pour le mois en cours
-
-        today = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-        not_paid = (
-            db.session.query(VNTenant)
-            .join(VNPayment)
-            .join(VNUser)
-            .filter(VNTenant.vn_payee_id == current_user.id)
-            .filter(VNPayment.vn_pay_date < today)
-            .filter(db.and_(VNPayment.vn_pay_date != VNHouse.vn_house_lease_start_date))
-            .all()
-        )
-        return not_paid
-
     def calculate_late_penalty(self):
         today = date.today()
         days_late = ((today - self.house_payment.vn_house_lease_start_date).days) + 3
@@ -145,79 +77,31 @@ class VNPayment(TimestampMixin):
         else:
             self.vn_pay_late_penalty = 0
 
-    def make_payment(self):
+    def make_payment(self) -> bool:
         self.vn_pay_status = True
         db.session.commit()
 
-    def get_payments(amount, tenant_id):
+    def get_payments(self):
         # A method that creates a new rent payment
         # record for the given tenant_id and amount.
         pass
 
-    def get_payments_by_month(tenant_id, month, year):
+    def get_payments_by_month(self):
         # A method that retrieves all rent payment records
         # for the given tenant_id in the specified month and year.
         pass
 
-    def get_payments_by_year(tenant_id, year):
+    def get_payments_by_year(self, year):
         # A method that retrieves all rent payment
         # records for the given tenant_id in the specified year
         pass
 
-    def get_outstanding_payments(tenant_id):
+    def get_outstanding_payments(self):
         # A method that retrieves all rent payment
         # records for the given tenant_id that have not been fully paid.
         pass
 
-    def get_total_payments(tenant_id):
+    def get_total_payments(self):
         #  A method that retrieves the total
         # amount of rent payments made by the given tenant_id.
         pass
-
-    def generate_payment_token(self):
-
-        API_KEY = current_app.config["CINETPAY_API_KEY"]
-        SITE_ID = current_app.config["CINETPAY_SITE_ID"]
-
-        client = Cinetpay(API_KEY, SITE_ID)
-
-        data = {
-            "amount": self.vn_pay_amount,
-            "currency": "XOF",
-            "transaction_id": self.vn_payment_id,
-            "description": f"Paiement du loyer {tenant.house.vn_house_id}",
-            "return_url": "https://venone.app",
-            "notify_url": "https://venone.app",
-            "customer_surname": self.tenant.vn_fullname,
-        }
-
-        response = client.PaymentInitialization(data)
-
-        if response.status_code != 200:
-            return None
-
-        payment_url = response["data"]["payment_url"]
-        return payment_url
-
-    def send_payment_link(payment_url, tenant_id):
-
-        SMS_APIKEY = current_app.config["SMS_API_KEY"]
-        SMS_SENDER_ID = current_app.config["SENDER_ID"]
-
-        tenant = VNTenant.query.get(tenant_id)
-
-        phone_number = tenant.vn_phonenumber_one
-        message = f"""
-        Bonjour {tenant.vn_fullname}, Votre loyer du mois
-        précédent est prêt. Veuillez cliquer sur ce lien:
-        {payment_url} pour procéder au paiement.
-        """
-        sms_url = f"https://sms.lws.fr/sms/api?action=send-sms&api_key={SMS_APIKEY}\
-            &to={phone_number}&from={SMS_SENDER_ID}&sms={message}"
-
-        response = requests.post(sms_url)
-
-        if response.status_code != 200:
-            return False
-
-        return True

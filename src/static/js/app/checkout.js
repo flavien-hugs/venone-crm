@@ -12,7 +12,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         data() {
             return {
                 user: [],
-                tenants: [],
+                houses: [],
 
                 perPage: 10,
                 currentPage: 1,
@@ -30,60 +30,28 @@ window.addEventListener("DOMContentLoaded", (event) => {
             delimiters: ["{", "}"],
         },
 
-        watch: {
-            searchQuery: function() {
-                this.filteredTenants;
-            }
-        },
-
-        computed: {
-            filteredTenants() {
-                if (!this.searchQuery) {
-                    return this.tenants;
-                }
-
-                const searchRegex = new RegExp(this.searchQuery, 'i');
-
-                    return this.tenants.filter(tenant => {
-                        const fullnameMatch = searchRegex.test(tenant.fullname);
-                        const addrEmailMatch = searchRegex.test(tenant.addr_email);
-                        const phonenumberOneMatch = searchRegex.test(tenant.phonenumber_one);
-                        const phonenumberTwoMatch = searchRegex.test(tenant.phonenumber_two);
-                        const cardNumberMatch = searchRegex.test(tenant.card_number);
-
-                    return (
-                        fullnameMatch ||
-                        addrEmailMatch ||
-                        phonenumberOneMatch ||
-                        phonenumberTwoMatch ||
-                        cardNumberMatch
-                    );
-                });
-            },
-        },
-
         async mounted() {
-            await this.getTenants();
+            await this.getHouses();
         },
 
         methods: {
-            async getTenants() {
+            async getHouses() {
                 try {
                     this.isLoading = true;
-                    const tenantURL = `/api/tenants/?page=${this.currentPage}&per_page=${this.perPage}&q=${this.searchQuery}`;
+                    const houseURL = `/api/houses/?page=${this.currentPage}`;
 
-                    const response = await fetch(tenantURL, {
+                    const response = await fetch(houseURL, {
                         method: "GET",
                         headers: {
                             'Content-type': 'application/json'
                         }
                     });
 
-                    this.isLoading = false;
-
-                    if (response.status == 200) {
+                    if (response.ok) {
+                        this.isLoading = false;
                         const data = await response.json();
-                        this.tenants = data.tenants;
+                        console.log(data)
+                        this.houses = data.houses;
                         this.user = data.user;
                         this.totalPages = Math.ceil(data.total / this.perPage);
                         this.currentPage = data.page;
@@ -93,6 +61,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     }
                 } catch (error) {
                     console.error("FETCH ERROR:", error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = 'Oops, problème de connexion au serveur.';
                 }
             },
 
