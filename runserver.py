@@ -8,10 +8,10 @@ from src import create_venone_app
 from src import db
 from src.auth.models import VNRole
 from src.auth.models import VNUser
+from src.payment.models import VNPayment
 from src.tenant.models import VNHouse
 from src.tenant.models import VNHouseOwner
 from src.tenant.models import VNTenant
-
 
 dotenv_path = os.path.join(os.path.dirname(__file__), ".flaskenv")
 if os.path.exists(dotenv_path):
@@ -19,13 +19,20 @@ if os.path.exists(dotenv_path):
 
 
 venone_app = create_venone_app(os.getenv("FLASK_CONFIG") or "dev")
+celery_app = venone_app.extensions["celery"]
+celery_app.conf.update(venone_app.config)
 migrate = Migrate(venone_app, db, render_as_batch=True)
 
 
 @venone_app.shell_context_processor
 def make_shell_context():
     return dict(
-        db=db, user=VNUser, tenant=VNTenant, house=VNHouse, houseowner=VNHouseOwner
+        db=db,
+        user=VNUser,
+        tenant=VNTenant,
+        house=VNHouse,
+        houseowner=VNHouseOwner,
+        payment=VNPayment,
     )
 
 
@@ -39,4 +46,4 @@ def init_db():
 
 
 if __name__ == "__main__":
-    venone_app.run(use_reloader=True)
+    venone_app.run()

@@ -11,9 +11,10 @@ from flask_login import login_required
 from src import cache
 from src import csrf
 from src.auth.forms.auth_form import ChangePasswordForm
-from src.auth.utils import upload_avatar
 from src.dashboard.forms import OwnerSettingForm
 from src.mixins.decorators import owner_required
+from src.tenant import tasks
+from src.tenant import VNHouse
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(owner_bp)
@@ -21,11 +22,12 @@ csrf.exempt(owner_bp)
 
 @owner_bp.route("/<string:uuid>/index/", methods=["GET"])
 @login_required
-@cache.cached(timeout=100)
 def dashboard(uuid):
     page_title = "Tableau de board"
+    VNHouse.update_expired_lease_end_dates()
+    tasks.send_payment_reminders.delay()
     return render_template(
-        "auth/admin/dashboard.html", page_title=page_title, current_user=current_user
+        "dashboard/dashboard.html", page_title=page_title, current_user=current_user
     )
 
 
@@ -37,10 +39,6 @@ def owner_setting(uuid):
     form = OwnerSettingForm()
 
     if request.method == "POST" and form.validate_on_submit():
-
-        if form.picture.data:
-            picture_file = upload_avatar(form.picture.data)
-            current_user.vn_avatar = picture_file
 
         current_user.vn_gender = form.gender.data
         current_user.vn_fullname = form.fullname.data
@@ -74,7 +72,7 @@ def owner_setting(uuid):
         form.birthdate.data = current_user.vn_birthdate
 
     return render_template(
-        "auth/admin/pages/owner/settings.html",
+        "dashboard/account/owner/settings.html",
         page_title=page_title,
         form=form,
         current_user=current_user,
@@ -97,7 +95,7 @@ def change_password(uuid):
             flash("Le mot de passe est invalide.", category="danger")
 
     return render_template(
-        "auth/admin/pages/password.html",
+        "dashboard/account/password.html",
         page_title=page_title,
         form=form,
         current_user=current_user,
@@ -105,5 +103,6 @@ def change_password(uuid):
 
 
 @owner_bp.route("/<filename>/")
+@cache.cached(timeout=100)
 def avatar(filename):
     return send_from_directory(current_app.config["UPLOAD_FOLDER_PATH"], filename)

@@ -3,6 +3,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://test.pypi.org/simple/"
+verify_ssl = true
+name = "testpypi"
+
 [packages]
 flask = "*"
 python-dotenv = "*"
@@ -21,10 +26,15 @@ flask-bcrypt = "*"
 email-validator = "*"
 pyjwt = "*"
 flask-htmlmin = "*"
-flask-apscheduler = "*"
 flask-caching = "*"
 psycopg2-binary = "*"
 pillow = "*"
+cinetpay-sdk = {version = "==0.1.1", index = "testpypi"}
+requests = "*"
+celery = {extras = ["redis"], version = "*"}
+redis = "*"
+flower = "*"
+pyshorteners = "*"
 
 [dev-packages]
 pre-commit = "*"

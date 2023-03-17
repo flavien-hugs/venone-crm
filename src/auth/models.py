@@ -10,6 +10,9 @@ from src import db
 from src import login_manager
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
+from src.tenant.models import VNHouse
+from src.tenant.models import VNHouseOwner
+from src.tenant.models import VNTenant
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
@@ -24,7 +27,7 @@ class VNRole(db.Model):
     __tablename__ = "roles"
 
     id = db.Column(db.Integer, index=True, primary_key=True)
-    role_permissions = db.Column(db.Integer)
+    role_permissions = db.Column(db.Integer, default=Permission.ADMIN)
     role_name = db.Column(db.String(64), unique=True)
     role_default = db.Column(db.Boolean, default=False, index=True)
     users = db.relationship("VNUser", backref="role", lazy="dynamic")
@@ -106,25 +109,25 @@ class VNUser(
         "VNHouseOwner",
         backref="house_owner",
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
-        single_parent=True,
         order_by="desc(VNHouseOwner.vn_created_at)",
     )
     houses = db.relationship(
         "VNHouse",
-        backref="houses",
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
-        single_parent=True,
+        backref="user_houses",
         order_by="desc(VNHouse.vn_created_at)",
     )
     tenants = db.relationship(
         "VNTenant",
-        backref="tenants",
         lazy="dynamic",
-        cascade="all, delete, delete-orphan",
-        single_parent=True,
+        backref="user_tenants",
         order_by="desc(VNTenant.vn_created_at)",
+    )
+    payments = db.relationship(
+        "VNPayment",
+        lazy="dynamic",
+        backref="user_payments",
+        order_by="desc(VNPayment.vn_pay_date)",
     )
 
     def __str__(self):
@@ -132,6 +135,41 @@ class VNUser(
 
     def __repr__(self):
         return f"VNUser({self.id}, {self.vn_fullname})"
+
+    def to_json(self):
+        json_user = {
+            "user_id": self.uuid,
+            "fullname": self.vn_fullname,
+            "addr_email": self.vn_addr_email,
+            "profession": self.vn_profession,
+            "parent_name": self.vn_parent_name,
+            "phonenumber_one": self.vn_phonenumber_one,
+            "phonenumber_two": self.vn_phonenumber_two,
+            "cni_number": self.vn_cni_number,
+            "location": self.vn_location,
+            "country": self.vn_country,
+            "agencie_name": self.vn_agencie_name,
+            "business_number": self.vn_business_number,
+            "devise": self.vn_device,
+            "find_us": self.vn_find_us,
+            "ip_address": self.vn_ip_address,
+            "is_company": self.vn_company,
+            "is_owner": self.vn_house_owner,
+            "is_admin": self.is_administrator(),
+            "is_activated": self.vn_activated,
+            "total_payment_month": self.total_payments_month(),
+            "payment_count": self.payments.filter_by(
+                vn_payee_id=current_user.id
+            ).count(),
+            "house_count": self.houses.filter_by(vn_user_id=current_user.id).count(),
+            "owner_count": self.houseowners.filter_by(
+                vn_user_id=current_user.id
+            ).count(),
+            "tenant_count": self.tenants.filter_by(vn_user_id=current_user.id).count(),
+            "last_seen": self.vn_last_seen,
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+        }
+        return json_user
 
     def set_password(self, password):
         self.vn_password = generate_password_hash(password)
@@ -195,26 +233,50 @@ class VNUser(
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def remove(self):
-        db.session.delete(self)
-        db.session.commit()
-
     def disable(self):
         self.vn_activated = False
         db.session.commit()
 
     def ping(self):
-        self.vn_last_seen = datetime.utcnow()
         self.vn_ip_address = request.remote_addr
+        self.vn_last_seen = datetime.utcnow()
         db.session.add(self)
 
     @staticmethod
-    def get_current_user():
-        return VNUser.query.filter_by(id=current_user.id).first()
+    def get_users_list():
+        users = VNUser.query.filter_by(vn_activated=True)
+        return users
+
+    @staticmethod
+    def get_user_logged():
+        user = VNUser.query.filter_by(id=current_user.id, vn_activated=True).first()
+        return user
+
+    def total_payments_month(self):
+
+        from src.payment import VNPayment
+        from src.tenant import VNHouse, VNHouseOwner, VNTenant
+
+        now = datetime.now()
+        month = now.month
+        year = now.year
+
+        total_payments = (
+            db.session.query(db.func.sum(VNPayment.vn_pay_amount))
+            .join(VNHouse)
+            .join(VNTenant)
+            .join(VNHouseOwner)
+            .join(VNUser)
+            .filter(
+                VNUser.uuid == current_user.uuid,
+                VNUser.id == self.id,
+                db.extract("month", VNPayment.vn_pay_date) == month,
+                db.extract("year", VNPayment.vn_pay_date) == year,
+            )
+            .scalar()
+        )
+        total_payments = total_payments or 0
+        return total_payments
 
     @staticmethod
     def get_label(user):
@@ -226,6 +288,93 @@ class VNUser(
         if self.vn_company:
             return self.vn_agencie_name
 
+    @staticmethod
+    def get_ownerbymonth():
+        count_by_month = (
+            db.session.query(
+                db.extract("year", VNHouseOwner.vn_created_at),
+                db.extract("month", VNHouseOwner.vn_created_at),
+                db.func.count(VNHouseOwner.id),
+            )
+            .join(VNUser, VNHouseOwner.vn_user_id == VNUser.id)
+            .filter(VNUser.id == current_user.id)
+            .group_by(
+                db.extract("year", VNHouseOwner.vn_created_at),
+                db.extract("month", VNHouseOwner.vn_created_at),
+            )
+            .all()
+        )
+        return count_by_month
+
+    @staticmethod
+    def get_tenantbymonth():
+        count_by_month = (
+            db.session.query(
+                db.extract("year", VNTenant.vn_created_at),
+                db.extract("month", VNTenant.vn_created_at),
+                db.func.count(VNTenant.id),
+            )
+            .join(VNUser, VNTenant.vn_user_id == VNUser.id)
+            .filter(VNUser.id == current_user.id)
+            .group_by(
+                db.extract("year", VNTenant.vn_created_at),
+                db.extract("month", VNTenant.vn_created_at),
+            )
+            .all()
+        )
+        return count_by_month
+
+    @staticmethod
+    def get_trendprices():
+        rent_prices = (
+            db.session.query(
+                db.extract("year", VNHouse.vn_created_at),
+                db.extract("month", VNHouse.vn_created_at),
+                db.func.avg(VNHouse.vn_house_rent),
+            )
+            .join(VNUser, VNHouse.vn_user_id == VNUser.id)
+            .filter(VNUser.id == current_user.id)
+            .group_by(
+                db.extract("year", VNHouse.vn_created_at),
+                db.extract("month", VNHouse.vn_created_at),
+            )
+            .all()
+        )
+        return rent_prices
+
+    @staticmethod
+    def count_available_properties():
+        vn_house_is_open = VNHouse.vn_house_is_open
+        current_user_id = current_user.id
+
+        available_properties = (
+            db.session.query(
+                db.func.sum(
+                    db.case(
+                        (
+                            (vn_house_is_open == True) & (VNUser.id == current_user_id),
+                            1,
+                        ),
+                        else_=0,
+                    )
+                ),
+                db.func.sum(
+                    db.case(
+                        (
+                            (vn_house_is_open == False)
+                            & (VNUser.id == current_user_id),
+                            1,
+                        ),
+                        else_=0,
+                    )
+                ),
+            )
+            .join(VNUser)
+            .all()
+        )
+
+        return available_properties
+
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -236,3 +385,8 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 login_manager.anonymous_user = AnonymousUser
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.query(VNUser).get(user_id)

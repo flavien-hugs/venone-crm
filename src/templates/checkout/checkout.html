@@ -1,0 +1,96 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_content %}
+    <section id="checkoutTable">
+
+        <!-- Alert message -->
+        <message-component
+            :show-message-alert="showMessageAlert"
+            :message-alert="messageAlert">
+        </message-component>
+
+        <div v-if="user.tenant_count == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
+            <div class="text-center py-2">
+
+                <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}">
+
+                <h4 class="d-flex justify-content-center text-muted mb-4">
+                    Vous n'avez aucun loyer en cours en ce moment.
+                </h4>
+            </div>
+        </div>
+
+        <div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else-if="user.tenant_count > 0" class="card card-header-actions mx-auto">
+            <div class="card-header">
+                <span class="fw-700">Vos loyers</span>
+            </div>
+
+            <div class="card-body">
+                <div class="input-group input-group-joined input-group-solid shadow-none">
+                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                    <input
+                        type="text"
+                        placeholder="Rechercher un locataire ..."
+                        v-model="searchQuery"
+                        class="form-control shadow-none ps-0"
+                    >
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="small">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">ID Locataire</th>
+                                <th scope="col">Loyer du mois en cours</th>
+                                <th scope="col">Date de location</th>
+                                <th scope="col">Prochain paiement</th>
+                                <th scope="col">Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="h in houses" v-bind:key="h.house_uuid">
+                                <tr v-if="h.house_is_open">
+                                    <td scope="row">
+                                        <span class="badge bg-blue-soft text-blue">{ h.house_id }</span>
+                                    </td>
+                                    <td>{ h.tenant_id }</td>
+                                    <td>{ h.house_type } &smid; { h.house_rent } { h.devise }</td>
+                                    <td>{ h.house_lease_start_date.toLocaleString() }</td>
+                                    <td>{ h.house_lease_end_date.toLocaleString() }</td>
+                                    <td>
+                                        <span :class="{'bg-red-soft': !h.status_payment, 'bg-red': h.status_payment}"
+                                        class="badge text-white">{ h.status_payment }</span>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <paginate-component
+                    :current-page="currentPage"
+                    :total-pages="totalPages"
+                    :next-page="nextPage"
+                    :prev-page="prevPage"
+                ></paginate-component>
+            </div>
+        </div>
+
+    </section>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script type="module" src="{{ url_for('static', filename="js/app/checkout.js") }}"></script>
+{% endblock other_js_src %}

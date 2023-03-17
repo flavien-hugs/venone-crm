@@ -1,18 +1,14 @@
-{% extends "tenant/_base.html" %}
-
-{% block breadcrmub_plus %}
-
-{% endblock breadcrmub_plus %}
+{% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-    <section id="houseTable">
+    <section id="houseApp">
 
-        <!-- Alert message -->
-        <div v-if="showDeleteAlert" class="alert alert-success" role="alert">
-            Le compte du bailleur a été supprimé avec succès.
-        </div>
+        <message-component
+            :show-message-alert="showMessageAlert"
+            :message-alert="messageAlert">
+        </message-component>
 
-        <div v-if="houses.length == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div v-if="user.house_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
                 <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
 
@@ -22,76 +18,66 @@
             </div>
         </div>
 
-        <div v-else-if="houses.length > 0" class="card card-header-actions">
+        <div v-else-if="user.house_count > 0" class="card card-header-actions">
+            <div v-if="isLoading" class="preloader">
+                <div class="preloader-body">
+                    <p>Chargement en cours...</p>
+                    <div class="cssload-container">
+                        <div class="cssload-speeding-wheel"></div>
+                    </div>
+                </div>
+            </div>
 
             <div class="card-header">
-                <span class="fw-700">Propriétés ({ houses.length })</span>
-                <form>
-                    <input class="form-control" placeholder="Rechercher">
-                </form>
+                <span class="fw-700">{ user.house_count } propriétés</span>
             </div>
 
-            <table class="table table-hover table-responsive">
-                <thead class="small">
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Bailleur</th>
-                        <th scope="col">Proprité</th>
-                        <th scope="col">Status location</th>
-                        <th scope="col">Mise en location le</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <p v-if="isLoading">Loading...</p>
-                    {% include "tenant/paths/_house.html" %}
-                </tbody>
-            </table>
+            <div class="card-body">
+                <div class="input-group input-group-joined input-group-solid shadow-none">
+                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                    <input
+                        type="text"
+                        placeholder="Rechercher une proprété ..."
+                        class="form-control shadow-none ps-0"
+                        aria-label="Rechercher"
+                    >
+                </div>
 
-            {% include "tenant/paths/_paginate.html" %}
+                <div class="table-responsive">
+                   <table class="table table-hover">
+                        <thead class="small">
+                            <tr>
+                                <th scope="col">ID Propriété</th>
+                                <th scope="col">ID Propriétaire</th>
+                                <th scope="col">Locataire</th>
+                                <th scope="col">Propriété &amp; Localisation</th>
+                                <th scope="col">Loyer/mois</th>
+                                <th scope="col">Ajouté le</th>
+                                <th scope="col">Status location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% include "tenant/paths/_house.html" %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <paginate-component
+                    :current-page="currentPage"
+                    :total-pages="totalPages"
+                    :next-page="nextPage"
+                    :prev-page="prevPage"
+                ></paginate-component>
+
+            </div>
         </div>
     </section>
-
-    <div class="modal fade" data-bs-backdrop="static" id="addTenantModal" tabindex="-1" role="dialog" aria-labelledby="tenantModal" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Enregistré une propriété</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="nav nav-pills nav-justified nav-wizard" id="cardTab tenantModal" role="tablist">
-                        <a class="nav-item nav-link active p-3" id="wizard1-tab" href="#wizard1" data-bs-toggle="tab" role="tab" aria-controls="wizard1" aria-selected="true">
-                            <div class="wizard-step-icon">1</div>
-                            <div class="wizard-step-text">
-                                <div class="modal-title wizard-step-text-name">
-                                    Enregistrer la propriété
-                                </div>
-                            </div>
-                        </a>
-
-                        <a class="nav-item nav-link p-3" id="wizard2-tab" href="#wizard2" data-bs-toggle="tab" role="tab" aria-controls="wizard2" aria-selected="true">
-                            <div class="wizard-step-icon">2</div>
-                            <div class="wizard-step-text">
-                                <div class="modal-title wizard-step-text-name">
-                                   Enregistrer le locataire
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <hr class="my-3">
-
-                    {% include "tenant/paths/_owner_register.html" %}
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock dashboard_content %}
 
 
 {% block other_js_src %}
     {{ super() }}
-    <script src="{{ url_for('static', filename="js/app/house.js") }}"></script>
+    <script type="module" src="{{ url_for('static', filename="js/app/house.js") }}"></script>
 {% endblock other_js_src %}

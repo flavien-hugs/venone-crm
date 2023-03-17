@@ -37,35 +37,40 @@
     <meta name="mobile-web-app-capable" content="yes">
 
     {% block other_css_src %}
-        {% include "includes/assets/css.html" %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/font-awesome/css/all.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     {% endblock other_css_src %}
 
     <title>
         {% block head_title %}
-            {{ page_title|safe }}
+        {{ page_title|safe }}
         {% endblock head_title %}
         &smid; {{ config.SITE_NAME }}
     </title>
 </head>
 
-    <body>
-        <main>
-            {% block body_content %}
-            {% endblock body_content %}
-        </main>
+<body>
+    <main>
+        {% block body_content %}
+        {% endblock body_content %}
+    </main>
 
-        {{ moment.include_moment() }}
-        {{ moment.locale(auto_detect=True) }}
-        {% block other_js_src %}
-            {% include "includes/assets/js.html" %}
-        {% endblock other_js_src %}
+    {% block other_js_src %}
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    {% endblock other_js_src %}
 
-        <script>
-            if('serviceWorker' in navigator) {
-                navigator.serviceWorker
-                    .register('/static/sw.js')
-                    .then(function() { console.log("Service Worker Registered"); });
-            }
-        </script>
-    </body>
+    {{ moment.include_moment() }}
+    {{ moment.locale(auto_detect=True) }}
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('/static/sw.js')
+                .then(function() {
+                    console.log("Service Worker Registered");
+                });
+        }
+    </script>
+</body>
+
 </html>

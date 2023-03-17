@@ -2,14 +2,14 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
+from celery import Celery
+from celery import Task
 from config import config
 from flask import current_app
 from flask import Flask
 from flask import redirect
 from flask import render_template
-from flask import send_from_directory
 from flask import url_for
-from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
 from flask_cors import CORS
@@ -23,6 +23,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFError
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
+
 
 naming_convention = {
     "ix": "ix_%(column_0_label)s",
@@ -50,7 +51,6 @@ moment = Moment()
 migrate = Migrate()
 pages = FlatPages()
 csrf = CSRFProtect()
-scheduler = APScheduler()
 login_manager = LoginManager()
 cache = Cache(config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
 htmlmin = HTMLMIN(remove_comments=False, remove_empty_space=True)
@@ -65,6 +65,7 @@ login_manager.needs_refresh_message = "Pour protéger votre compte,\
 
 
 def create_venone_app(config_name):
+
     venone_app = Flask(__name__)
     venone_app.config.from_object(config[config_name])
     config[config_name].init_app(venone_app)
@@ -80,31 +81,29 @@ def create_venone_app(config_name):
     csrf.init_app(venone_app)
 
     cache.init_app(venone_app)
-    scheduler.init_app(venone_app)
     login_manager.init_app(venone_app)
 
     db.init_app(venone_app)
     migrate.init_app(venone_app, db)
 
-    scheduler.start()
+    venone_app.config.from_prefixed_env()
+    celery_init_app(venone_app)
 
     with venone_app.app_context():
 
         from src.auth import auth_bp
-        from src.dashboard.routes import owner_bp, agency_bp, admin_bp
+        from src.main.routes import main_bp
+        from src.dashboard.routes import owner_bp, agency_bp, admin_bp, checkout_bp
         from src.api import api
 
         venone_app.register_blueprint(auth_bp)
         venone_app.register_blueprint(owner_bp)
         venone_app.register_blueprint(agency_bp)
+        venone_app.register_blueprint(checkout_bp)
         venone_app.register_blueprint(admin_bp)
+        venone_app.register_blueprint(main_bp)
 
         venone_app.register_blueprint(api)
-
-        @venone_app.before_first_request
-        def load_tasks():
-            pass
-            # from src.auth.tasks import get_user  # noqa
 
         @venone_app.errorhandler(CSRFError)
         def handle_csrf_error(e):
@@ -180,14 +179,6 @@ def create_venone_app(config_name):
                 500,
             )
 
-        @venone_app.route("/favicon.ico")
-        def favicon():
-            return send_from_directory(
-                os.path.join(current_app.root_path, "static"),
-                "img/logo/favicon.png",
-                mimetype="img/logo/favicon.png",
-            )
-
         try:
             if not os.path.exists("upload"):
                 os.mkdir("upload")
@@ -224,3 +215,16 @@ def create_venone_app(config_name):
             venone_app.logger.info("running venone app")
 
         return venone_app
+
+
+def celery_init_app(app: Flask) -> Celery:
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object) -> object:
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app

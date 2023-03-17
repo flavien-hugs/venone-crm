@@ -1,5 +1,6 @@
 window.addEventListener('DOMContentLoaded', event => {
-	feather.replace();
+
+    feather.replace();
 
 	var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

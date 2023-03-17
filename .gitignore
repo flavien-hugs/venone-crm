@@ -146,6 +146,5 @@ migrations
 alchemydumps/
 /src/fixtures/
 
-/client/node_modules/
-/client/public/build/
-/client/.DS_Store
+alembic
+*.ini

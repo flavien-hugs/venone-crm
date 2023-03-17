@@ -13,19 +13,13 @@ from src import csrf
 from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
 from src.mixins.decorators import agency_required
-from src.tenant import HouseForm
-from src.tenant import HouseOwnerForm
-from src.tenant import TenantForm
-from src.tenant import VNHouse
-from src.tenant import VNHouseOwner
-from src.tenant import VNTenant
 
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(agency_bp)
 
 
-@agency_bp.route("/<string:uuid>/settings/", methods=["GET", "POST"])
+@agency_bp.route("/<string:uuid>/parametres/", methods=["GET", "POST"])
 @login_required
 @agency_required
 def agency_setting(uuid):
@@ -63,132 +57,38 @@ def agency_setting(uuid):
         form.devise.data = current_user.vn_device
 
     return render_template(
-        "auth/admin/pages/company/settings.html",
+        "dashboard/account/company/settings.html",
         page_title=page_title,
         form=form,
         current_user=current_user,
     )
 
 
-@agency_bp.route("/<string:uuid>/tenants/", methods=["GET", "POST"])
+@agency_bp.get("/<string:uuid>/tenants/")
 @login_required
-@agency_required
 def agency_create_tenant(uuid):
     page_title = "Vos locataires"
 
-    house_owner_form = HouseOwnerForm(request.form)
-    house_form = HouseForm(request.form)
-    tenant_form = TenantForm(request.form)
-
-    if tenant_form.validate_on_submit():
-
-        houseowner = VNHouseOwner(
-            vn_gender=house_owner_form.gender.data,
-            vn_fullname=house_owner_form.fullname.data,
-            vn_addr_email=house_owner_form.addr_email.data,
-            vn_cni_number=house_owner_form.cni_number.data,
-            vn_profession=house_owner_form.profession.data,
-            vn_parent_name=house_owner_form.parent_name.data,
-            vn_location=house_owner_form.location.data,
-            vn_phonenumber_one=house_owner_form.phonenumber_one.data,
-            vn_phonenumber_two=house_owner_form.phonenumber_two.data,
-        )
-        houseowner.vn_user_id = current_user.id
-        houseowner.save()
-
-        house = VNHouse(
-            vn_house_type=house_form.house_type.data,
-            vn_house_rent=house_form.house_rent.data,
-            vn_house_guaranty=house_form.house_guaranty.data,
-            vn_house_month=house_form.house_month.data,
-            vn_number_or_room=house_form.house_number_or_room.data,
-            vn_house_address=house_form.house_address.data,
-        )
-        house.vn_houseowner_id = houseowner.id
-        house.vn_user_id = current_user.id
-        house.save()
-
-        tenant = VNTenant(
-            vn_gender=tenant_form.gender.data,
-            vn_fullname=tenant_form.fullname.data,
-            vn_addr_email=tenant_form.addr_email.data,
-            vn_cni_number=tenant_form.cni_number.data,
-            vn_profession=tenant_form.profession.data,
-            vn_parent_name=tenant_form.parent_name.data,
-            vn_location=tenant_form.location.data,
-            vn_birthdate=tenant_form.birthdate.data,
-            vn_phonenumber_one=tenant_form.phonenumber_one.data,
-            vn_phonenumber_two=tenant_form.phonenumber_two.data,
-        )
-        tenant.vn_house_id = house.id
-        tenant.vn_houseowner_id = houseowner.id
-        tenant.vn_user_id = current_user.id
-        tenant.save()
-
-        return redirect(
-            url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid)
-        )
-
     return render_template(
         "tenant/tenant.html",
-        house_owner_form=house_owner_form,
-        house_form=house_form,
-        tenant_form=tenant_form,
         page_title=page_title,
         current_user=current_user,
     )
 
 
-@agency_bp.route("/<string:uuid>/houses/", methods=["GET", "POST"])
+@agency_bp.get("/<string:uuid>/houses/")
 @login_required
-@agency_required
 def agency_house_list(uuid):
     page_title = "Propriétés"
-
-    house_form = HouseForm(request.form)
-    tenant_form = TenantForm(request.form)
-
-    if tenant_form.validate_on_submit():
-
-        house = VNHouse(
-            vn_house_type=house_form.house_type.data,
-            vn_house_rent=house_form.house_rent.data,
-            vn_house_guaranty=house_form.house_guaranty.data,
-            vn_house_month=house_form.house_month.data,
-            vn_number_or_room=house_form.house_number_or_room.data,
-            vn_house_address=house_form.house_address.data,
-        )
-        house.vn_user_id = current_user.id
-        house.save()
-
-        tenant = VNTenant(
-            vn_gender=tenant_form.gender.data,
-            vn_fullname=tenant_form.fullname.data,
-            vn_addr_email=tenant_form.addr_email.data,
-            vn_cni_number=tenant_form.cni_number.data,
-            vn_profession=tenant_form.profession.data,
-            vn_parent_name=tenant_form.parent_name.data,
-            vn_location=tenant_form.location.data,
-            vn_birthdate=tenant_form.birthdate.data,
-            vn_phonenumber_one=tenant_form.phonenumber_one.data,
-            vn_phonenumber_two=tenant_form.phonenumber_two.data,
-        )
-        tenant.vn_house_id = house.id
-        tenant.vn_user_id = current_user.id
-        tenant.save()
-
-        return redirect(url_for("agency_bp.agency_house_list", uuid=current_user.uuid))
 
     return render_template(
         "tenant/house.html",
         page_title=page_title,
-        house_form=house_form,
-        tenant_form=tenant_form,
         current_user=current_user,
     )
 
 
-@agency_bp.route("/<string:uuid>/houseowners/", methods=["GET", "POST"])
+@agency_bp.get("/<string:uuid>/homeowners/")
 @login_required
 @agency_required
 def agency_owner_list(uuid):
@@ -199,54 +99,6 @@ def agency_owner_list(uuid):
         page_title=page_title,
         current_user=current_user,
     )
-
-
-@agency_bp.route("/<string:uuid>/create_house_owner/", methods=["GET", "POST"])
-@login_required
-@agency_required
-def create_house_owner(uuid):
-    page_title = "Enregistrer un propriétaire de maison"
-
-    form = HouseOwnerForm(request.form)
-
-    if request.method == "POST" and form.validate_on_submit():
-
-        houseowner = VNHouseOwner(
-            vn_gender=form.gender.data,
-            vn_fullname=form.fullname.data,
-            vn_addr_email=form.addr_email.data,
-            vn_cni_number=form.cni_number.data,
-            vn_profession=form.profession.data,
-            vn_parent_name=form.parent_name.data,
-            vn_location=form.location.data,
-            vn_phonenumber_one=form.phonenumber_one.data,
-            vn_phonenumber_two=form.phonenumber_two.data,
-        )
-        houseowner.vn_user_id = current_user.id
-        houseowner.save()
-        return redirect(url_for("agency_bp.house_owner_list", uuid=current_user.uuid))
-
-    return render_template(
-        "tenant/create.html",
-        form=form,
-        page_title=page_title,
-        current_user=current_user,
-    )
-
-
-@agency_bp.route("/<string:uuid>/delete_houseowner/", methods=["POST"])
-@login_required
-@agency_required
-def agency_delete_houseowner(uuid):
-    houseowner = VNHouseOwner.get_houseowner(uuid)
-    if current_user != houseowner.vn_user_id:
-        abort(400)
-    houseowner.disable()
-    flash(
-        f"Le propriétaire {houseowner.vn_fullname} a été retiré avec succès !",
-        category="success",
-    )
-    return redirect(url_for("agency_bp.house_owner_list", uuid=current_user.uuid))
 
 
 @agency_bp.route("/<string:uuid>/delete_account/", methods=["POST"])
@@ -264,9 +116,3 @@ def delete_account(uuid):
     except Exception as e:
         print(f"Une erreur s'est produite: {e}")
         abort(500)
-
-
-@agency_bp.route("/api/tenant/data/")
-@login_required
-def data():
-    return {"data": [tenant.to_tenant_dict() for tenant in current_user.tenants]}

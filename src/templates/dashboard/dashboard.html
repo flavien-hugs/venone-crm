@@ -1,0 +1,85 @@
+{% extends "dashboard/_base.html" %}
+
+{% block other_css_src %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock other_css_src %}
+
+{% block dashboard_content %}
+    {% include "includes/partials/message.html" %}
+    <section id="dashboardApp" >
+        <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row mb-4">
+            <div class="me-4 mb-3 mb-sm-0">
+                <h1 class="mb-0">{{ page_title | e}}</h1>
+                <div class="small">
+                    <span class="fw-500 text-muted">
+                        {{ moment().format('dddd') }} {{ moment().format('Do MMMM YYYY') }}
+                    </span> &smid; { user.country }
+                </div>
+            </div>
+        </div>
+
+        <kpi-component :user="user"></kpi-component>
+
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card card-header-actions h-auto">
+                    <div class="card-header text-muted">
+                        Tendances des coûts de location
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="trendPriceChart" width="100%" height="50"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-4 mb-4">
+                <div class="card card-header-actions h-auto">
+                    <div class="card-header text-muted">
+                        Nombre de bailleurs par mois
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="ownerChart" width="100%" height="30"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 mb-4">
+                <div class="card card-header-actions h-auto">
+                    <div class="card-header text-muted">
+                        Nombre de locataires par mois
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="tenantChart" width="100%" height="30"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 mb-4">
+                <div class="card card-header-actions h-auto">
+                    <div class="card-header text-muted">
+                        Disponibilté de vos propriétés
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie">
+                            <canvas id="openHouseChart" width="100%" height="50"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script type="module" src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/app/dashboard.js') }}"></script>
+{% endblock other_js_src %}

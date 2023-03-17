@@ -40,12 +40,22 @@ NB: all alerts are not only receivable by SMS, but also on the software
     "PATCH" qui va appliquer une modification partielle d’une ressource.
 
 
-### Run project
-Run:
-```sh
-$ sh entrypoint.sh
-```
+### Entities:
 
+- User
+- Tenant
+- House
+- Rent
+- Payment
+- Penaltie
+
+### Relationships:
+
+- User can have multiple tenants.
+- House can be rented by multiple tenants.
+- Rents are associated with a house and a tenant.
+- Payment are associated with a rent.
+- Penaltie are associated with a payment.
 
 ### Credit
 
