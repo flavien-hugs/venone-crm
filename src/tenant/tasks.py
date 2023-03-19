@@ -1,14 +1,6 @@
-import os
-import requests
-from datetime import date, timedelta
-
-from flask import current_app
-
 from celery import shared_task
-
-from src.payment import VNPayment
-from src.tenant import VNHouse, VNTenant
 from src.main.routes import send_sms_reminder
+from src.tenant import VNHouse
 
 
 @shared_task

@@ -98,7 +98,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         )
 
     def __str__(self):
-        return self.vn_fullname
+        return f"{self.vn_fullname} - {self.vn_fullname} - {self.vn_phonenumber_one}"
 
     def __repr__(self):
         return f"VNHouseOwner({self.id}, {self.vn_fullname})"
@@ -220,8 +220,8 @@ class VNHouse(TimestampMixin):
         }
         return json_house
 
-    def __str__(self):
-        return self.vn_house_type
+    def __str__(self) -> str:
+        return f"{self.vn_house_id} - {self.vn_house_type} - {self.vn_house_rent}"
 
     def __repr__(self):
         return f"VNHouse({self.id}, {self.vn_house_type})"
