@@ -19,11 +19,15 @@
 		</td>
 		<td>{ tn.created_at.toLocaleString() }</td>
 		<td>
-			<button @click.prevent="updateTenant(tn)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+			<button title="Télécharger le contrat de ce locataire" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
+				<i class="fa fa-download me-2"></i>
+            </button>
+
+			<button title="Mettre à jour les informations de ce locataire" @click.prevent="updateTenant(tn)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
 				<i class="feather text-secondary fa fa-edit"></i>
 			</button>
 
-			<button @click.prevent="deleteTenantConfirm(tn.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
+			<button title="Supprimer ce locataire" @click.prevent="deleteTenantConfirm(tn.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
 				<i class="feather text-danger fa fa-trash"></i>
 			</button>
 		</td>

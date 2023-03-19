@@ -23,15 +23,15 @@
 		<td><span :class="{'bg-red': hs.house_is_open, 'bg-blue': !hs.house_is_open}" class="badge text-white text-uppercase">{ hs.house_status }</span></td>
 
 		<td>
-			<button @click="assignHouseToTenantConfirm(hs)" v-if="!hs.house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+			<button title="Assigner un locataire à cette propriété" @click="assignHouseToTenantConfirm(hs)" v-if="!hs.house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
 				<i class="text-success fa fa-user-plus"></i>
 			</button>
 
-			<button @click="updateHouse(hs)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+			<button title="Mettre à jour cette propriété" @click="updateHouse(hs)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
 				<i class="text-primary fa fa-edit"></i>
 			</button>
 
-			<button v-if="!hs.house_is_open" @click="deleteHouseConfirm(hs.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+			<button title="Supprimer cette propriété" v-if="!hs.house_is_open" @click="deleteHouseConfirm(hs.house_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
 				<i class="text-danger fa fa-trash"></i>
 			</button>
 		</td>

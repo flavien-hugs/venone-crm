@@ -17,15 +17,19 @@
 		</td>
 		<td>{ own.created_at }</td>
 		<td>
-			<button @click="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+			<button title="Télécharger le contrat de ce propriétaire" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
+				<i class="fa fa-download me-2"></i>
+            </button>
+
+			<button title="Mettre à jour les informations de ce propriétaire" @click.prevent="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
 				<i class="text-secondary fa fa-edit"></i>
 			</button>
 
-			<button @click="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+			<button title="Enregistrer un locataire pour ce propriétaire" @click.prevent="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">
 				<i class="text-success fa fa-user-plus"></i>
 			</button>
 
-			<button @click="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+			<button title="Supprimer ce propriétaire" @click.prevent="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
 				<i class="text-danger fa fa-trash"></i>
 			</button>
 		</td>

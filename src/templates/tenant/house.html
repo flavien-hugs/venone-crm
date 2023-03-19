@@ -1,83 +1,78 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-    <section id="houseApp">
+<section id="houseApp">
 
-        <message-component
-            :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">
-        </message-component>
+    <message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
+    </message-component>
 
-        <div v-if="user.house_count == 0" class="card card-body shadow-none bg-transparent border-0">
-            <div class="text-center py-2">
-                <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
+    <div v-if="user.house_count == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div class="text-center py-2">
+            <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
 
-                <p class="d-flex justify-content-center text-muted mb-4">
-                    Vous n'avez aucune propriété enregistrée en ce moment.
-                </p>
+            <p class="d-flex justify-content-center text-muted mb-4">
+                Vous n'avez aucune propriété enregistrée en ce moment.
+            </p>
+        </div>
+    </div>
+
+    <div v-else-if="user.house_count > 0" class="card card-header-actions">
+        <div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
+                </div>
             </div>
         </div>
 
-        <div v-else-if="user.house_count > 0" class="card card-header-actions">
-            <div v-if="isLoading" class="preloader">
-                <div class="preloader-body">
-                    <p>Chargement en cours...</p>
-                    <div class="cssload-container">
-                        <div class="cssload-speeding-wheel"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-header">
-                <span class="fw-700">{ user.house_count } propriétés</span>
-            </div>
-
-            <div class="card-body">
-                <div class="input-group input-group-joined input-group-solid shadow-none">
-                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
-                    <input
-                        type="text"
-                        placeholder="Rechercher une proprété ..."
-                        class="form-control shadow-none ps-0"
-                        aria-label="Rechercher"
-                    >
-                </div>
-
-                <div class="table-responsive">
-                   <table class="table table-hover">
-                        <thead class="small">
-                            <tr>
-                                <th scope="col">ID Propriété</th>
-                                <th scope="col">ID Propriétaire</th>
-                                <th scope="col">Locataire</th>
-                                <th scope="col">Propriété &amp; Localisation</th>
-                                <th scope="col">Loyer/mois</th>
-                                <th scope="col">Ajouté le</th>
-                                <th scope="col">Status location</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% include "tenant/paths/_house.html" %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <paginate-component
-                    :current-page="currentPage"
-                    :total-pages="totalPages"
-                    :next-page="nextPage"
-                    :prev-page="prevPage"
-                ></paginate-component>
-
+        <div class="card-header">
+            <span class="fw-700">{ user.house_count } propriétés</span>
+            <div>
+                <button @click.prevent="downloadHouseCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
+                    <i class="me-2" data-feather="download"></i>
+                    télécharger le csv
+                </button>
             </div>
         </div>
-    </section>
+
+        <div class="card-body">
+            <div class="input-group input-group-joined input-group-solid shadow-none">
+                <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                <input type="text" placeholder="Rechercher une proprété ..." class="form-control shadow-none ps-0" aria-label="Rechercher">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="small">
+                        <tr>
+                            <th scope="col">ID Propriété</th>
+                            <th scope="col">ID Propriétaire</th>
+                            <th scope="col">Locataire</th>
+                            <th scope="col">Propriété &amp; Localisation</th>
+                            <th scope="col">Loyer/mois</th>
+                            <th scope="col">Ajouté le</th>
+                            <th scope="col">Status location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% include "tenant/paths/_house.html" %}
+                    </tbody>
+                </table>
+            </div>
+
+            <paginate-component :current-page="currentPage" :total-pages="totalPages" :next-page="nextPage" :prev-page="prevPage"></paginate-component>
+
+        </div>
+    </div>
+</section>
 {% endblock dashboard_content %}
 
 
 {% block other_js_src %}
-    {{ super() }}
-    <script type="module" src="{{ url_for('static', filename="js/app/house.js") }}"></script>
+{{ super() }}
+<script type="module" src="{{ url_for('static', filename="js/app/house.js") }}"></script>
 {% endblock other_js_src %}
+src %}
