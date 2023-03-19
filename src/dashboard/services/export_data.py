@@ -48,3 +48,29 @@ def generate_owner_csv(data, headers):
         )
 
     return output.getvalue()
+
+
+def generate_house_csv(data, headers):
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow(headers)
+
+    for row in data:
+        writer.writerow(
+            [
+                row.vn_house_id,
+                row.owner_houses,
+                row.vn_house_type,
+                row.vn_house_rent,
+                row.vn_house_guaranty,
+                row.vn_house_number_room,
+                row.vn_house_address,
+                row.vn_house_lease_start_date,
+                row.get_house_open(),
+                row.vn_created_at,
+            ]
+        )
+
+    return output.getvalue()
