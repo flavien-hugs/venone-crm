@@ -15,12 +15,11 @@ from flask_login import logout_user
 from src import csrf
 from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
+from src.dashboard.services.export_data import generate_owner_csv
+from src.dashboard.services.export_data import generate_tenant_csv
 from src.mixins.decorators import agency_required
-
-from src.tenant import VNTenant, VNHouseOwner
-from src.dashboard.services.export_data import(
-    generate_tenant_csv, generate_owner_csv
-)
+from src.tenant import VNHouseOwner
+from src.tenant import VNTenant
 
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
@@ -144,8 +143,7 @@ def export_tenants_csv():
     data = VNTenant.get_tenants_list()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
-    response = Response(generate_tenant_csv(
-        data, headers), mimetype="text/csv")
+    response = Response(generate_tenant_csv(data, headers), mimetype="text/csv")
 
     response.headers.set(
         "Content-Disposition",
@@ -173,8 +171,7 @@ def export_owners_csv():
     owners = VNHouseOwner.get_owners_list()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
-    response = Response(generate_owner_csv(
-        owners, headers), mimetype="text/csv")
+    response = Response(generate_owner_csv(owners, headers), mimetype="text/csv")
 
     response.headers.set(
         "Content-Disposition",
