@@ -66,7 +66,7 @@ window.addEventListener('DOMContentLoaded', event => {
                 showMessageAlert: false,
                 ownerData: { ...OWNER_DATA },
                 houseData: { ...HOUSE_DATA },
-                tenantData: { ...TENANT_DATA }
+                tenantData: { ...TENANT_DATA },
             }
         },
         delimiters: ["{", "}"],
@@ -138,6 +138,10 @@ window.addEventListener('DOMContentLoaded', event => {
 
             filterNumber(e) {
                 return  ("" + e).replace(/[^0-9]/g, '');
+            },
+
+            downloadTenantCSV() {
+                window.location.href = `/dashboard/export-tenants-data`;
             },
 
             formatPhoneNumber(n) {

@@ -85,6 +85,10 @@ window.addEventListener('DOMContentLoaded', event => {
                 this.currentStep--;
             },
 
+            downloadOwnerCSV() {
+                window.location.href = `/dashboard/export-owners-data`;
+            },
+
             async getOwners() {
                 try {
                     this.isLoading = true;
