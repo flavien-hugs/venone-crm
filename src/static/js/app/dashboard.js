@@ -27,8 +27,9 @@ var app = Vue.createApp({
 
     async mounted() {
         await this.getUser();
-
-        await this.getOwnerData();
+        if (this.user.is_company) {
+            await this.getOwnerData();
+        }
         await this.getTenantData();
         await this.getOpenHousesData();
         await this.getTrendPriceData();
