@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from flask import abort
 from flask import Blueprint
 from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import Response
 from flask import session
 from flask import url_for
 from flask_login import current_user
@@ -13,6 +16,11 @@ from src import csrf
 from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
 from src.mixins.decorators import agency_required
+
+from src.tenant import VNTenant, VNHouseOwner
+from src.dashboard.services.export_data import(
+    generate_tenant_csv, generate_owner_csv
+)
 
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
@@ -116,3 +124,61 @@ def delete_account(uuid):
     except Exception as e:
         print(f"Une erreur s'est produite: {e}")
         abort(500)
+
+
+@agency_bp.get("/export-tenants-data/")
+@login_required
+def export_tenants_csv():
+
+    headers = [
+        "ID",
+        "Nom & Prénoms",
+        "N° Téléphone",
+        "Adresse e-mail",
+        "N° CNI",
+        "Profession",
+        "Loyer",
+        "Date d'ajout",
+    ]
+
+    data = VNTenant.get_tenants_list()
+
+    current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
+    response = Response(generate_tenant_csv(
+        data, headers), mimetype="text/csv")
+
+    response.headers.set(
+        "Content-Disposition",
+        "attachment",
+        filename="tenants_data{}.csv".format(current_date),
+    )
+    return response
+
+
+@agency_bp.get("/export-owners-data/")
+@login_required
+def export_owners_csv():
+
+    headers = [
+        "ID",
+        "Nom & Prénoms",
+        "N° Téléphone",
+        "Adresse e-mail",
+        "N° CNI",
+        "Profession",
+        "Nombre de propriétés",
+        "Date d'ajout",
+    ]
+
+    owners = VNHouseOwner.get_owners_list()
+
+    current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
+    response = Response(generate_owner_csv(
+        owners, headers), mimetype="text/csv")
+
+    response.headers.set(
+        "Content-Disposition",
+        "attachment",
+        filename="owners_data_{}.csv".format(current_date),
+    )
+    return response
