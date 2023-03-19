@@ -3,7 +3,6 @@ import time
 import csv
 import io
 import requests
-import schedule
 from flask import Response
 
 def generate_tenant_csv(data, headers):
