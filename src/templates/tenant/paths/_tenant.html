@@ -6,7 +6,7 @@
 				{ tn.tenant_id }
 			</span>
 		</td>
-		<td scope="row">
+		<td v-if="user.is_company" scope="row">
 			<span
 				class="badge bg-purple-soft text-purple">
 				{ tn.owner }

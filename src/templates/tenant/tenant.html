@@ -76,7 +76,7 @@
                         <thead class="small">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col">ID Propriétaire</th>
+                                <th v-if="user.is_company" scope="col">ID Propriétaire</th>
                                 <th scope="col">Nom &amp; prénoms / téléphone</th>
                                 <th scope="col">Loyer du mois en cours</th>
                                 <th scope="col">Date d'ajout</th>

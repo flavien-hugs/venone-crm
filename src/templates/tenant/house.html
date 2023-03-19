@@ -47,7 +47,7 @@
                     <thead class="small">
                         <tr>
                             <th scope="col">ID Propriété</th>
-                            <th scope="col">ID Propriétaire</th>
+                            <th v-if="user.is_company" scope="col">ID Propriétaire</th>
                             <th scope="col">Locataire</th>
                             <th scope="col">Propriété &amp; Localisation</th>
                             <th scope="col">Loyer/mois</th>

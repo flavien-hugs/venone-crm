@@ -3,7 +3,7 @@
 		<td>
 			<span class="badge bg-green-soft text-green">{ hs.house_id }</span>
 		</td>
-		<td>
+		<td v-if="user.is_company">
 			<span class="badge bg-red-soft text-red">{ hs.owner_id }</span>
 		</td>
 		<td>
