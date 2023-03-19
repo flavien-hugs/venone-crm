@@ -2,20 +2,21 @@ import os
 import random
 import string
 from datetime import datetime
-from flask import Blueprint, url_for, redirect, request
 
-from src import db
-from src.tenant import VNHouse
-from src.payment import VNPayment
-
-import requests
 import pyshorteners
+import requests
 from cinetpay_sdk.s_d_k import Cinetpay
+from flask import Blueprint
+from flask import redirect
+from flask import request
+from flask import url_for
+from src.payment import VNPayment
+from src.tenant import VNHouse
 
 main_bp = Blueprint("main_bp", __name__, url_prefix="/")
 
 
-@main_bp.get('/payment/<string:house_uuid>/')
+@main_bp.get("/payment/<string:house_uuid>/")
 def process_payment(house_uuid):
 
     CINETPAY_SITEID = os.getenv("CINETPAY_SITEID")
@@ -35,7 +36,7 @@ def process_payment(house_uuid):
         phonenumber_one = house.get_tenant_phone_number()
         print(phonenumber_one)
 
-        notify_url = redirect(url_for('main_bp.payment_success', _external=True))
+        notify_url = redirect(url_for("main_bp.payment_success", _external=True))
         print(notify_url)
 
         data = {
@@ -71,14 +72,16 @@ def send_sms_reminder(house, tenant):
     house_lease_end = house.vn_house_lease_end_date
 
     payment_response = redirect(
-        url_for('main_bp.process_payment',
-        house_uuid=house.uuid, _external=True
-    ))
-    payment_url = payment_response.headers['Location']
+        url_for("main_bp.process_payment", house_uuid=house.uuid, _external=True)
+    )
+    payment_url = payment_response.headers["Location"]
 
     s = pyshorteners.Shortener()
-    short_url = s.dagd.short(payment_url) if not payment_url.startswith(
-            ("http://", "https://")) else payment_url
+    short_url = (
+        s.dagd.short(payment_url)
+        if not payment_url.startswith(("http://", "https://"))
+        else payment_url
+    )
     print(short_url)
 
     message = f"Bonjour {fullname}, votre facture de loyer\
@@ -88,10 +91,7 @@ def send_sms_reminder(house, tenant):
     reqUrl = f"{SMS_BASE_URL}?sendsms&apikey={SMS_API_KEY}\
     &apitoken={SMS_API_TOKEN}&type=sms&from={SMS_SENDER_ID}&to={phone_number}&text={message}"
 
-    if (
-        current_date == house_lease_end
-        and not VNHouse.is_rent_paid(house)
-    ):
+    if current_date == house_lease_end and not VNHouse.is_rent_paid(house):
         requests.request("POST", reqUrl)
 
 
@@ -117,7 +117,7 @@ def payment_success():
             vn_tenant_id=self.tenant_payment.id,
             vn_house_id=self.id,
             vn_pay_status=True,
-            vn_pay_date=current_date
+            vn_pay_date=current_date,
         )
         payment.save()
         return "OK"
