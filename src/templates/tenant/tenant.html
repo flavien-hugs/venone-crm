@@ -43,14 +43,19 @@
             <div class="card-header">
                 <span class="fw-700">{ user.tenant_count } locataires</span>
                 <div>
-                    <button v-if="user.is_company" @click.prevent="createCompanyTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700">
+                    <button v-if="user.is_company" @click.prevent="createCompanyTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
                         <i class="me-2" data-feather="user-plus"></i>
                         Enregistrer un locataire
                     </button>
 
-                    <button v-if="user.is_owner" @click.prevent="createOwnerTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700">
+                    <button v-if="user.is_owner" @click.prevent="createOwnerTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
                         <i class="me-2" data-feather="user-plus"></i>
                         Enregistrer un locataire
+                    </button>
+
+                    <button @click.prevent="downloadTenantCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
+                        <i class="me-2" data-feather="download"></i>
+                        télécharger le csv
                     </button>
                 </div>
             </div>

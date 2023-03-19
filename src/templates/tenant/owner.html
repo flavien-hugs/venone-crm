@@ -34,6 +34,13 @@
 
             <div class="card-header">
                 <span class="fw-700">{{ current_user.houseowners.count() }} bailleurs</span>
+
+                <div>
+                    <button @click.prevent="downloadOwnerCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
+                        <i class="me-2" data-feather="download"></i>
+                        télécharger le csv
+                    </button>
+                </div>
             </div>
 
             <div class="card-body">
