@@ -204,7 +204,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onCreateOwnerTenant() {
                 try {
-                    const ownerTenantRegisterURL = `/api/owner/create_tenant/`;
+                    const ownerTenantRegisterURL = `/api/owner/tenant_register/`;
                     const response = await fetch(ownerTenantRegisterURL, {
                         method: "POST",
                         headers: {
@@ -219,7 +219,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     const data = await response.json();
 
                     if (data.success) {
-                        await this.getOwners();
+                        await this.getTenants();
                         this.tenantData = { ...TENANT_DATA };
                         this.houseData = { ...HOUSE_DATA };
                         this.showMessageAlert = true;

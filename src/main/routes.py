@@ -95,8 +95,10 @@ def send_sms_reminder(house, tenant):
         requests.request("POST", reqUrl)
 
 
-@main_bp.route("/payment/success/")
-def payment_success():
+@main_bp.route("/payment/success/<house>/")
+def payment_success(house):
+
+    house = VNHouse.query.filter_by(uuid=house).first()
 
     current_date = datetime.utcnow().date()
     transaction_id = request.args.get("transaction_id")
@@ -111,11 +113,11 @@ def payment_success():
     if token:
         payment = VNPayment(
             vn_transaction_id=transaction_id,
-            vn_pay_amount=self.vn_house_rent,
-            vn_payee_id=self.vn_user_id,
-            vn_owner_id=self.vn_owner_id,
-            vn_tenant_id=self.tenant_payment.id,
-            vn_house_id=self.id,
+            vn_pay_amount=house.vn_house_rent,
+            vn_payee_id=house.vn_user_id,
+            vn_owner_id=house.vn_owner_id,
+            vn_tenant_id=house.tenant_payment.id,
+            vn_house_id=house.id,
             vn_pay_status=True,
             vn_pay_date=current_date,
         )
