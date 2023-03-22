@@ -22,6 +22,9 @@ test: ## Run the unit tests
 initdb: ## Init and create database
 	$(MANAGE) flask db init && $(MANAGE) flask init_db
 
+celery: ## start celery
+	celery -A runserver worker --loglevel=INFO
+
 migrate: ## Generate an migration
 	$(MANAGE) flask db migrate -m 'Intial Migration'
 
