@@ -35,7 +35,6 @@ celery = {extras = ["redis"], version = "*"}
 redis = "*"
 flower = "*"
 pyshorteners = "*"
-schedule = "*"
 
 [dev-packages]
 pre-commit = "*"
