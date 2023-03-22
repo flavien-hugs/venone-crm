@@ -24,15 +24,6 @@ from flask_wtf.csrf import CSRFError
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
 
-
-naming_convention = {
-    "ix": "ix_%(column_0_label)s",
-    "uq": "uq_%(table_name)s_%(column_0_name)s",
-    "ck": "ck_%(table_name)s_%(column_0_name)s",
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s",
-}
-
 metadata = MetaData(
     naming_convention={
         "ix": "ix_%(column_0_label)s",
@@ -86,7 +77,6 @@ def create_venone_app(config_name):
     db.init_app(venone_app)
     migrate.init_app(venone_app, db)
 
-    venone_app.config.from_prefixed_env()
     celery_init_app(venone_app)
 
     with venone_app.app_context():
@@ -217,14 +207,19 @@ def create_venone_app(config_name):
         return venone_app
 
 
-def celery_init_app(app: Flask) -> Celery:
-    class FlaskTask(Task):
-        def __call__(self, *args: object, **kwargs: object) -> object:
+def celery_init_app(app):
+
+    celery_app = Celery(
+        app.import_name,
+        backend=os.getenv("CELERY_BROKER_URL"),
+        broker=os.getenv("CELERY_BROKER_URL"),
+    )
+    celery_app.conf.update(app.config)
+
+    class ContextTask(Task):
+        def __call__(self, *args, **kwargs):
             with app.app_context():
                 return self.run(*args, **kwargs)
 
-    celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object(app.config["CELERY"])
-    celery_app.set_default()
-    app.extensions["celery"] = celery_app
+    celery_app.Task = ContextTask
     return celery_app

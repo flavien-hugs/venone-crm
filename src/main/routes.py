@@ -7,6 +7,7 @@ import pyshorteners
 import requests
 from cinetpay_sdk.s_d_k import Cinetpay
 from flask import Blueprint
+from flask import current_app
 from flask import redirect
 from flask import request
 from flask import url_for
@@ -19,12 +20,13 @@ main_bp = Blueprint("main_bp", __name__, url_prefix="/")
 @main_bp.get("/payment/<string:house_uuid>/")
 def process_payment(house_uuid):
 
-    CINETPAY_SITEID = os.getenv("CINETPAY_SITEID")
-    CINETPAY_APIKEY = os.getenv("CINETPAY_APIKEY")
-    client = Cinetpay(CINETPAY_APIKEY, CINETPAY_SITEID)
+    app = current_app._get_current_object()
+    SITEID = app.config["CINETPAY_SITE_ID"]
+    APIKEY = app.config["CINETPAY_API_KEY"]
+
+    client = Cinetpay(APIKEY, SITEID)
 
     house = VNHouse.query.filter_by(uuid=house_uuid).first()
-    print(house)
 
     if house is not None:
         transaction_id = "".join(random.choices(string.digits, k=8))
@@ -34,9 +36,10 @@ def process_payment(house_uuid):
         tenant = house.get_current_tenant()
         device = house.user_houses.vn_device
         phonenumber_one = house.get_tenant_phone_number()
-        print(phonenumber_one)
 
-        notify_url = redirect(url_for("main_bp.payment_success", _external=True))
+        notify_url = redirect(
+            url_for("main_bp.payment_success", house_uuid=house.uuid, _external=True)
+        )
         print(notify_url)
 
         data = {
@@ -61,11 +64,12 @@ def process_payment(house_uuid):
 def send_sms_reminder(house, tenant):
 
     current_date = datetime.utcnow().date()
+    app = current_app._get_current_object()
 
-    SMS_API_KEY = os.getenv("SMS_APIKEY")
-    SMS_BASE_URL = os.getenv("SMS_BASEURL")
-    SMS_SENDER_ID = os.getenv("SMS_SENDERID")
-    SMS_API_TOKEN = os.getenv("SMS_APITOKEN")
+    SMS_API_KEY = app.config["SMS_API_KEY"]
+    SMS_BASE_URL = app.config["SMS_BASE_URL"]
+    SMS_SENDER_ID = app.config["SMS_SENDER_ID"]
+    SMS_API_TOKEN = app.config["SMS_API_TOKEN"]
 
     fullname = house.get_current_tenant()
     phone_number = house.get_tenant_phone_number()
@@ -91,14 +95,14 @@ def send_sms_reminder(house, tenant):
     reqUrl = f"{SMS_BASE_URL}?sendsms&apikey={SMS_API_KEY}\
     &apitoken={SMS_API_TOKEN}&type=sms&from={SMS_SENDER_ID}&to={phone_number}&text={message}"
 
-    if current_date == house_lease_end and not VNHouse.is_rent_paid(house):
+    if current_date <= house_lease_end and not VNHouse.is_rent_paid(house):
         requests.request("POST", reqUrl)
 
 
-@main_bp.route("/payment/success/<house>/")
-def payment_success(house):
+@main_bp.route("/payment/success/<house_uuid>/")
+def payment_success(house_uuid):
 
-    house = VNHouse.query.filter_by(uuid=house).first()
+    house = VNHouse.query.filter_by(uuid=house_uuid).first()
 
     current_date = datetime.utcnow().date()
     transaction_id = request.args.get("transaction_id")
