@@ -37,7 +37,7 @@ const KpiComponent = {
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
 								<div class="small fw-bold text-info mb-2 text-uppercase">nombre de bailleurs</div>
-								<div class="h1">{ user.owner_count }</div>
+								<div class="h1">{{ user.owner_count }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
 						</div>
