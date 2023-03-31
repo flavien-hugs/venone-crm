@@ -13,9 +13,6 @@ venv: ## Make a new virtual environment
 install: venv ## Install or update dependencies
 	pipenv install
 
-freeze: ## Pin current dependencies
-	pipenv requirements > requirements.txt
-
 test: ## Run the unit tests
 	$(MANAGE) flask test
 
@@ -23,7 +20,7 @@ initdb: ## Init and create database
 	$(MANAGE) flask db init && $(MANAGE) flask init_db
 
 celery: ## start celery
-	celery -A runserver worker --loglevel=INFO
+	celery -A runserver worker
 
 migrate: ## Generate an migration
 	$(MANAGE) flask db migrate -m 'Intial Migration'
