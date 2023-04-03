@@ -35,6 +35,7 @@ def get_db() -> Generator:
 class Config:
 
     DEBUG = False
+    TESTING = False
     DEVELOPMENT = False
 
     SITE_NAME = "Venone"
@@ -92,6 +93,11 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
 
 
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+
+
 class ProductionConfig(Config):
 
     DATABASE_URI = os.getenv("DATABASE_URL")
@@ -111,4 +117,5 @@ class ProductionConfig(Config):
 config = {
     "prod": ProductionConfig,
     "dev": DevelopmentConfig,
+    "test": TestingConfig,
 }
