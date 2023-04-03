@@ -77,5 +77,5 @@ def send_sms_reminder(house, tenant):
     reqUrl = f"{SMS_BASE_URL}?sendsms&apikey={SMS_API_KEY}\
     &apitoken={SMS_API_TOKEN}&type=sms&from={SMS_SENDER_ID}&to={phone_number}&text={message}"
 
-    if current_date <= house_lease_end and not VNHouse.is_rent_paid(house):
+    if current_date == house_lease_end and not VNHouse.is_rent_paid(house):
         requests.request("POST", reqUrl)
