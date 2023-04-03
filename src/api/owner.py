@@ -33,7 +33,7 @@ def get_all_houseowners():
     if pagination.has_next:
         next = url_for("api.get_all_houseowners", page=page + 1, _external=True)
 
-    return jsonify(
+    return make_response(jsonify(
         {
             "houseowners": [owner.to_json() for owner in owners],
             "prev": prev,
@@ -43,7 +43,7 @@ def get_all_houseowners():
             "total": pagination.total,
             "user": current_user.to_json(),
         }
-    )
+    ))
 
 
 @api.get("/owner/<string:owner_uuid>/")
@@ -68,19 +68,19 @@ def delete_houseowner(owner_uuid):
         [h.remove() for h in owner.houses]
         [t.remove() for t in owner.tenants]
         owner.remove()
-        return jsonify(
+        return make_response(jsonify(
             {
                 "success": True,
                 "message": f"Le compte du bailleur\
                     #{owner.vn_owner_id} a été supprimé avec succès.",
             }
-        )
-    return jsonify(
+        ))
+    return make_response(jsonify(
         {
             "success": False,
             "message": "Oups ! L'élément n'a pas été trouvé.",
         }
-    )
+    ))
 
 
 @api.put("/owner/<string:owner_uuid>/update/")
@@ -112,7 +112,7 @@ def update_houseowner(owner_uuid):
 
     owner.save()
 
-    return (
+    return make_response(
         jsonify(
             {
                 "success": True,
@@ -195,7 +195,7 @@ def owner_create_tenant(owner_uuid):
         db.session.add_all([house, tenant])
         db.session.commit()
 
-        return (
+        return make_response(
             jsonify(
                 {
                     "success": True,
@@ -231,7 +231,7 @@ def get_houseowner_houses(owner_uuid):
             "api.get_houseowner_houses", uuid=owner_uuid, page=page + 1, _external=True
         )
 
-    return jsonify(
+    return make_response(jsonify(
         {
             "houses": [house.to_json() for house in houses],
             "prev": prev,
@@ -240,7 +240,7 @@ def get_houseowner_houses(owner_uuid):
             "per_page": per_page,
             "total": pagination.total,
         }
-    )
+    ))
 
 
 @api.get("/owner/<string:owner_uuid>/tenants/")
@@ -266,7 +266,7 @@ def get_houseowner_tenants(owner_uuid):
             "api.get_houseowner_tenants", uuid=owner_uuid, page=page + 1, _external=True
         )
 
-    return jsonify(
+    return make_response(jsonify(
         {
             "tenants": [tenant.to_json() for tenant in tenants],
             "prev": prev,
@@ -275,4 +275,4 @@ def get_houseowner_tenants(owner_uuid):
             "per_page": per_page,
             "total": pagination.total,
         }
-    )
+    ))
