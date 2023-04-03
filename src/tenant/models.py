@@ -257,9 +257,6 @@ class VNHouse(TimestampMixin):
         return next((own.get_owner_id() for own in owners), None)
 
     def get_house_tenants(self):
-        """
-        liste des locataires de la propriété
-        """
         house = VNHouse.query.filter_by(
             vn_user_id=current_user.id, vn_house_id=self
         ).first()
@@ -273,10 +270,23 @@ class VNHouse(TimestampMixin):
         tenant = self.tenants[0] if len(self.tenants) > 0 else None
         return tenant.vn_phonenumber_one if tenant is not None else None
 
+    def record_payment(house, transaction_id):
+        payment = VNPayment(
+            vn_transaction_id=transaction_id,
+            vn_pay_amount=house.vn_house_rent,
+            vn_payee_id=house.vn_user_id,
+            vn_owner_id=house.vn_owner_id,
+            vn_tenant_id=house.get_current_tenant(),
+            vn_house_id=house.id,
+            vn_pay_status=False,
+            vn_pay_date=datetime.utcnow().date()
+        )
+        payment.save()
+
     def is_rent_paid(house):
+
         """
-        vérifie si le loyer du mois en cours
-        avant la date d'échéance a été effectué ou pas
+        Check if rent for the current month has been paid
         """
 
         current_date = datetime.utcnow().date()
@@ -446,6 +456,7 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
             "phonenumber_one": self.vn_phonenumber_one,
             "phonenumber_two": self.vn_phonenumber_two,
             "activated": self.vn_activated,
+            "payments": [p.to_json() for p in self.payments],
             "monthly_rent": self.get_monthly_rent(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
         }
