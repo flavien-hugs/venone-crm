@@ -12,7 +12,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         data() {
             return {
                 user: [],
-                houses: [],
+                payments: [],
 
                 perPage: 10,
                 currentPage: 1,
@@ -31,27 +31,27 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         async mounted() {
-            await this.getHouses();
+            await this.getPayments();
         },
 
         methods: {
-            async getHouses() {
+            async getPayments() {
                 try {
                     this.isLoading = true;
-                    const houseURL = `/api/houses/?page=${this.currentPage}`;
+                    const paymentURL = `/api/payments/?page=${this.currentPage}`;
 
-                    const response = await fetch(houseURL, {
+                    const response = await fetch(paymentURL, {
                         method: "GET",
                         headers: {
-                            'Content-type': 'application/json'
-                        }
+                            "Content-type": "application/json",
+                        },
                     });
 
                     if (response.ok) {
                         this.isLoading = false;
                         const data = await response.json();
-                        console.log(data)
-                        this.houses = data.houses;
+                        this.payments = data.payments;
+                        console.log(data);
                         this.user = data.user;
                         this.totalPages = Math.ceil(data.total / this.perPage);
                         this.currentPage = data.page;
@@ -62,19 +62,20 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 } catch (error) {
                     console.error("FETCH ERROR:", error);
                     this.showMessageAlert = true;
-                    this.messageAlert = 'Oops, problème de connexion au serveur.';
+                    this.messageAlert =
+                        "Oops, problème de connexion au serveur.";
                 }
             },
 
             prevPage() {
                 this.currentPage--;
-                this.getTenants();
+                this.getPayments();
                 window.scrollTo({ top: 0, behavior: "smooth" });
             },
 
             nextPage() {
                 this.currentPage++;
-                this.getTenants();
+                this.getPayments();
                 window.scrollTo({ top: 0, behavior: "smooth" });
             },
         },
