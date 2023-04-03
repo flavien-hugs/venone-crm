@@ -48,7 +48,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
 
-    form = LoginForm()
+    form = LoginForm(request.form)
     if request.method == "POST" and form.validate_on_submit():
         user = VNUser.query.filter_by(vn_addr_email=form.addr_email.data).first()
         if user and user.verify_password(form.password.data) and user.vn_activated:
@@ -115,7 +115,7 @@ def agencieregister_page():
         flash("Vous êtes déjà inscrit(e).", category="info")
         return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
 
-    form = AgencieSignupForm()
+    form = AgencieSignupForm(request.form)
     if request.method == "POST" and form.validate_on_submit():
         user_to_create = VNUser(
             vn_gender=form.gender.data,
@@ -144,7 +144,7 @@ def agencieregister_page():
 @auth_bp.route("/reset_password/", methods=["GET", "POST"])
 def password_reset_request():
 
-    form = PasswordResetRequestForm()
+    form = PasswordResetRequestForm(request.form)
     if request.method == "POST" and form.validate_on_submit():
         email_lower = form.addr_email.data.lower()
         user = VNUser.query.filter_by(vn_addr_email=email_lower).first()
@@ -189,7 +189,7 @@ def password_reset(token):
     if not user:
         return redirect(url_for("auth_bp.login"))
 
-    form = PasswordResetForm()
+    form = PasswordResetForm(request.form)
     if form.validate_on_submit():
         user.password(form.new_password.data)
         db.session.commit()
@@ -206,7 +206,7 @@ def password_reset(token):
 @login_required
 def change_email_request():
     form = ChangeEmailForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit(request.form):
         if current_user.verify_password(form.password.data):
             new_email = form.addr_email.data.lower()
             token = current_user.generate_email_change_token(new_email)
