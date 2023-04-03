@@ -38,24 +38,18 @@ class VNPayment(TimestampMixin):
 
     def to_json(self):
         json_payment = {
-            "user_uuid": current_user.uuid,
             "payment_uuid": self.uuid,
             "user_id": self.vn_payee_id,
-            "owner_id": self.vn_owner_id,
-            "tenant_id": self.vn_tenant_id,
-            "house_id": self.vn_house_id,
-            "amount": self.calculate_late_penalty(),
+            "payment_id": self.vn_payment_id,
+            "trans_id": self.vn_transaction_id,
+            "house": self.house_payment.to_json(),
+            "house_rent": self.vn_pay_amount,
+            "amount_penalty": self.calculate_late_penalty(),
             "payment_date": self.vn_pay_date.strftime("%d-%m-%Y"),
             "payment_late_penalty": self.vn_pay_late_penalty,
             "payment_status": self.vn_pay_status,
-            "house": self.house_payment.to_json(),
-            "tenant": self.tenant_payment.to_json(),
+            "get_payment": self.get_status_payment(),
             "make_payment": self.make_payment(),
-            "payments": self.get_payments(),
-            "payments_by_month": self.get_payments_by_month(),
-            "payments_by_year": self.get_payments_by_year(),
-            "outstanding_payments": self.get_outstanding_payments(),
-            "total_payments": self.get_total_payments(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
         }
         return json_payment
@@ -66,11 +60,19 @@ class VNPayment(TimestampMixin):
     def __repr__(self):
         return f"Payment({self.id}, {self.vn_payment_id}, {self.vn_payment_date})"
 
+    @staticmethod
+    def get_payment_list() -> list:
+        payments = VNPayment.query.filter_by(vn_payee_id=current_user.id)
+        return payments
+
+    def get_status_payment(self) -> bool:
+        return "payé" if self.vn_pay_status else "impayé"
+
     def calculate_late_penalty(self):
         today = date.today()
-        days_late = ((today - self.house_payment.vn_house_lease_start_date).days) + 3
+        days_late = ((today - self.house_payment.vn_house_lease_end_date).days) + 3
         if days_late > 10 and not self.vn_pay_status:
-            late_fee = self.house_payment.vn_house_rent * Decimal(0.1)
+            late_fee = self.house_payment.vn_house_rent * 0.1
             self.vn_pay_amount += late_fee
             self.vn_pay_late_penalty = late_fee
             db.session.commit()
@@ -80,28 +82,3 @@ class VNPayment(TimestampMixin):
     def make_payment(self) -> bool:
         self.vn_pay_status = True
         db.session.commit()
-
-    def get_payments(self):
-        # A method that creates a new rent payment
-        # record for the given tenant_id and amount.
-        pass
-
-    def get_payments_by_month(self):
-        # A method that retrieves all rent payment records
-        # for the given tenant_id in the specified month and year.
-        pass
-
-    def get_payments_by_year(self, year):
-        # A method that retrieves all rent payment
-        # records for the given tenant_id in the specified year
-        pass
-
-    def get_outstanding_payments(self):
-        # A method that retrieves all rent payment
-        # records for the given tenant_id that have not been fully paid.
-        pass
-
-    def get_total_payments(self):
-        #  A method that retrieves the total
-        # amount of rent payments made by the given tenant_id.
-        pass
