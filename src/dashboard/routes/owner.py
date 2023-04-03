@@ -25,7 +25,7 @@ csrf.exempt(owner_bp)
 def dashboard(uuid):
     page_title = "Tableau de board"
     VNHouse.update_expired_lease_end_dates()
-    tasks.payment_reminders.apply_async()
+    tasks.payment_reminders.delay()
     return render_template(
         "dashboard/dashboard.html", page_title=page_title, current_user=current_user
     )
