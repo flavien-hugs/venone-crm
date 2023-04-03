@@ -8,7 +8,7 @@ const KpiComponent = {
 					<div class="card-body">
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
-								<div class="small fw-bold text-primary mb-2 text-uppercase">solde actuel</div>
+								<div class="small fw-bold text-primary mb-2 text-uppercase">total paiement reçu</div>
 								<div class="h1">{{ user.total_payment_month }} {{ user.devise }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
@@ -22,7 +22,7 @@ const KpiComponent = {
 					<div class="card-body">
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
-								<div class="small fw-bold text-success text-uppercase mb-2">nombre de locataires</div>
+								<div class="small fw-bold text-success text-uppercase mb-2">total locataires</div>
 								<div class="h1">{{ user.tenant_count }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
@@ -36,7 +36,7 @@ const KpiComponent = {
 					<div class="card-body">
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
-								<div class="small fw-bold text-info mb-2 text-uppercase">nombre de bailleurs</div>
+								<div class="small fw-bold text-info mb-2 text-uppercase">total bailleurs</div>
 								<div class="h1">{{ user.owner_count }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
@@ -50,7 +50,7 @@ const KpiComponent = {
 					<div class="card-body">
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
-								<div class="small fw-bold text-secondary mb-2 text-uppercase">nombre de propriétés</div>
+								<div class="small fw-bold text-secondary mb-2 text-uppercase">total propriétés</div>
 								<div class="h1">{{ user.house_count }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-home fa-2x text-gray-200"></i></div>
