@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from flask import jsonify
+from flask import make_response
 from flask import request
 from flask import url_for
 from flask_login import current_user
@@ -33,17 +34,19 @@ def get_all_houseowners():
     if pagination.has_next:
         next = url_for("api.get_all_houseowners", page=page + 1, _external=True)
 
-    return make_response(jsonify(
-        {
-            "houseowners": [owner.to_json() for owner in owners],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-            "user": current_user.to_json(),
-        }
-    ))
+    return make_response(
+        jsonify(
+            {
+                "houseowners": [owner.to_json() for owner in owners],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+                "user": current_user.to_json(),
+            }
+        )
+    )
 
 
 @api.get("/owner/<string:owner_uuid>/")
@@ -68,19 +71,23 @@ def delete_houseowner(owner_uuid):
         [h.remove() for h in owner.houses]
         [t.remove() for t in owner.tenants]
         owner.remove()
-        return make_response(jsonify(
-            {
-                "success": True,
-                "message": f"Le compte du bailleur\
+        return make_response(
+            jsonify(
+                {
+                    "success": True,
+                    "message": f"Le compte du bailleur\
                     #{owner.vn_owner_id} a été supprimé avec succès.",
+                }
+            )
+        )
+    return make_response(
+        jsonify(
+            {
+                "success": False,
+                "message": "Oups ! L'élément n'a pas été trouvé.",
             }
-        ))
-    return make_response(jsonify(
-        {
-            "success": False,
-            "message": "Oups ! L'élément n'a pas été trouvé.",
-        }
-    ))
+        )
+    )
 
 
 @api.put("/owner/<string:owner_uuid>/update/")
@@ -231,16 +238,18 @@ def get_houseowner_houses(owner_uuid):
             "api.get_houseowner_houses", uuid=owner_uuid, page=page + 1, _external=True
         )
 
-    return make_response(jsonify(
-        {
-            "houses": [house.to_json() for house in houses],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
-    ))
+    return make_response(
+        jsonify(
+            {
+                "houses": [house.to_json() for house in houses],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
+    )
 
 
 @api.get("/owner/<string:owner_uuid>/tenants/")
@@ -266,13 +275,15 @@ def get_houseowner_tenants(owner_uuid):
             "api.get_houseowner_tenants", uuid=owner_uuid, page=page + 1, _external=True
         )
 
-    return make_response(jsonify(
-        {
-            "tenants": [tenant.to_json() for tenant in tenants],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
-    ))
+    return make_response(
+        jsonify(
+            {
+                "tenants": [tenant.to_json() for tenant in tenants],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
+    )

@@ -1,7 +1,7 @@
 from flask import jsonify
+from flask import make_response
 from flask import request
 from flask import url_for
-from flask import make_response
 from flask_login import current_user
 from flask_login import login_required
 from src import db
@@ -51,17 +51,19 @@ def get_all_tenants():
             "api.get_all_tenants", page=page - 1, q=search_term, _external=True
         )
 
-    return make_response(jsonify(
-        {
-            "tenants": [tenant.to_json() for tenant in tenants],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-            "user": current_user.to_json(),
-        }
-    ))
+    return make_response(
+        jsonify(
+            {
+                "tenants": [tenant.to_json() for tenant in tenants],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+                "user": current_user.to_json(),
+            }
+        )
+    )
 
 
 @api.delete("/tenant/<string:tenant_uuid>/delete/")
@@ -72,18 +74,22 @@ def delete_tenant(tenant_uuid):
     if tenant is not None:
         tenant.house_tenant.house_disable()
         tenant.remove()
-        return make_response(jsonify(
+        return make_response(
+            jsonify(
+                {
+                    "success": True,
+                    "message": f"Locataire #{tenant.vn_tenant_id} a été supprimé avec succès !",
+                }
+            )
+        )
+    return make_response(
+        jsonify(
             {
-                "success": True,
-                "message": f"Locataire #{tenant.vn_tenant_id} a été supprimé avec succès !",
+                "success": False,
+                "message": "Oups ! L'élément n'a pas été trouvé.",
             }
-        ))
-    return make_response(jsonify(
-        {
-            "success": False,
-            "message": "Oups ! L'élément n'a pas été trouvé.",
-        }
-    ))
+        )
+    )
 
 
 @api.put("/tenant/<string:tenant_uuid>/update/")

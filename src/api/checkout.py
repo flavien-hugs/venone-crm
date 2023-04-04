@@ -1,6 +1,7 @@
 from flask import jsonify
+from flask import make_response
 from flask import request
-from flask import url_for, make_response
+from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src.payment import VNPayment
@@ -27,14 +28,16 @@ def get_all_payments():
     if pagination.has_next:
         next = url_for("api.get_all_payments", page=page + 1, _external=True)
 
-    return make_response(jsonify(
-        {
-            "payments": [payment.to_json() for payment in payments],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-            "user": current_user.to_json(),
-        }
-    ))
+    return make_response(
+        jsonify(
+            {
+                "payments": [payment.to_json() for payment in payments],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+                "user": current_user.to_json(),
+            }
+        )
+    )

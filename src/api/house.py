@@ -2,8 +2,9 @@ from datetime import datetime
 from datetime import timedelta
 
 from flask import jsonify
+from flask import make_response
 from flask import request
-from flask import url_for, make_response
+from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src import db
@@ -32,56 +33,54 @@ def get_all_houses():
     if pagination.has_next:
         next = url_for("api.get_all_houses", page=page + 1, _external=True)
 
-    return make_response(jsonify(
-        {
-            "houses": [house.to_json() for house in houses],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-            "user": current_user.to_json(),
-        }
-    ))
+    return make_response(
+        jsonify(
+            {
+                "houses": [house.to_json() for house in houses],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+                "user": current_user.to_json(),
+            }
+        )
+    )
 
 
 @api.get("/house/<string:house_uuid>/")
 @login_required
 def get_house(house_uuid):
 
-    try:
-        uuid_obj = UUID(house_uuid, version=4)
-    except ValueError:
-        return make_response(jsonify({"error": "Invalid UUID format"}), 400)
-
-
     house = VNHouse.get_house(house_uuid)
 
     if not house:
         return make_response(jsonify({"error": "House not found"}), 404)
 
-    tenants = house.tenants(page=request.args.get('page', 1, type=int))
-    payments = house.payments(page=request.args.get('page', 1, type=int))
+    tenants = house.tenants(page=request.args.get("page", 1, type=int))
+    payments = house.payments(page=request.args.get("page", 1, type=int))
 
-    return make_response(jsonify(
-        {
-            "house": house.to_json(),
-            "house_tenant": [t.to_json() for t in tenants.items],
-            "house_tenants_pagination": {
-                "page": tenants.page,
-                "per_page": tenants.per_page,
-                "total": tenants.total,
-                "pages": tenants.pages
-            },
-            "house_payment": [p.to_json() for p in payments.items],
-            "house_payments_pagination": {
-                "page": payments.page,
-                "per_page": payments.per_page,
-                "total": payments.total,
-                "pages": payments.pages
+    return make_response(
+        jsonify(
+            {
+                "house": house.to_json(),
+                "house_tenant": [t.to_json() for t in tenants.items],
+                "house_tenants_pagination": {
+                    "page": tenants.page,
+                    "per_page": tenants.per_page,
+                    "total": tenants.total,
+                    "pages": tenants.pages,
+                },
+                "house_payment": [p.to_json() for p in payments.items],
+                "house_payments_pagination": {
+                    "page": payments.page,
+                    "per_page": payments.per_page,
+                    "total": payments.total,
+                    "pages": payments.pages,
+                },
             }
-        }
-    ))
+        )
+    )
 
 
 @api.patch("/house/<string:house_uuid>/house_assign_tenant/")
@@ -123,12 +122,12 @@ def house_assign_tenant(house_uuid):
         else None
     )
 
-    notice_period = timedelta(days=15)
+    notice_period = timedelta(days=10)
 
     if lease_start_date:
         lease_end_date = (
             datetime.strptime(lease_start_date, "%Y-%m-%d")
-            + timedelta(days=45)
+            + timedelta(days=31)
             - notice_period
         ).date()
 
@@ -167,7 +166,9 @@ def house_assign_tenant(house_uuid):
         201,
     )
 
-    return make_response(jsonify({"success": False, "message": "Une erreur s'est lors de l'ajout !"}))
+    return make_response(
+        jsonify({"success": False, "message": "Une erreur s'est lors de l'ajout !"})
+    )
 
 
 @api.put("/house/<string:house_uuid>/update/")
@@ -214,19 +215,23 @@ def delete_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
     if house is not None:
         house.remove()
-        return make_response(jsonify(
-            {
-                "success": True,
-                "message": f"Propriété #{house.vn_house_id} retirée avec succès.",
-            }
-        ))
+        return make_response(
+            jsonify(
+                {
+                    "success": True,
+                    "message": f"Propriété #{house.vn_house_id} retirée avec succès.",
+                }
+            )
+        )
 
-    return make_response(jsonify(
-        {
-            "success": False,
-            "message": "Oups ! L'élément n'a pas été trouvé.",
-        }
-    ))
+    return make_response(
+        jsonify(
+            {
+                "success": False,
+                "message": "Oups ! L'élément n'a pas été trouvé.",
+            }
+        )
+    )
 
 
 @api.get("/house/<string:house_uuid>/payments/")
