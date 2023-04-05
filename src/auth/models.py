@@ -157,17 +157,17 @@ class VNUser(
             "is_owner": self.vn_house_owner,
             "is_admin": self.is_administrator(),
             "is_activated": self.vn_activated,
-            "total_payment_month": self.total_payments_month(),
-            "payment_count": self.payments.filter_by(
-                vn_payee_id=current_user.id
-            ).count(),
-            "house_count": self.houses.filter_by(vn_user_id=current_user.id).count(),
-            "owner_count": self.houseowners.filter_by(
-                vn_user_id=current_user.id
-            ).count(),
-            "tenant_count": self.tenants.filter_by(vn_user_id=current_user.id).count(),
             "last_seen": self.vn_last_seen,
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "payments_list": self.get_payments_list(),
+            "payments_count": self.get_payments_count(),
+            "total_payment_month": self.total_payments_month(),
+            "houses_count": self.get_houses_count(),
+            "houses_list": self.get_houses_list(),
+            "tenants_list": self.get_tenants_list(),
+            "tenants_count": self.get_tenants_count(),
+            "owners_list": self.get_houseowners_list(),
+            "owners_count": self.get_houseowners_count(),
         }
         return json_user
 
@@ -176,6 +176,42 @@ class VNUser(
 
     def verify_password(self, password):
         return check_password_hash(self.vn_password, password)
+
+    def get_payments_list(self):
+        payments_list = self.payments.filter_by(vn_payee_id=current_user.id).all()
+        return [p.to_json() for p in payments_list]
+
+    def get_payments_count(self):
+        payments_count = self.payments.filter_by(
+            vn_payee_id=current_user.id, vn_pay_status=True
+        ).count()
+        return payments_count
+
+    def get_houseowners_list(self):
+        owners_list = self.houseowners.filter_by(vn_user_id=current_user.id).all()
+        return [o.to_json() for o in owners_list]
+
+    def get_houseowners_count(self):
+        houseowners_count = self.houseowners.filter_by(
+            vn_user_id=current_user.id
+        ).count()
+        return houseowners_count
+
+    def get_houses_list(self):
+        houses_list = self.houses.filter_by(vn_user_id=current_user.id).all()
+        return [h.to_json() for h in houses_list]
+
+    def get_houses_count(self):
+        houses_count = self.houses.filter_by(vn_user_id=current_user.id).count()
+        return houses_count
+
+    def get_tenants_list(self):
+        tenants_list = self.tenants.filter_by(vn_user_id=current_user.id).all()
+        return [t.to_json() for t in tenants_list]
+
+    def get_tenants_count(self):
+        tenants_count = self.tenants.filter_by(vn_user_id=current_user.id).count()
+        return tenants_count
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -269,7 +305,7 @@ class VNUser(
             .join(VNUser)
             .filter(
                 VNUser.uuid == current_user.uuid,
-                VNUser.id == self.id,
+                VNPayment.vn_pay_status,
                 db.extract("month", VNPayment.vn_pay_date) == month,
                 db.extract("year", VNPayment.vn_pay_date) == year,
             )
@@ -344,28 +380,20 @@ class VNUser(
 
     @staticmethod
     def count_available_properties():
-        vn_house_is_open = VNHouse.vn_house_is_open
         current_user_id = current_user.id
 
         available_properties = (
             db.session.query(
                 db.func.sum(
-                    db.case(
-                        (
-                            (vn_house_is_open == True) & (VNUser.id == current_user_id),
-                            1,
-                        ),
-                        else_=0,
+                    db.cast(
+                        VNHouse.vn_house_is_open & (VNUser.id == current_user_id),
+                        db.Integer,
                     )
                 ),
                 db.func.sum(
-                    db.case(
-                        (
-                            (vn_house_is_open == False)
-                            & (VNUser.id == current_user_id),
-                            1,
-                        ),
-                        else_=0,
+                    db.cast(
+                        ~VNHouse.vn_house_is_open & (VNUser.id == current_user_id),
+                        db.Integer,
                     )
                 ),
             )

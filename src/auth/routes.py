@@ -10,6 +10,7 @@ from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
 from src import db
+from src import login_manager
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
 from src.auth.forms.auth_form import LoginForm
@@ -22,24 +23,16 @@ from src.mixins.email import send_email
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/")
 
 
-@auth_bp.get("/unactivated/")
-def unconfirmed():
-    if current_user.is_authenticated and not current_user.vn_activated:
-        flash(
-            "L'utilisateur n'existe pas ou le compte à été désactivé ! \
-                Veuillez contacter l'administrateur système.",
-            category="danger",
-        )
-        return redirect(url_for("auth_bp.login"))
-    return render_template("auth/unactivated.html", page_title="Compte indisponible")
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash("Vous devez être connecté pour voir cette page.")
+    return redirect(url_for("auth_bp.login"))
 
 
 @auth_bp.before_app_request
 def before_request():
     if current_user.is_authenticated:
         current_user.ping()
-        if not current_user.vn_activated and request.blueprint != "auth_bp":
-            return redirect(url_for("auth_bp.unconfirmed"))
 
 
 @auth_bp.route("/login/", methods=["GET", "POST"])

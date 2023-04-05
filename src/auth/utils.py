@@ -1,9 +1,13 @@
+import logging
 import os
 import secrets
 
 from flask import current_app
 from flask import request
 from werkzeug.utils import secure_filename
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def allowed_file(filename):
@@ -28,6 +32,6 @@ def upload_avatar(picture):
             )
             if os.path.exists(file_path):
                 os.remove(file_path)
-            print(f"file {file_path} does not exist!")
+            logger.debug(f"file {file_path} does not exist!")
         picture.save(os.path.join(current_app.config["UPLOAD_FOLDER_PATH"], picture_fn))
         return picture_fn
