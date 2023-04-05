@@ -55,15 +55,7 @@ def get_all_users():
 @login_required
 def get_user():
     user = current_user.get_user_logged()
-    return jsonify(
-        {
-            "user": user.to_json(),
-            "user_houseowners": [ow.to_json() for ow in user.houseowners],
-            "user_houses": [h.to_json() for h in user.houses],
-            "user_tenants": [t.to_json() for t in user.tenants],
-            "user_payments": [p.to_json() for p in user.payments],
-        }
-    )
+    return make_response(jsonify({"user": user.to_json()}))
 
 
 @api.get("/user/<string:user_uuid>/owners/")
