@@ -1,19 +1,13 @@
-import os
-import random
-import string
 import logging as lg
+import secrets
 from datetime import datetime
 
 import pyshorteners
 import requests
+from cinetpay_sdk.s_d_k import Cinetpay
 from flask import current_app
-from flask import redirect
-from flask import request
-from flask import url_for
-from src.payment import VNPayment
 from src.tenant import VNHouse
 
-from cinetpay_sdk.s_d_k import Cinetpay
 
 def process_payment(house):
 
@@ -22,7 +16,7 @@ def process_payment(house):
     APIKEY = app.config["CINETPAY_API_KEY"]
 
     client = Cinetpay(APIKEY, SITEID)
-    transaction_id = "".join(random.choices(string.digits, k=8))
+    transaction_id = secrets.randbelow(10**8)
 
     house_id = house.vn_house_id
     amount = house.vn_house_rent
@@ -41,14 +35,14 @@ def process_payment(house):
     }
     try:
         response = client.PaymentInitialization(data)
-        payment_url = response["data"]["payment_url"]
-        lg.warning(payment_url)
+        lg.info(f"Response data : {response}")
         if response["code"] == "201":
-            VNHouse.record_payment(house, transaction_id)
-        return payment_url
+            VNHouse.process_payment_data(house, transaction_id)
+        return response["data"]["payment_url"]
     except Exception as e:
         lg.warning(f"Error processing payment for house {house.vn_house_id}: {e}")
         return None
+
 
 def send_sms_reminder(house, tenant):
 
@@ -74,8 +68,9 @@ def send_sms_reminder(house, tenant):
     du mois de {house_lease_end} est prête.\
     Veuillez cliquer sur ce lien: {short_url} pour procéder au paiement. Merci, Venone."
 
-    reqUrl = f"{SMS_BASE_URL}?sendsms&apikey={SMS_API_KEY}\
-    &apitoken={SMS_API_TOKEN}&type=sms&from={SMS_SENDER_ID}&to={phone_number}&text={message}"
+    if current_date == house_lease_end and not house.is_rent_paid(tenant_id=tenant.id):
+        reqUrl = f"{SMS_BASE_URL}?sendsms&apikey={SMS_API_KEY}&apitoken={SMS_API_TOKEN}\
+        &type=sms&from={SMS_SENDER_ID}&to={phone_number}&text={message}"
 
-    if current_date == house_lease_end and not VNHouse.is_rent_paid(house):
         requests.request("POST", reqUrl)
+        lg.info(f"SMS reminder sent to {phone_number} for house {house.vn_house_id}")
