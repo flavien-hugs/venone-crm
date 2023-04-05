@@ -20,7 +20,7 @@ initdb: ## Init and create database
 	$(MANAGE) flask db init && $(MANAGE) flask init_db
 
 celery: ## start celery
-	celery -A runserver worker
+	celery -A runserver worker -E
 
 migrate: ## Generate an migration
 	$(MANAGE) flask db migrate -m 'Intial Migration'
