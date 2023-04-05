@@ -1,7 +1,7 @@
 """
 Global Flask Application Setting
 See `.flaskenv` for default settings.
- """
+"""
 import os
 from typing import Generator
 
@@ -42,13 +42,13 @@ class Config:
 
     SERVER_NAME = "127.0.0.1:5000"
     PREFERRED_URL_SCHEME = "http"
+    SESSION_COOKIE_SECURE = True
 
     SECRET_KEY = os.getenv("SECRET_KEY", os.urandom(24))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_ECHO = False
 
-    # mail settings
     MAIL_TIMEOUT = 30
     MAIL_SUBJECT_PREFIX = "[Venone]"
     MAIL_PORT = os.getenv("MAIL_PORT")
@@ -69,8 +69,6 @@ class Config:
     MINIFY_HTML = True
 
     WEBSITE_BUILDER = "gestion.venone.app"
-
-    SESSION_COOKIE_SECURE = True
     WTF_CSRF_ENABLED = False
 
     CINETPAY_SITE_ID = os.getenv("CINETPAY_SITEID")
@@ -80,6 +78,20 @@ class Config:
     SMS_BASE_URL = os.getenv("SMS_BASEURL")
     SMS_SENDER_ID = os.getenv("SMS_SENDERID")
     SMS_API_TOKEN = os.getenv("SMS_APITOKEN")
+
+    ALLOWED_COUNTRIES = [
+        "SN",
+        "TG",
+        "BF",
+        "CM",
+        "CG",
+        "GN",
+        "CD",
+        "NE",
+        "BJ",
+        "ML",
+        "KM",
+    ]
 
     @staticmethod
     def init_app(venone_app):
