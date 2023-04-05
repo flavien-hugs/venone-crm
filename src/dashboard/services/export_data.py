@@ -74,3 +74,26 @@ def generate_house_csv(data, headers):
         )
 
     return output.getvalue()
+
+
+def generate_payments_csv(data, headers):
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow(headers)
+
+    for row in data:
+        cinetpay_data = row.vn_cinetpay_data.get("data", {})
+        writer.writerow(
+            [
+                row.vn_transaction_id,
+                cinetpay_data.get("operator_id", ""),
+                row.tenant_payment.vn_fullname,
+                row.vn_pay_amount,
+                cinetpay_data.get("payment_method", ""),
+                cinetpay_data.get("payment_date", ""),
+            ]
+        )
+
+    return output.getvalue()

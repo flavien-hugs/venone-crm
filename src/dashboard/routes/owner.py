@@ -1,3 +1,5 @@
+import os
+
 from flask import Blueprint
 from flask import current_app
 from flask import flash
@@ -14,7 +16,7 @@ from src.auth.forms.auth_form import ChangePasswordForm
 from src.dashboard.forms import OwnerSettingForm
 from src.mixins.decorators import owner_required
 from src.tenant import tasks
-from src.tenant import VNHouse
+
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(owner_bp)
@@ -24,8 +26,8 @@ csrf.exempt(owner_bp)
 @login_required
 def dashboard(uuid):
     page_title = "Tableau de board"
-    VNHouse.update_expired_lease_end_dates()
     tasks.payment_reminders.delay()
+    tasks.update_expired_lease_end_dates()
     return render_template(
         "dashboard/dashboard.html", page_title=page_title, current_user=current_user
     )
@@ -106,3 +108,11 @@ def change_password(uuid):
 @cache.cached(timeout=100)
 def avatar(filename):
     return send_from_directory(current_app.config["UPLOAD_FOLDER_PATH"], filename)
+
+
+@owner_bp.route("/favicon.png")
+@cache.cached(timeout=100)
+def favicon():
+    return send_from_directory(
+        os.path.join(current_app.root_path, "static"), "img/logo/favicon.png"
+    )

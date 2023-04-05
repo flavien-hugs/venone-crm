@@ -15,10 +15,9 @@ from flask_login import logout_user
 from src import csrf
 from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
-from src.dashboard.services.export_data import generate_house_csv
-from src.dashboard.services.export_data import generate_owner_csv
-from src.dashboard.services.export_data import generate_tenant_csv
+from src.dashboard.services import export_data
 from src.mixins.decorators import agency_required
+from src.payment import VNPayment
 from src.tenant import VNHouse
 from src.tenant import VNHouseOwner
 from src.tenant import VNTenant
@@ -123,8 +122,7 @@ def delete_account(uuid):
         flash("Votre compte a été supprimé avec succès !", category="success")
         return redirect(url_for("auth_bp.login"))
     except Exception as e:
-        print(f"Une erreur s'est produite: {e}")
-        abort(500)
+        abort(500, f"Une erreur s'est produite: {e}")
 
 
 @agency_bp.get("/export-tenants-data/")
@@ -145,7 +143,9 @@ def export_tenants_csv():
     data = VNTenant.get_tenants_list()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
-    response = Response(generate_tenant_csv(data, headers), mimetype="text/csv")
+    response = Response(
+        export_data.generate_tenant_csv(data, headers), mimetype="text/csv"
+    )
 
     response.headers.set(
         "Content-Disposition",
@@ -173,7 +173,9 @@ def export_owners_csv():
     owners = VNHouseOwner.get_owners_list()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
-    response = Response(generate_owner_csv(owners, headers), mimetype="text/csv")
+    response = Response(
+        export_data.generate_owner_csv(owners, headers), mimetype="text/csv"
+    )
 
     response.headers.set(
         "Content-Disposition",
@@ -203,11 +205,41 @@ def export_houses_csv():
     owners = VNHouse.get_houses_list()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
-    response = Response(generate_house_csv(owners, headers), mimetype="text/csv")
+    response = Response(
+        export_data.generate_house_csv(owners, headers), mimetype="text/csv"
+    )
 
     response.headers.set(
         "Content-Disposition",
         "attachment",
         filename="houses_data_{}.csv".format(current_date),
+    )
+    return response
+
+
+@agency_bp.get("/export-payments-data/")
+@login_required
+def export_payments_csv():
+
+    headers = [
+        "ID Transaction",
+        "ID Opérateur",
+        "Nom & prénom du locataire",
+        "Loyer (montant)",
+        "Méthode de paiement",
+        "Date de paiement",
+    ]
+
+    payments = VNPayment.get_payment_list()
+
+    current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
+    response = Response(
+        export_data.generate_payments_csv(payments, headers), mimetype="text/csv"
+    )
+
+    response.headers.set(
+        "Content-Disposition",
+        "attachment",
+        filename="payments_data_{}.csv".format(current_date),
     )
     return response
