@@ -9,7 +9,7 @@
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-if="user.payment_count == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
+        <div v-if="user.payments_count == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
 
                 <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}">
@@ -29,9 +29,15 @@
             </div>
         </div>
 
-        <div v-else-if="user.payment_count > 0" class="card card-header-actions mx-auto">
+        <div v-else-if="user.payments_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
-                <span class="fw-700">Vos loyers</span>
+                <span class="fw-700">{{ page_title }}</span>
+                <div>
+                    <button @click.prevent="downloadPaymentCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
+                        <i class="me-2" data-feather="download"></i>
+                        télécharger le csv
+                    </button>
+                </div>
             </div>
 
             <div class="card-body">
@@ -50,25 +56,25 @@
                         <thead class="small">
                             <tr>
                                 <th scope="col">ID Transaction</th>
-                                <th scope="col">Loyer</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
+                                <th scope="col">ID Opérateur</th>
+                                <th scope="col">Nom &amp; prénom du locataire</th>
+                                <th scope="col">Loyer (Montant)</th>
+                                <th scope="col">Méthode de paiement</th>
+                                <th scope="col">Date de paiement</th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <template v-for="p in payments" v-bind:key="p.payment_uuid">
-                                <tr>
+                                <tr v-if="p.payment_status">
                                     <td><span class="badge bg-red-soft text-red">{ p.trans_id }</span></td>
+                                    <td><span class="badge bg-blue-soft text-blue">{ p.trans_info.data.operator_id }</span></td>
+                                    <td>{ p.house.tenant_id }</td>
                                     <td>
-                                        <span class="badge bg-blue-soft text-blue ms-2">{ p.house.house_id }</span>
-                                        { p.house.house_type } &smid; { p.house.house_rent } { p.house.devise }
+                                        <span class="badge bg-blue-soft text-blue ms-2">{ p.house.house_id }</span>{ p.house.house_type } - { p.house_rent} { p.house.devise }
                                     </td>
-                                    <td>{ p.payment_date }</td>
-                                    <td>
-                                        <span :class="{'bg-red-soft': !p.payment_status, 'bg-red': p.payment_status}"
-                                        class="badge text-white text-uppercase">{ p.get_payment }</span>
-                                    </td>
+                                    <td>{ p.trans_info.data.payment_method }</td>
+                                    <td>{ p.trans_info.data.payment_date }</td>
                                     <td>
                                         <button v-if="p.payment_status" title="Télécharger la facture du paiement" type="button" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
                                             <i class="text-secondary fa fa-eye"></i>

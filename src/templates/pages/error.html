@@ -1,16 +1,15 @@
 {% extends "dashboard/_base.html" %}
 
 {% block head_title %}
-{{ page_title | title() }}
+    {{ page_title | title() }}
 {% endblock head_title %}
 
 {% block body_content %}
-<div id="layoutError" class="bg-white">
-    <div id="layoutError_content">
-        <main>
+    <div id="layoutError" class="bg-white">
+        <div id="layoutError_content">
             <div class="container-xl px-4">
-                <div class="row d-flex align-items-center justify-content-center">
-                    <div class="col-lg-6">
+                <div class="row d-md-flex align-items-md-center justify-content-md-center min-vh-100">
+                    <div class="col-lg-5">
                         <div class="text-center mt-4">
                             <img loading="lazy" class="img-fluid p-4" src="{{ image_path }}" alt="{{ error.description }}">
                             <p class="lead">{{ error.description | capitalize() }}</p>
@@ -25,20 +24,6 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-
-    <div id="layoutError_footer">
-        <footer class="footer-admin mt-auto footer-light">
-            <div class="container-xl px-4">
-                <div class="row">
-                    <div class="col-md-6 small">&copy; {{ moment().format('YYYY') }} Venone, filiale CGIC GROUP</div>
-                    <div class="col-md-6 text-md-end small">
-                        <a href="#!">Politique de confidentialité</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
-</div>
 {% endblock body_content %}

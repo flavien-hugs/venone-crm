@@ -6,7 +6,7 @@
     <message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
     </message-component>
 
-    <div v-if="user.house_count == 0" class="card card-body shadow-none bg-transparent border-0">
+    <div v-if="user.houses_count == 0" class="card card-body shadow-none bg-transparent border-0">
         <div class="text-center py-2">
             <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
 
@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div v-else-if="user.house_count > 0" class="card card-header-actions">
+    <div v-else-if="user.houses_count > 0" class="card card-header-actions">
         <div v-if="isLoading" class="preloader">
             <div class="preloader-body">
                 <p>Chargement en cours...</p>
@@ -27,7 +27,7 @@
         </div>
 
         <div class="card-header">
-            <span class="fw-700">{ user.house_count } propriétés</span>
+            <span class="fw-700">{ user.houses_count } propriétés</span>
             <div>
                 <button @click.prevent="downloadHouseCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
                     <i class="me-2" data-feather="download"></i>

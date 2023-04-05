@@ -1,7 +1,6 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-
     <section id="houseOwnerTable">
 
         <!-- Alert message -->
@@ -10,7 +9,7 @@
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-if="owners.length == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div v-if="user.owners_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
 
                 <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/avatar.png")}}" alt="">
@@ -30,7 +29,7 @@
             </div>
         </div>
 
-        <div v-else-if="owners.length > 0" class="card card-header-actions">
+        <div v-else-if="user.owners_count > 0" class="card card-header-actions">
 
             <div class="card-header">
                 <span class="fw-700">{{ current_user.houseowners.count() }} bailleurs</span>
