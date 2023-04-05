@@ -48,6 +48,8 @@ window.addEventListener('DOMContentLoaded', event => {
 
         data() {
             return {
+                user: [],
+
                 owners: [],
                 owner: [],
                 perPage: 20,
@@ -103,6 +105,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
                     if (response.ok) {
                         const data = await response.json();
+                        this.user = data.user;
                         this.owners = data.houseowners;
                         this.totalPages = Math.ceil(data.total / this.perPage);
                         this.isLoading = false;

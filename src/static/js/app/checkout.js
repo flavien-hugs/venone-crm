@@ -35,6 +35,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         methods: {
+
+            downloadPaymentCSV() {
+                window.location.href = `/dashboard/export-payments-data`;
+            },
+
             async getPayments() {
                 try {
                     this.isLoading = true;
@@ -51,7 +56,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         this.isLoading = false;
                         const data = await response.json();
                         this.payments = data.payments;
-                        console.log(data);
                         this.user = data.user;
                         this.totalPages = Math.ceil(data.total / this.perPage);
                         this.currentPage = data.page;
@@ -60,7 +64,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         throw new Error("NETWORK RESPONSE ERROR");
                     }
                 } catch (error) {
-                    console.error("FETCH ERROR:", error);
                     this.showMessageAlert = true;
                     this.messageAlert =
                         "Oops, problème de connexion au serveur.";

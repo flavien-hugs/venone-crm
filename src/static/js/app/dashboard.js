@@ -55,7 +55,7 @@ var app = Vue.createApp({
                     this.user = data.user;
                 } else {
                     this.isLoading = false;
-                    console.log(error);
+                    throw new Error("NETWORK RESPONSE ERROR");
                 }
             } catch (error) {
                 console.log("FETCH ERROR:", error);
