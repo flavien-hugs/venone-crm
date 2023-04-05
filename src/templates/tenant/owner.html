@@ -32,7 +32,7 @@
         <div v-else-if="user.owners_count > 0" class="card card-header-actions">
 
             <div class="card-header">
-                <span class="fw-700">{{ current_user.houseowners.count() }} bailleurs</span>
+                <span class="fw-700">{ user.owners_count } bailleurs</span>
 
                 <div>
                     <button @click.prevent="downloadOwnerCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">

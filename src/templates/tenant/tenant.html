@@ -41,7 +41,7 @@
 
         <div v-else-if="user.tenants_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
-                <span class="fw-700">{ user.tenant_count } locataires</span>
+                <span class="fw-700">{ user.tenants_count } locataires</span>
                 <div>
                     <button v-if="user.is_company" @click.prevent="createCompanyTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
                         <i class="me-2" data-feather="user-plus"></i>
