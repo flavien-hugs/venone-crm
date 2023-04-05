@@ -141,10 +141,9 @@ Pipfile.lock
 */migrations/*.py
 alchemydumps-backup/
 alchemydumps-backup/*.gz
-upload/*
 migrations
 alchemydumps/
 /src/fixtures/
-
+upload
 alembic
 *.ini
