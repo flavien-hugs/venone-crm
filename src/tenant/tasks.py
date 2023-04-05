@@ -19,7 +19,7 @@ def payment_reminders():
 
     for house in houses:
         reminder_date = house.vn_house_lease_end_date - timedelta(days=7)
-        if current_date <= reminder_date:
+        if current_date == reminder_date:
             for tenant in house.tenants:
                 send_sms_reminder(house, tenant)
                 # send_email_reminder(tenant, house)

@@ -5,7 +5,6 @@ from logging.handlers import RotatingFileHandler
 from celery import Celery
 from celery import Task
 from config import config
-from flask import current_app
 from flask import Flask
 from flask import redirect
 from flask import render_template
@@ -20,7 +19,6 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFError
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
 
@@ -93,24 +91,9 @@ def create_venone_app(config_name):
 
         venone_app.register_blueprint(api)
 
-        @venone_app.errorhandler(CSRFError)
-        def handle_csrf_error(e):
-            page_title = e.name
-            image_path = url_for("static", filename="img/error/400.svg")
-            return (
-                render_template(
-                    "pages/error.html",
-                    page_title=page_title,
-                    image_path=image_path,
-                    error=e,
-                ),
-                400,
-            )
-
         @venone_app.errorhandler(400)
         def key_error(e):
             page_title = e.name
-            current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/404.svg")
             return (
                 render_template(
@@ -125,7 +108,6 @@ def create_venone_app(config_name):
         @venone_app.errorhandler(403)
         def forbidden(e):
             page_title = f"erreur {e}"
-            current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/403.svg")
             return (
                 render_template(
@@ -140,7 +122,6 @@ def create_venone_app(config_name):
         @venone_app.errorhandler(404)
         def page_not_found(e):
             page_title = e.name
-            current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/404.svg")
             return (
                 render_template(
@@ -155,7 +136,6 @@ def create_venone_app(config_name):
         @venone_app.errorhandler(500)
         def internal_server_error(e):
             page_title = e.name
-            current_app.logger.warning(page_title, exc_info=e)
             image_path = url_for("static", filename="img/error/500.svg")
             return (
                 render_template(
@@ -176,14 +156,6 @@ def create_venone_app(config_name):
         @venone_app.route("/")
         def entrypoint():
             return redirect(url_for("auth_bp.login"))
-
-        @venone_app.before_request
-        def log_entry():
-            venone_app.logger.debug("Demande de traitement")
-
-        @venone_app.teardown_request
-        def log_exit(exc):
-            venone_app.logger.debug("Traitement de la demande terminé", exc_info=exc)
 
         if not venone_app.debug:
             if not os.path.exists("logs"):
@@ -209,8 +181,7 @@ def celery_init_app(app):
 
     celery_app = Celery(
         app.import_name,
-        backend=os.getenv("CELERY_BROKER_URL"),
-        broker=os.getenv("CELERY_BROKER_URL"),
+        backend=os.getenv("CELERY_BROKER_URL")
     )
     celery_app.conf.update(app.config)
 
