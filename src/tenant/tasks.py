@@ -1,13 +1,12 @@
 from datetime import datetime
 from datetime import timedelta
 
-from celery import shared_task
-from flask import current_app
 from src import db
-from src.tenant import VNHouse
 from src.celery import celery_app
-
 from src.main.utils import send_sms_reminder
+from src.tenant import VNHouse
+
+from celery import shared_task
 
 
 @shared_task
