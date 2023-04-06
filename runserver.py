@@ -9,7 +9,6 @@ from src.payment.models import VNPayment
 from src.tenant.models import VNHouse
 from src.tenant.models import VNHouseOwner
 from src.tenant.models import VNTenant
-
 from src.venone import venone_app
 
 migrate = Migrate(venone_app, db, render_as_batch=True)

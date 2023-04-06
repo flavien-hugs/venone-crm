@@ -2,8 +2,6 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from celery import Celery
-from celery import Task
 from config import config
 from flask import Flask
 from flask import redirect
@@ -22,6 +20,9 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
+
+from celery import Celery
+from celery import Task
 
 metadata = MetaData(
     naming_convention={
