@@ -30,7 +30,7 @@ def admin_required(func):
 def owner_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if current_user.vn_house_owner and current_user.vn_activated:
+        if current_user.vn_company and current_user.vn_activated:
             abort(403)
         return func(*args, **kwargs)
 
@@ -40,7 +40,7 @@ def owner_required(func):
 def agency_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if current_user.vn_company and current_user.vn_activated:
+        if current_user.vn_house_owner and current_user.vn_activated:
             abort(403)
         return func(*args, **kwargs)
 
