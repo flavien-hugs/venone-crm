@@ -43,7 +43,8 @@ def login():
 
     form = LoginForm(request.form)
     if request.method == "POST" and form.validate_on_submit():
-        user = VNUser.query.filter_by(vn_addr_email=form.addr_email.data).first()
+        addr_email = form.addr_email.data
+        user = VNUser.query.filter_by(vn_addr_email=addr_email.lower()).first()
         if user and user.verify_password(form.password.data) and user.vn_activated:
             login_user(user, form.remember_me.data)
             next_page = request.args.get("next")
