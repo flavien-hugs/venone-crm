@@ -8,6 +8,7 @@ from flask_login import current_user
 from flask_login import UserMixin
 from src import db
 from src import login_manager
+from src.constants import COUNTRY_DEFAULT
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
 from src.tenant.models import VNHouse
@@ -87,11 +88,10 @@ class VNUser(
 
     __tablename__ = "user"
 
-    vn_country = db.Column(db.String(80), nullable=False)
+    vn_country = db.Column(db.String(80), default=COUNTRY_DEFAULT, nullable=False)
     vn_avatar = db.Column(
         db.String(80), nullable=True, default="/static/img/element/avatar.png"
     )
-    vn_activated = db.Column(db.Boolean, nullable=False, default=False)
     vn_password = db.Column(db.String(180), nullable=False)
     vn_birthdate = db.Column(db.Date, nullable=True)
     vn_last_seen = db.Column(db.DateTime, onupdate=datetime.utcnow())
@@ -402,6 +402,34 @@ class VNUser(
         )
 
         return available_properties
+
+    @staticmethod
+    def create_admin():
+
+        """
+        Create the admin user.
+        """
+        import logging
+
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+
+        addr_email = current_app.config["ADMIN_EMAIL"]
+        fullname = current_app.config["ADMIN_USERNAME"]
+        password = current_app.config["ADMIN_PASSWORD"]
+        phonenumber_one = current_app.config["ADMIN_PHONE_NUMBER"]
+
+        try:
+            user = VNUser(vn_addr_email=addr_email)
+            user.vn_fullname = fullname
+            user.vn_password = generate_password_hash(password)
+            user.vn_phonenumber_one = phonenumber_one
+            user.vn_role_id = Permission.ADMIN
+            db.session.add(user)
+            db.session.commit()
+            logger.info(f"Admin with email {addr_email} created successfully!")
+        except Exception as e:
+            logger.warning(f"Couldn't create admin user, because {e}")
 
 
 class AnonymousUser(AnonymousUserMixin):
