@@ -1,11 +1,7 @@
 import logging as lg
-import os
 
-from dotenv import load_dotenv
 from flask_migrate import Migrate
 from flask_migrate import upgrade
-from src import celery_init_app
-from src import create_venone_app
 from src import db
 from src.auth.models import VNRole
 from src.auth.models import VNUser
@@ -14,13 +10,7 @@ from src.tenant.models import VNHouse
 from src.tenant.models import VNHouseOwner
 from src.tenant.models import VNTenant
 
-
-dotenv_path = os.path.join(os.path.dirname(__file__), ".flaskenv")
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
-
-venone_app = create_venone_app(os.getenv("FLASK_CONFIG") or "dev")
-celery_app = celery_init_app(venone_app)
+from src.venone import venone_app
 
 migrate = Migrate(venone_app, db, render_as_batch=True)
 
