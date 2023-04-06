@@ -16,55 +16,103 @@
         </div>
     </div>
 
-    <div v-else-if="user.houses_count > 0" class="card card-header-actions">
-        <div v-if="isLoading" class="preloader">
-            <div class="preloader-body">
-                <p>Chargement en cours...</p>
-                <div class="cssload-container">
-                    <div class="cssload-speeding-wheel"></div>
+    <div v-if="isLoading" class="preloader">
+        <div class="preloader-body">
+            <p>Chargement en cours...</p>
+            <div class="cssload-container">
+                <div class="cssload-speeding-wheel"></div>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="user.houses_count > 0" class="row">
+        <div :class="{ 'col-xl-4': user.is_admin }" class="col-md-4 mb-4">
+            <div class="card border-start-lg border-start-secondary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-secondary mb-2 text-uppercase">total propriétés disponibles</div>
+                            <div class="h1">{ user.houses_open_count }</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-home fa-2x text-gray-200"></i></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="card-header">
-            <span class="fw-700">{ user.houses_count } propriétés</span>
-            <div>
-                <button @click.prevent="downloadHouseCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
-                    <i class="me-2" data-feather="download"></i>
-                    télécharger le csv
-                </button>
+        <div :class="{ 'col-xl-4': user.is_admin }" class="col-md-4 mb-4">
+            <div class="card border-start-lg border-start-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-primary mb-2 text-uppercase">total propriétés indisponibles</div>
+                            <div class="h1">{ user.houses_close_count }</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-home fa-2x text-gray-200"></i></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="card-body">
-            <div class="input-group input-group-joined input-group-solid shadow-none">
-                <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
-                <input type="text" placeholder="Rechercher une proprété ..." class="form-control shadow-none ps-0" aria-label="Rechercher">
+        <div :class="{ 'col-xl-4': user.is_admin }" class="col-md-4 mb-4">
+            <div class="card border-start-lg border-start-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-success text-uppercase mb-2">total locataires</div>
+                            <div class="h1">{ user.tenants_count }</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="small">
-                        <tr>
-                            <th scope="col">ID Propriété</th>
-                            <th v-if="user.is_company" scope="col">ID Propriétaire</th>
-                            <th scope="col">Locataire</th>
-                            <th scope="col">Propriété &amp; Localisation</th>
-                            <th scope="col">Loyer/mois</th>
-                            <th scope="col">Ajouté le</th>
-                            <th scope="col">Status location</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+    <div v-if="user.houses_count > 0" class="row">
+        <div class="col-12">
+            <div class="card card-header-actions">
+                <div class="card-header">
+                    <span class="fw-700">Vos propriétés</span>
+                    <div>
+                        <button @click.prevent="downloadHouseCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
+                            <i class="me-2" data-feather="download"></i>
+                            télécharger le csv
+                        </button>
+                    </div>
+                </div>
 
-                    <tbody>
-                        {% include "tenant/paths/_house.html" %}
-                    </tbody>
-                </table>
+                <div class="card-body">
+                    <div class="input-group input-group-joined input-group-solid shadow-none">
+                        <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                        <input type="text" placeholder="Rechercher une proprété ..." class="form-control shadow-none ps-0" aria-label="Rechercher">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="small">
+                                <tr>
+                                    <th scope="col">ID Propriété</th>
+                                    <th v-if="user.is_company" scope="col">ID Propriétaire</th>
+                                    <th scope="col">Locataire</th>
+                                    <th scope="col">Propriété &amp; Localisation</th>
+                                    <th scope="col">Loyer/mois</th>
+                                    <th scope="col">Ajouté le</th>
+                                    <th scope="col">Status location</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% include "tenant/paths/_house.html" %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <paginate-component :current-page="currentPage" :total-pages="totalPages" :next-page="nextPage" :prev-page="prevPage"></paginate-component>
+
+                </div>
             </div>
-
-            <paginate-component :current-page="currentPage" :total-pages="totalPages" :next-page="nextPage" :prev-page="prevPage"></paginate-component>
-
         </div>
     </div>
 </section>
