@@ -12,11 +12,12 @@ from flask import url_for
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
 from flask_cors import CORS
+from flask_debugtoolbar import DebugToolbarExtension
 from flask_flatpages import FlatPages
-from flask_htmlmin import HTMLMIN
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_minify import Minify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
@@ -42,7 +43,9 @@ pages = FlatPages()
 csrf = CSRFProtect()
 login_manager = LoginManager()
 cache = Cache(config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
-htmlmin = HTMLMIN(remove_comments=True, remove_empty_space=True)
+
+minify = Minify(html=True, js=True, cssless=True, bypass=["owner_bp.*", "agency_bp.*"])
+toolbar = DebugToolbarExtension()
 
 login_manager.login_view = "auth_bp.login"
 login_manager.session_protection = "strong"
@@ -66,11 +69,13 @@ def create_venone_app(config_name):
     bcrypt.init_app(venone_app)
     moment.init_app(venone_app)
     pages.init_app(venone_app)
-    htmlmin.init_app(venone_app)
     csrf.init_app(venone_app)
 
     cache.init_app(venone_app)
     login_manager.init_app(venone_app)
+
+    minify.init_app(venone_app)
+    toolbar.init_app(venone_app)
 
     db.init_app(venone_app)
     migrate.init_app(venone_app, db)
@@ -178,11 +183,7 @@ def create_venone_app(config_name):
 
 
 def celery_init_app(app):
-
-    celery_app = Celery(
-        app.import_name,
-        backend=os.getenv("CELERY_BROKER_URL")
-    )
+    celery_app = Celery(app.name, backend=os.getenv("CELERY_BROKER_URL"))
     celery_app.conf.update(app.config)
 
     class ContextTask(Task):
