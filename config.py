@@ -79,6 +79,11 @@ class Config:
     SMS_SENDER_ID = os.getenv("SMS_SENDERID")
     SMS_API_TOKEN = os.getenv("SMS_APITOKEN")
 
+    ADMIN_PHONE_NUMBER = os.getenv("ADMIN_PHONE_NUMBER")
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+    ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+    ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+
     ALLOWED_COUNTRIES = [
         "SN",
         "TG",
@@ -101,6 +106,8 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
+
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
 
