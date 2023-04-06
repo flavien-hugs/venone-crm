@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 
+from flask import abort
 from flask import jsonify
 from flask import make_response
 from flask import request
@@ -43,6 +44,92 @@ def get_all_houses():
                 "per_page": per_page,
                 "total": pagination.total,
                 "user": current_user.to_json(),
+            }
+        )
+    )
+
+
+def house_to_json(house):
+    return {
+        "house_id": house.vn_house_id,
+        "house_type": house.vn_house_type,
+        "house_month": house.vn_house_month,
+        "house_guaranty": house.vn_house_guaranty,
+        "house_rent": house.vn_house_rent,
+        "house_devise": house.user_houses.vn_device,
+        "house_number_room": house.vn_house_number_room,
+        "house_address": house.vn_house_address,
+        "house_country": house.user_houses.vn_country,
+        "created_at": house.vn_created_at.isoformat(),
+    }
+
+
+@api.get("/available-houses/")
+def get_houses_listing():
+
+    """
+    Récupère une liste paginée des maisons disponibles.
+
+    Args:
+        page (int, optional): Le numéro de page à récupérer. Par défaut, 1.
+        per_page (int, optional): Le nombre d'éléments par page. Par défaut, 10.
+
+    Returns:
+        dict: Un objet JSON contenant la liste des maisons disponibles.
+
+    Raises:
+        Aucune erreur n'est levée.
+
+    Exemple:
+        Pour récupérer la deuxième page contenant 20 éléments :
+        /api/available-houses/?page=2&per_page=20
+    """
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+
+    houses = VNHouse.query.filter_by(vn_house_is_open=False).order_by(
+        VNHouse.vn_created_at.desc()
+    )
+    pagination = houses.paginate(page=page, per_page=per_page)
+
+    return make_response(
+        jsonify(
+            {
+                "houses": [house_to_json(house) for house in pagination.items],
+            }
+        )
+    )
+
+
+@api.get("/available-house/<int:house_id>/")
+def get_house_info(house_id):
+
+    """
+    Récupère les informations d'une maison disponible.
+
+    Args:
+        house_id (int): L'identifiant de la maison
+
+    Returns:
+        dict: Un objet JSON contenant les informations sur la maison disponible.
+
+    Exemple:
+        Pour récupérer les informations de la maison avec l'identifiant 123 :
+        /api/available-house/123/
+    """
+
+    house = VNHouse.query.filter_by(
+        vn_house_id=house_id, vn_house_is_open=False
+    ).first()
+
+    if not house:
+        abort(404, "Could not find house.")
+
+    return make_response(
+        jsonify(
+            {
+                "house": house_to_json(house),
             }
         )
     )

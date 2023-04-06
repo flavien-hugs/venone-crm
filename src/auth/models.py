@@ -163,6 +163,8 @@ class VNUser(
             "payments_count": self.get_payments_count(),
             "total_payment_month": self.total_payments_month(),
             "houses_count": self.get_houses_count(),
+            "houses_close_count": self.get_houses_close_count(),
+            "houses_open_count": self.get_houses_open_count(),
             "houses_list": self.get_houses_list(),
             "tenants_list": self.get_tenants_list(),
             "tenants_count": self.get_tenants_count(),
@@ -204,6 +206,14 @@ class VNUser(
     def get_houses_count(self):
         houses_count = self.houses.filter_by(vn_user_id=current_user.id).count()
         return houses_count
+
+    def get_houses_close_count(self):
+        houses_close_count = self.houses.filter_by(vn_house_is_open=True, vn_user_id=current_user.id).count()
+        return houses_close_count
+
+    def get_houses_open_count(self):
+        houses_open_count = self.houses.filter_by(vn_house_is_open=False, vn_user_id=current_user.id).count()
+        return houses_open_count
 
     def get_tenants_list(self):
         tenants_list = self.tenants.filter_by(vn_user_id=current_user.id).all()
