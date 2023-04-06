@@ -14,7 +14,7 @@ flask-flatpages
 flask-bcrypt
 email-validator
 pyjwt
-flask-htmlmin
+flask-minify
 flask-caching
 psycopg2-binary
 pillow
