@@ -1,4 +1,5 @@
 from unittest.mock import patch
+
 from tests.base_case import BaseCase
 
 

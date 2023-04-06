@@ -1,11 +1,9 @@
 import sys
 import unittest
 
-
 from flask import current_app
-
-from src import db
 from src import create_venone_app
+from src import db
 
 sys.path.append("..")
 
