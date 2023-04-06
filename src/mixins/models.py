@@ -1,5 +1,5 @@
-import uuid
 import secrets
+import uuid
 from datetime import datetime
 
 from src import db
@@ -8,6 +8,7 @@ from src.utils import Updateable
 
 def id_generator():
     return secrets.randbelow(100000)
+
 
 class CRUDMixin(object):
 
