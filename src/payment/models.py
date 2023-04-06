@@ -94,7 +94,6 @@ class VNPayment(TimestampMixin):
             logger.warning(
                 f"Error verifying transaction with id {self.vn_transaction_id}: {e}"
             )
-            
 
     def get_status_payment(self) -> bool:
         return "payé" if self.vn_pay_status else "impayé"
