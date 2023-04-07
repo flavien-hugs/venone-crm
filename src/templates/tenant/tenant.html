@@ -9,7 +9,7 @@
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-if="user.tenants_count == 0" class="card card-body card card-body shadow-none bg-transparent border-0">
+        <div v-if="user.tenants_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
 
                 <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}">

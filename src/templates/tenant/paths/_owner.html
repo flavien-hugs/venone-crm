@@ -17,19 +17,23 @@
 		</td>
 		<td>{ own.created_at.toLocaleString() }</td>
 		<td>
-			<button title="Télécharger le contrat de ce propriétaire" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
-				<i class="fa fa-download me-2"></i>
+			<button @click.prevent="getOwner(own.owner_uuid)"  title="Détail information propriétaire" type="button" class="btn btn-datatable btn-icon me-2">
+				<i class="text-secondary fa fa-eye"></i>
             </button>
 
-			<button title="Mettre à jour les informations de ce propriétaire" @click.prevent="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+			<button title="Télécharger le contrat de ce propriétaire" type="button" class="btn btn-datatable btn-icon me-2">
+				<i class="text-green fa fa-download"></i>
+            </button>
+
+			<button title="Mettre à jour les informations de ce propriétaire" @click.prevent="updateOwnerConfirm(own)" class="btn btn-datatable btn-icon me-2">
 				<i class="text-secondary fa fa-edit"></i>
 			</button>
 
-			<button title="Enregistrer un locataire pour ce propriétaire" @click.prevent="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-success me-2">
+			<button title="Enregistrer un locataire pour ce propriétaire" @click.prevent="createOwnerTenantConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon me-2">
 				<i class="text-success fa fa-user-plus"></i>
 			</button>
 
-			<button title="Supprimer ce propriétaire" @click.prevent="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
+			<button title="Supprimer ce propriétaire" @click.prevent="deleteOwnerConfirm(own.owner_uuid)" class="btn btn-datatable btn-icon">
 				<i class="text-danger fa fa-trash"></i>
 			</button>
 		</td>
@@ -68,21 +72,84 @@
 
 <!-- modal owner detail -->
 <div class="modal fade" data-bs-backdrop="static" id="detailModal">
-	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+	<div role="document" class="modal-dialog modal-fullscreen modal-dialog-scrollable">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Bailleur: {owner.owner_id} - { owner.gender } {owner.fullname}</h4>
+				<h4 class="modal-title">Bailleur: {owner.owner_id}</h4>
 				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 			</div>
 
 			<div class="modal-body">
-				<div v-if="owner.number_houses > 0" v-for="house in owner.houses" :key="house.house_uuid">
-                    <span>Propriété: { house.house_id }</span>
-                </div>
+				<div class="row g-2">
+					<div class="col-xl-3">
+						<div class="card mb-4 mb-xl-0 shadow-none">
+							<div class="card-header text-center">Information propriétaire</div>
+							<div class="card-body text-center">
+								<img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename='img/element/avatar.png') }}" alt="{ owner.owner_uuid }">
+								<div class="py-2">
+									<span>{ owner.gender } { owner.fullname } / { owner.phonenumber_one }</span>
+								</div>
+								<div class="mb-4">
+									<span>{ owner.profession } - { owner.location }</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-9">
+						<div class="card shadow-none mb-4">
+							<div class="card-header">Informations sur le compte</div>
+							<div class="card-body px-0">
+								<div class="d-flex align-items-center justify-content-between px-4">
+									<div class="d-flex align-items-center">
+                                        <i class="fa fa-home fa-3x cc-color-visa"></i>
+                                        <div class="ms-4">
+                                            <div class="text-lg fw-700">{ owner.number_houses }</div>
+                                            <small>Nombre de propriétés</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-users fa-3x cc-color-visa"></i>
+                                        <div class="ms-4">
+                                            <div class="text-lg fw-700">{ owner.number_tenants }</div>
+                                            <small>Nombre de locataires</small>
+                                        </div>
+                                    </div>
+									<div class="d-flex align-items-center">
+                                        <i class="fa fa-dollar-sign fa-3x cc-color-visa"></i>
+                                        <div class="ms-4">
+                                            <div class="text-lg fw-700">{ owner.amount } { owner.devise }</div>
+                                            <small>Montant à reverser ce mois</small>
+                                        </div>
+                                    </div>
+								</div>
+							</div>
+						</div>
 
-                <div v-if="owner.number_tenants > 0" v-for="tenant in owner.tenants" :key="tenant.tenant_uuid">
-                    <span>Locataire: { tenant.tenant_id }</span>
-                </div>
+						<div class="card shadow-none mb-4">
+							<div class="card-header">Liste des propriétés de ce bailleur</div>
+							<div class="card-body px-0">
+								<template v-for="house in owner.houses_list" :key="house.house_uuid">
+									<div class="d-flex align-items-center justify-content-between px-4">
+										<div class="d-flex align-items-center">
+											<i :class="{'fa-user': owner.number_tenants > 0, 'fa-home': owner.number_tenants == 0}" class="fa fa-2x text-muted"></i>
+	                                        <div class="ms-4">
+	                                            <div v-if="owner.number_tenants > 0" class="small">{ house.tenant_id }</div>
+	                                            <div class="text-xs text-secondary">
+	                                            	{ house.house_id } &smid; { house.house_type } ({ house.house_address }) &smid; Loyer: { house.house_rent } { house.devise }/ mois
+	                                            </div>
+	                                        </div>
+	                                    </div>
+
+	                                    <div class="ms-4 small">
+	                                        <div :class="{'bg-red': house.house_is_open, 'bg-blue': !house.house_is_open}" class="badge text-white me-3 text-uppercase">{ house.house_status }</div>
+	                                    </div>
+									</div>
+									<hr>
+								</template>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<div class="modal-footer">
