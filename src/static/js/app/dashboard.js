@@ -48,9 +48,8 @@ var app = Vue.createApp({
                     },
                 });
 
-                this.isLoading = false;
-
                 if (response.status == 200) {
+                    this.isLoading = false;
                     const data = await response.json();
                     this.user = data.user;
                 } else {

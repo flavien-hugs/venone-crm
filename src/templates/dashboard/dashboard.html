@@ -20,6 +20,15 @@
 
         <kpi-component :user="user"></kpi-component>
 
+        <div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12 mb-4">
                 <div class="card card-header-actions h-auto">
