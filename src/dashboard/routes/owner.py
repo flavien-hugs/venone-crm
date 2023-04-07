@@ -23,6 +23,7 @@ csrf.exempt(owner_bp)
 
 @owner_bp.route("/<string:uuid>/index/", methods=["GET"])
 @login_required
+@cache.cached(timeout=500)
 def dashboard(uuid):
     page_title = "Tableau de board"
     return render_template(
@@ -102,13 +103,13 @@ def change_password(uuid):
 
 
 @owner_bp.route("/<filename>/")
-@cache.cached(timeout=100)
+@cache.cached(timeout=500)
 def avatar(filename):
     return send_from_directory(current_app.config["UPLOAD_FOLDER_PATH"], filename)
 
 
 @owner_bp.route("/favicon.png")
-@cache.cached(timeout=100)
+@cache.cached(timeout=500)
 def favicon():
     return send_from_directory(
         os.path.join(current_app.root_path, "static"), "img/logo/favicon.png"

@@ -3,12 +3,15 @@ from flask import render_template
 from flask_login import current_user
 from flask_login import login_required
 
+from src import cache
+
 
 checkout_bp = Blueprint("checkout_bp", __name__, url_prefix="/dashboard/")
 
 
 @checkout_bp.get("/payments/")
 @login_required
+@cache.cached(timeout=500)
 def checkout():
     page_title = "Liste des paiements de loyers"
     return render_template(
