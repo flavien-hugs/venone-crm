@@ -126,12 +126,17 @@ window.addEventListener('DOMContentLoaded', event => {
                         headers: {'Content-type': 'application/json'},
                     });
 
-                    const data = await response.json();
-                    this.owner = data.owner;
-                    const modal = new bootstrap.Modal(document.getElementById('detailModal'));
-                    modal.show();
+                    if (response.status == 200){
+                        const data = await response.json();
+                        console.log('owner: ', data.owner)
+                        this.owner = data.owner;
+                        const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+                        modal.show();
+                    } else {
+                        throw new Error("NETWORK RESPONSE ERROR");
+                    }
                 } catch (error) {
-                    console.error(error);
+                    console.error("FETCH ERROR:", error);
                 }
             },
 

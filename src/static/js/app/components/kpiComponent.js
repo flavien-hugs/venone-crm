@@ -2,7 +2,7 @@ const KpiComponent = {
 	props: ['user'],
 
 	template: `
-		<div class="row">
+		<div class="row g-2">
 			<div :class="{ 'col-xl-4': user.is_owner, 'col-xl-3': user.is_company }" class="col-md-6 mb-4">
 				<div class="card border-start-lg border-start-primary h-100">
 					<div class="card-body">

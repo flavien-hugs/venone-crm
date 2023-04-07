@@ -168,7 +168,7 @@ window.addEventListener('DOMContentLoaded', event => {
                         this.messageAlert = data.message;
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.error("FETCH ERROR:", error);
                     this.showMessageAlert = true;
                     this.messageAlert =
                         "Une erreur est survenue lors de la mise à jour de cette propriété";
