@@ -62,6 +62,10 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "amount": self.get_owner_property_values(),
             "houses": [h.vn_house_id for h in self.houses],
             "tenants": [t.vn_tenant_id for t in self.tenants],
+
+            "houses_list": [h.to_json() for h in self.houses],
+            "tenants_list": [t.to_json() for t in self.tenants],
+
             "number_houses": self.houses.count(),
             "number_tenants": self.tenants.count(),
             "number_payments": self.payments.count(),
