@@ -128,7 +128,6 @@ window.addEventListener('DOMContentLoaded', event => {
 
                     if (response.status == 200){
                         const data = await response.json();
-                        console.log('owner: ', data.owner)
                         this.owner = data.owner;
                         const modal = new bootstrap.Modal(document.getElementById('detailModal'));
                         modal.show();
