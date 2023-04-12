@@ -81,6 +81,8 @@ def create_venone_app(config_name):
     db.init_app(venone_app)
     migrate.init_app(venone_app, db)
 
+    cors.init_app(venone_app, origins="*", supports_credentials=True)
+
     celery_init_app(venone_app)
 
     with venone_app.app_context():
