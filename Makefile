@@ -13,9 +13,6 @@ venv: ## Make a new virtual environment
 install: venv ## Install or update dependencies
 	pipenv install
 
-test: ## Run the unit tests
-	$(MANAGE) flask test
-
 initdb: ## Init and create database
 	$(MANAGE) flask db init && $(MANAGE) flask init_db
 
@@ -31,23 +28,8 @@ migrate: ## Generate an migration
 upgrade: ## Apply the upgrade to the database
 	$(MANAGE) flask db upgrade
 
-revision: ## Apply the revision to the database
-	$(MANAGE) flask db revision --rev-id e59c306fa28b
-
-heads: ## Apply the heads to the database
-	$(MANAGE) flask db stamp heads
-
-merge: ## Apply the merge to the database
-	$(MANAGE) flask db merge heads -m "merging two heads"
-
-history: ## Apply the history to the database
-	$(MANAGE) flask db history
-
-downgrade: ## Remove the last migration from the database
-	$(MANAGE) flask db downgrade
-
-current: ## Shows the current revision of the database.
-	$(MANAGE) flask db current
+test: ## Run the unit tests
+	python3 -m unittest discover -s tests
 
 shell: ## Flask Shell Load
 	$(MANAGE) flask shell
