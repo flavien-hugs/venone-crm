@@ -328,7 +328,7 @@ def list_payments_for_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return jsonify({"message": "Oops! propriété introuvable"}), 404
+        return make_response(jsonify({"message": "Oops! propriété introuvable"})), 404
 
     payments = []
     for payment in house.payments:

@@ -58,9 +58,9 @@ def get_user():
     return make_response(jsonify({"user": user.to_json()}))
 
 
-@api.get("/user/<string:user_uuid>/owners/")
+@api.get("/user/owners/")
 @login_required
-def get_user_owners(user_uuid):
+def get_user_owners():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -90,9 +90,9 @@ def get_user_owners(user_uuid):
     )
 
 
-@api.get("/user/<string:user_uuid>/tenants/")
+@api.get("/user/tenants/")
 @login_required
-def get_user_tenants(user_uuid):
+def get_user_tenants():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -122,9 +122,9 @@ def get_user_tenants(user_uuid):
     )
 
 
-@api.get("/user/<string:user_uuid>/houses/")
+@api.get("/user/houses/")
 @login_required
-def get_user_houses(user_uuid):
+def get_user_houses():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -154,9 +154,9 @@ def get_user_houses(user_uuid):
     )
 
 
-@api.get("/user/<string:user_uuid>/payments/")
+@api.get("/user/payments/")
 @login_required
-def get_user_payments(user_uuid):
+def get_user_payments():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -350,3 +350,63 @@ def user_company_register_tenant():
         )
 
     return make_response(jsonify({"success": False, "message": "Erreur"}))
+
+
+@api.post("/house-register/")
+@login_required
+def user_owner_register_house():
+
+    if request.method == "POST":
+
+        house_data = request.json.get("house_data")
+        house = VNHouse()
+        house.vn_house_type = house_data.get("house_type")
+        house.vn_house_rent = house_data.get("house_rent")
+        house.vn_house_month = house_data.get("house_month")
+        house.vn_house_guaranty = house_data.get("house_guaranty")
+        house.vn_house_number_room = house_data.get("house_number_room")
+        house.vn_house_address = house_data.get("house_address")
+        house.vn_house_is_open = False
+
+        current_user.houses.append(house)
+        house.save()
+
+        return make_response(
+            jsonify({"success": True, "message": "Propriété ajoutée avec succès !"}),
+            201,
+        )
+
+    return make_response(jsonify({"success": False, "message": "Erreur"}))
+
+
+@api.patch("/define-percent/")
+@login_required
+def update_percent():
+
+    data = request.get_json()
+    percent = data.get("percent")
+
+    if (
+        percent is not None
+        and isinstance(percent, (int, float))
+        and 0 <= percent <= 100
+    ):
+        current_user.vn_percentage = percent
+        current_user.save()
+        return make_response(
+            jsonify(
+                {"success": True, "message": "Pourcentage mis à jour avec succès !"}
+            ),
+            200,
+        )
+    else:
+        return make_response(
+            jsonify(
+                {
+                    "success": False,
+                    "message": "Valeur de pourcentage invalide.\
+                        Le pourcentage doit être un nombre entre 0 et 100.",
+                }
+            ),
+            400,
+        )
