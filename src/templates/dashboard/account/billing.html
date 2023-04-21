@@ -1,0 +1,106 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_content %}
+	<div id="billingApp">
+
+		<message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
+    	</message-component>
+
+		<div class="row">
+			<div class="col-sm-6 col-lg-3 mb-4">
+				<div class="card h-100 border-start-lg border-start-primary">
+					<div class="card-body">
+						<div class="small text-muted mb-2">Total loyer en location</div>
+						<div class="h1">{ user.total_houses_amount.toLocaleString() } { user.devise }</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-6 col-lg-3 mb-4">
+				<div class="card h-100 border-start-lg border-start-primary">
+					<div class="card-body">
+						<div class="small text-muted mb-2">Total loyer à collecter ce mois</div>
+						<div class="h1">{ user.total_payment_month.toLocaleString() } { user.devise }</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-6 col-lg-3 mb-4">
+	            <div class="card h-100 border-start-lg border-start-secondary">
+	                <div class="card-body">
+	                    <div class="small text-muted mb-2">Pourcentage appliqué</div>
+	                    <div class="h1">
+	                    	{ user.percent }&#x25;
+	    				</div>
+	                </div>
+	            </div>
+	        </div>
+
+	        <div class="col-sm-6 col-lg-3 mb-4">
+	            <div class="card h-100 border-start-lg border-start-secondary">
+	                <div class="card-body">
+	                    <div class="small text-muted mb-2">Total pourcentage</div>
+	                    <div class="h1">{ user.total_houses_percent.toLocaleString() } { user.devise }</div>
+	                </div>
+	            </div>
+	        </div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-8">
+			    <div class="card mb-4">
+			    	<div class="card-header">Historique de vos retraits effectués</div>
+			    	<div class="card-body px-0">
+			    		<div class="d-flex align-items-center justify-content-between px-4">
+				    		<div class="d-flex align-items-center">
+				    			<i class="fab fa-cc-visa fa-2x cc-color-visa"></i>
+				    			<div class="ms-4">
+				    				<div class="small">Retrait effectué le 21 Avril 2023 sur le 07070707</div>
+				    				<div class="text-xs text-muted">le 04/2024</div>
+				    			</div>
+				    		</div>
+			    		</div>
+			    	</div>
+			    </div>
+		    </div>
+
+		    <div class="col-lg-4">
+		    	<div class="card mb-4">
+		    		<div class="card-header text-danger">
+		    			Pourcentage relatif à chaque bien immobilier
+		    		</div>
+		    		<div class="card-body">
+		    			<h1 class="display-2 text-center text-success fw-bold fw-700">
+	                    	{ user.percent }&#x25;
+	    				</h1>
+
+		    			<p class="text-justify text-center">
+		    				Veuillez spécifier le pourcentage que vous récupérez sur la totalité des biens que vous renseignez. Saisissez une valeur numérique comprise entre 0 et 100 pour représenter la proportion ou la part en pourcentage.
+		    			</p>
+
+		    			<form action="." method="post">
+		    				<div class="my-3">
+		    					<input id="percent" v-model="percent" class="form-control" placeholder="Entrer le pourcentage"/>
+		    				</div>
+
+		    				<div class="d-grid">
+			    				<button @click.prevent="onUpdatePercent" class="btn btn-danger-soft fw-bold text-danger text-uppercase" type="submit">
+			    				{% if current_user.vn_percentage <= 0 %}
+			    					<span>Valider</span>
+			    				{% elif current_user.vn_percentage > 0 %}
+			    					<span>Mettre à jour votre pourcentage</span>
+			    				{% endif %}
+			    				</button>
+		    				</div>
+						</form>
+		    		</div>
+		    	</div>
+		    </div>
+	    </div>
+    </div>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script type="module" src="{{ url_for('static', filename="js/app/billing.js") }}"></script>
+{% endblock other_js_src %}
