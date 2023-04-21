@@ -26,10 +26,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         methods: {
-            filterNumber(e) {
-                return  ("" + e).replace(/[^0-9]/g, '');
-            },
-
             async getUser() {
                 try {
                     this.isLoading = true;
