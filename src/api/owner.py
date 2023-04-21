@@ -107,6 +107,7 @@ def update_houseowner(owner_uuid):
     parent_name = data.get("parent_name")
     phonenumber_one = data.get("phonenumber_one")
     phonenumber_two = data.get("phonenumber_two")
+    percent = data.get('percent')
 
     owner.vn_fullname = fullname
     owner.vn_addr_email = addr_email
@@ -116,6 +117,7 @@ def update_houseowner(owner_uuid):
     owner.vn_parent_name = parent_name
     owner.vn_phonenumber_one = phonenumber_one
     owner.vn_phonenumber_two = phonenumber_two
+    owner.vn_owner_percent = percent
 
     owner.save()
 

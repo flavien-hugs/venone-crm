@@ -273,6 +273,7 @@ def user_company_register_tenant():
 
         # Add owner objects
         owner = VNHouseOwner()
+        owner.vn_owner_percent = owner_data.get('percent')
         owner.vn_gender = owner_data.get("gender")
         owner.vn_fullname = owner_data.get("fullname")
         owner.vn_addr_email = owner_data.get("addr_email")
@@ -377,36 +378,3 @@ def user_owner_register_house():
         )
 
     return make_response(jsonify({"success": False, "message": "Erreur"}))
-
-
-@api.patch("/define-percent/")
-@login_required
-def update_percent():
-
-    data = request.get_json()
-    percent = data.get("percent")
-
-    if (
-        percent is not None
-        and isinstance(percent, (int, float))
-        and 0 <= percent <= 100
-    ):
-        current_user.vn_percentage = percent
-        current_user.save()
-        return make_response(
-            jsonify(
-                {"success": True, "message": "Pourcentage mis à jour avec succès !"}
-            ),
-            200,
-        )
-    else:
-        return make_response(
-            jsonify(
-                {
-                    "success": False,
-                    "message": "Valeur de pourcentage invalide.\
-                        Le pourcentage doit être un nombre entre 0 et 100.",
-                }
-            ),
-            400,
-        )
