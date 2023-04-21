@@ -6,7 +6,9 @@
         <i data-feather="menu"></i>
     </button>
 
-    <a class="navbar-brand pe-3 ps-4 ps-lg-2" href="{{ url_for('owner_bp.dashboard', uuid=current_user.uuid) }}">{{ current_user.get_name() }}</a>
+    <a class="navbar-brand pe-3 ps-4 ps-lg-2" href="{{ url_for('owner_bp.dashboard') }}">
+        {{ current_user.get_name() }}
+    </a>
 
     <ul class="navbar-nav align-items-center ms-auto">
 
@@ -65,7 +67,7 @@
                 <div class="dropdown-divider"></div>
 
                 {% if current_user.vn_house_owner %}
-                    <a class="dropdown-item" href="{{ url_for("owner_bp.owner_setting", uuid=current_user.uuid) }}">
+                    <a class="dropdown-item" href="{{ url_for("owner_bp.owner_setting") }}">
                         <div class="dropdown-item-icon">
                         <i data-feather="settings"></i></div>
                         Paramètre du compte
@@ -73,7 +75,7 @@
                 {% endif %}
 
                 {% if current_user.vn_company %}
-                    <a class="dropdown-item" href="{{ url_for("agency_bp.agency_setting", uuid=current_user.uuid) }}">
+                    <a class="dropdown-item" href="{{ url_for("agency_bp.agency_setting") }}">
                         <div class="dropdown-item-icon">
                         <i data-feather="settings"></i></div>
                         Paramètre du compte

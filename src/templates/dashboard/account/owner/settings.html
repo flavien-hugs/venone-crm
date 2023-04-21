@@ -3,14 +3,13 @@
 {% block dashboard_content %}
 	<nav class="nav nav-borders">
 		{% if current_user.vn_house_owner %}
-			<a class="nav-link ms-0" href="{{ url_for("owner_bp.owner_setting", uuid=current_user.uuid) }}">Paramètres</a>
+			<a class="nav-link ms-0" href="{{ url_for("owner_bp.owner_setting") }}">Paramètres</a>
 		{% elif current_user.vn_company %}
-			<a class="nav-link ms-0" href="{{ url_for("agency_bp.agency_setting", uuid=current_user.uuid) }}">Paramètres</a>
+			<a class="nav-link ms-0" href="{{ url_for("agency_bp.agency_setting") }}">Paramètres</a>
 		{% endif %}
-		<a class="nav-link" href="#!">Facturation</a>
-		<a class="nav-link" href="{{ url_for('owner_bp.change_password', uuid=current_user.uuid) }}">Sécurité</a>
-		<a class="nav-link" href="#!">Notification</a>
+		<a class="nav-link" href="{{ url_for('owner_bp.change_password') }}">Sécurité</a>
 	</nav>
+
 	<hr class="mt-0 mb-4"/>
 
 	<div class="row">

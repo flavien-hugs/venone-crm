@@ -2,12 +2,17 @@
 
 {% block dashboard_content %}
     <section id="tenantTable">
-
-        <!-- Alert message -->
         <message-component
             :show-message-alert="showMessageAlert"
             :message-alert="messageAlert">
         </message-component>
+
+        <div v-if="user.is_company && !user.percent" class="alert alert-danger alert-dismissible my-2">
+            <span>
+                Veuillez renseigner le pourcentage relatif à vos bien immobilier d'enregister un bien !
+                Veuillez cliquer sur ce <a class="fw-bold" href="{{ url_for("agency_bp.agency_billing") }}">lien</a> pour le définir.
+            </span>
+        </div>
 
         <div v-if="user.tenants_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
@@ -23,7 +28,7 @@
                     Enregistrer un locataire
                 </button>
 
-                <button v-if="user.is_company" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                <button v-if="user.is_company && user.percent > 0" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
                     <i class="me-2" data-feather="user-plus"></i>
                     Enregistrer un locataire
                 </button>

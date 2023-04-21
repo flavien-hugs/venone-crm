@@ -2,12 +2,17 @@
 
 {% block dashboard_content %}
     <section id="houseOwnerTable">
-
-        <!-- Alert message -->
         <message-component
             :show-message-alert="showMessageAlert"
             :message-alert="messageAlert">
         </message-component>
+
+        <div v-if="user.is_company && !user.percent" class="alert alert-danger alert-dismissible my-2">
+            <span>
+                Veuillez renseigner le pourcentage relatif à vos bien immobilier d'enregister un bien !
+                Veuillez cliquer sur ce <a class="fw-bold" href="{{ url_for("agency_bp.agency_billing") }}">lien</a> pour le définir.
+            </span>
+        </div>
 
         <div v-if="user.owners_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
@@ -30,7 +35,21 @@
         </div>
 
         <div v-if="user.owners_count > 0" class="row g-2">
-            <div :class="{ 'col-xl-4': user.is_admin }" class="col-md-4 mb-3">
+            <div class="col-md-3 mb-4">
+                <div class="card border-start-lg border-start-primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">total pourcentage perçu</div>
+                                <div class="h1">{ user.total_houses_percent.toLocaleString() } { user.devise }</div>
+                            </div>
+                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
                 <div class="card border-start-lg border-start-secondary h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
@@ -44,7 +63,7 @@
                 </div>
             </div>
 
-            <div :class="{ 'col-xl-4': user.is_admin }" class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card border-start-lg border-start-primary h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
@@ -58,7 +77,7 @@
                 </div>
             </div>
 
-            <div :class="{ 'col-xl-4': user.is_admin }" class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card border-start-lg border-start-success h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
@@ -106,6 +125,7 @@
                                         <th scope="col">ID</th>
                                         <th scope="col">Nom &amp; prénoms / contact</th>
                                         <th scope="col">Loyer à collecter</th>
+                                        <th scope="col">Pourcentage à collecter</th>
                                         <th scope="col">Total propriétés</th>
                                         <th scope="col">Total locataires</th>
                                         <th scope="col">Date d'ajout</th>

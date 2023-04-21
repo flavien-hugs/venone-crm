@@ -5,10 +5,13 @@
 		</td>
 		<td v-if="user.is_company">
 			<span class="badge bg-red-soft text-red">{ hs.owner_id }</span>
+			<span v-if="!hs.owner_id">
+				@
+			</span>
 		</td>
 		<td>
 			<span v-if="hs.tenant_id">{ hs.tenant_id }</span>
-			<span v-else-if="!hs.tenant_id">
+			<span v-if="!hs.tenant_id">
 				Aucun locataire
 			</span>
 		</td>
@@ -47,41 +50,48 @@
 					<div class="modal-title">
 						Mise à jour location : { houseData.house_id }
 					</div>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 
 				<div class="modal-body">
 					<div class="row gx-3 mb-4">
-			            <div class="col-4">
-			                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
-			            </div>
+						<div class="col-4">
+							<label for="house_type" class="form-label small">Type de propriétés</label>
+							<input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
+						</div>
 
-			            <div class="col-4">
-			                <input placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
-			            </div>
+						<div class="col-4">
+							<label for="house_rent" class="form-label small">Loyer/mois</label>
+							<input @input.number="calculateGuaranty" placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
+						</div>
 
-			            <div class="col-4">
-			                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
-			            </div>
-			        </div>
+						<div class="col-4">
+							<label for="house_number_room" class="form-label small">Nombre de pièces</label>
+							<input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
+						</div>
+					</div>
 
-			        <div class="row gx-3 mb-4">
-			            <div class="col-4">
-			                <input placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
-			            </div>
+					<div class="row gx-3 mb-4">
+						<div class="col-4">
+							<label for="house_month" class="form-label small">Nombre de mois de caution</label>
+							<input @input="calculateGuaranty" placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model.number="houseData.house_month">
+						</div>
 
-			            <div class="col-4">
-			                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
-			            </div>
+						<div class="col-4">
+							<label for="house_guaranty" class="form-label small">Caution</label>
+							<input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model.number="houseData.house_guaranty">
+						</div>
 
-			            <div class="col-4">
-			                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
-			            </div>
-			        </div>
+						<div class="col-4">
+							<label for="house_address" class="form-label small">Situation géographique</label>
+							<input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
+						</div>
+					</div>
 				</div>
 
 				<div class="modal-footer">
-					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
-					<button type="button" @click="onUpdateHouse" class="btn btn-success shadow-none">Mettre à jour</button>
+					<button @click="houseData.house_uuid = null; onUpdateHouse = false" type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
+					<button type="button" @click.prevent="onUpdateHouse" class="btn btn-success shadow-none">Mettre à jour</button>
 				</div>
 			</form>
 		</div>
@@ -104,11 +114,11 @@
 			<div class="modal-footer">
 				<div class="row">
 					<div class="col-6 d-grid">
-						<button @click="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
+						<button @click.prevent="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
 					</div>
 
 					<div class="col-6 d-grid">
-						<button data-bs-dismiss="modal" @click="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
+						<button data-bs-dismiss="modal" @click.prevent="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
 					</div>
 				</div>
 			</div>
@@ -157,34 +167,40 @@
 					    <div :class="{ active: currentStep === 1 }" class="tab-pane fade show">
 					    	<div class="row gx-3 mb-4">
 					            <div class="col-3">
+					            	<label for="house_type" class="form-label small">Type de propriétés</label>
 					                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
 					            </div>
 
 					            <div class="col-3">
+					            	<label for="house_rent" class="form-label small">Loyer/mois</label>
 					                <input @input.number="calculateGuaranty" placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
 					            </div>
 
 					            <div class="col-3">
+					            	<label for="house_number_room" class="form-label small">Nombre de pièces</label>
 					                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
 					            </div>
 
 					            <div class="col-3">
+					            	<label for="house_address" class="form-label small">Situation géographique</label>
 					                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
 					            </div>
 					        </div>
 
 					        <div class="row gx-3 mb-4">
 					            <div class="col-3">
+					            	<label for="house_month" class="form-label small">Nombre de mois de caution</label>
 					                <input @input="calculateGuaranty" placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model.number="houseData.house_month">
 					            </div>
 
 					            <div class="col-3">
+					            	<label for="house_guaranty" class="form-label small">Caution</label>
 					                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model.number="houseData.house_guaranty">
 					            </div>
 
 					            <div class="col-3">
-					            	<input type="date" id="lease_start_date" class="form-control" v-model="houseData.lease_start_date">
-					            	<span class="text-muted small">Mettre à jour la date de location</span>
+					            	<label for="lease_start_date" class="form-label small">Date de location</label>
+					            	<input  v-bind:placeholder="houseData.lease_start_date" type="date" id="lease_start_date" class="form-control" v-model="houseData.lease_start_date">
                                 </div>
 					        </div>
 					    </div>
@@ -229,9 +245,9 @@
 				<div class="row modal-footer justify-content-center">
 					<div class="col-12">
 						<div class="d-flex justify-content-between">
-							<button :class="{ disabled: currentStep === 1 }" @click="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
-							<button v-if="currentStep < 2" @click="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
-							<button v-if="currentStep === 2" @click="onAssignHouseToTenant" class="btn btn-success shadow-none" type="submit">Valider</button>
+							<button :class="{ disabled: currentStep === 1 }" @click.prevent="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
+							<button v-if="currentStep < 2" @click.prevent="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
+							<button v-if="currentStep === 2" @click.prevent="onAssignHouseToTenant" class="btn btn-success shadow-none" type="submit">Valider</button>
 						</div>
 					</div>
 				</div>
