@@ -59,13 +59,13 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "phonenumber_one": self.vn_phonenumber_one,
             "phonenumber_two": self.vn_phonenumber_two,
             "devise": current_user.vn_device,
+            "amount_repaid": self.get_amount_repaid(),
             "amount": self.get_owner_property_values(),
+            "total_percent": self.total_houses_amount(),
             "houses": [h.vn_house_id for h in self.houses],
             "tenants": [t.vn_tenant_id for t in self.tenants],
-
             "houses_list": [h.to_json() for h in self.houses],
             "tenants_list": [t.to_json() for t in self.tenants],
-
             "number_houses": self.houses.count(),
             "number_tenants": self.tenants.count(),
             "number_payments": self.payments.count(),
@@ -150,11 +150,23 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
         )
         return query.first()
 
-    def get_owner_property_values(self) -> float:
-        house_value = 0.0
-        for house in self.houses.filter_by(vn_house_is_open=True):
-            house_value += house.vn_house_rent
-        return house_value
+    def get_owner_property_values(self):
+        user_houses = self.houses.filter_by(
+            vn_house_is_open=True, vn_user_id=current_user.id
+        ).all()
+        total_house_value = sum(house.vn_house_rent for house in user_houses)
+        return total_house_value
+
+    def total_houses_amount(self):
+        user_houses = self.houses.filter_by(
+            vn_house_is_open=True, vn_user_id=current_user.id
+        ).all()
+        total = sum(house.get_house_rent_with_percentage() for house in user_houses)
+        return total
+
+    def get_amount_repaid(self):
+        total = self.get_owner_property_values() - self.total_houses_amount()
+        return total
 
 
 class VNHouse(TimestampMixin):
@@ -177,8 +189,12 @@ class VNHouse(TimestampMixin):
     vn_house_address = db.Column(db.String(120), nullable=False)
     vn_house_is_open = db.Column(db.Boolean, nullable=False, default=True)
 
-    vn_house_lease_start_date = db.Column(db.Date, nullable=False)
-    vn_house_lease_end_date = db.Column(db.Date, nullable=False)
+    vn_house_lease_start_date = db.Column(
+        db.Date, nullable=True, default=datetime.utcnow()
+    )
+    vn_house_lease_end_date = db.Column(
+        db.Date, nullable=True, default=datetime.utcnow()
+    )
 
     vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     vn_owner_id = db.Column(db.Integer, db.ForeignKey("houseowner.id"))
@@ -208,6 +224,7 @@ class VNHouse(TimestampMixin):
             "house_address": self.vn_house_address,
             "house_is_open": self.vn_house_is_open,
             "house_status": self.get_house_open(),
+            "house_percent": self.get_house_rent_with_percentage(),
             "house_lease_start_date": self.vn_house_lease_start_date.strftime(
                 "%d-%m-%Y"
             ),
@@ -265,6 +282,11 @@ class VNHouse(TimestampMixin):
     def get_tenant_phone_number(self):
         tenant = self.tenants[0] if len(self.tenants) > 0 else None
         return tenant.vn_phonenumber_one if tenant is not None else None
+
+    def get_house_rent_with_percentage(self):
+        percent = self.user_houses.vn_percentage / 100
+        result = self.vn_house_rent * percent
+        return result
 
     def update_lease_end_date(self):
         today = date.today()
