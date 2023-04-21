@@ -9,9 +9,9 @@ window.addEventListener('DOMContentLoaded', event => {
         house_rent: '',
         house_guaranty: '',
         house_month: '',
-        house_number_room: '',
         house_address: '',
-        lease_start_date: '',
+        house_number_room: '',
+        lease_start_date: new Date().toISOString().substring(0, 10),
     }
 
     const TENANT_DATA = {
@@ -27,7 +27,6 @@ window.addEventListener('DOMContentLoaded', event => {
     };
 
     var app = Vue.createApp({
-
         components: {
             paginateComponent,
             messageComponent,
@@ -49,20 +48,47 @@ window.addEventListener('DOMContentLoaded', event => {
                 showMessageAlert: false,
                 deleteHouseUUID: null,
                 houseData: { ...HOUSE_DATA },
-                tenantData: { ...TENANT_DATA }
-            }
+                tenantData: { ...TENANT_DATA },
+            };
         },
 
         delimiters: ["{", "}"],
         compilerOptions: {
-            delimiters: ["{", "}"]
+            delimiters: ["{", "}"],
+        },
+
+        watch: {
+            'houseData.house_rent': function (f){
+                this.houseData.house_rent = this.filterNumber(f);
+            },
+            'houseData.house_number_room': function (f){
+                this.houseData.house_number_room = this.filterNumber(f);
+            },
+            'houseData.vn_house_month': function (f){
+                this.houseData.vn_house_month = this.filterNumber(f);
+            },
+            'houseData.house_month': function (f){
+                this.houseData.house_month = this.filterNumber(f);
+            },
+            'houseData.house_guaranty': function (f){
+                this.houseData.house_guaranty = this.filterNumber(f);
+            },
         },
 
         async mounted() {
-            await this.getHouses()
+            await this.getHouses();
         },
 
         methods: {
+
+            downloadHouseCSV() {
+                window.location.href = `/dashboard/export-houses-data`;
+            },
+
+            filterNumber(e) {
+                return  ("" + e).replace(/[^0-9]/g, '');
+            },
+
             nextStep() {
                 this.currentStep++;
             },
@@ -75,9 +101,9 @@ window.addEventListener('DOMContentLoaded', event => {
                 const hrent = parseInt(this.houseData.house_rent);
                 const hmonth = parseInt(this.houseData.house_month);
                 if (!isNaN(hrent) && !isNaN(hmonth))
-                    return this.houseData.house_guaranty =  hrent * hmonth;
+                    return (this.houseData.house_guaranty = hrent * hmonth);
                 else {
-                    return
+                    return;
                 }
             },
 
@@ -89,8 +115,8 @@ window.addEventListener('DOMContentLoaded', event => {
                     const response = await fetch(houseURL, {
                         method: "GET",
                         headers: {
-                            'Content-type': 'application/json'
-                        }
+                            "Content-type": "application/json",
+                        },
                     });
 
                     if (response.status == 200) {
@@ -109,24 +135,73 @@ window.addEventListener('DOMContentLoaded', event => {
                 }
             },
 
+            createHouse() {
+                const modal = new bootstrap.Modal(document.getElementById('createHouseModal'));
+                modal.show();
+            },
+
             updateHouse(house) {
                 this.houseData = { ...house } ?? {};
-                const modal = new bootstrap.Modal(document.getElementById('updateHouseConfirm'));
+                const modal = new bootstrap.Modal(
+                    document.getElementById("updateHouseConfirm")
+                );
                 modal.show();
             },
 
             assignHouseToTenantConfirm(houseUuid) {
                 this.houseUUID = houseUuid;
                 this.houseData = { ...houseUuid };
-                this.tenantData = {...houseUuid };
-                const modal = new bootstrap.Modal(document.getElementById('assignHouseToTenantModal'));
+                this.tenantData = { ...houseUuid };
+                const modal = new bootstrap.Modal(
+                    document.getElementById("assignHouseToTenantModal")
+                );
                 modal.show();
             },
 
             deleteHouseConfirm(houseUUID) {
                 this.deleteHouseUUID = houseUUID;
-                const modal = new bootstrap.Modal(document.getElementById('deleteHouseModal'));
+                const modal = new bootstrap.Modal(
+                    document.getElementById("deleteHouseModal")
+                );
                 modal.show();
+            },
+
+            async onCreateHouse() {
+                try {
+                    const houseRegisterURL = `/api/house-register/`;
+                    const response = await fetch(houseRegisterURL, {
+                        method: "POST",
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            house_data: this.houseData,
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.houseData = { ...HOUSE_DATA };
+                        await this.getHouses();
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                        setTimeout(() => {
+                            this.showMessageAlert = false;
+                        }, 3000);
+                    } else {
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                    }
+                } catch (error) {
+                    console.log(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = "Une erreur est survenue lors de l'enregistrement.";
+                } finally {
+                    this.houseData.house_uuid = null;
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createHouseModal'));
+                    modal.hide();
+                }
             },
 
             async onUpdateHouse() {
@@ -134,14 +209,16 @@ window.addEventListener('DOMContentLoaded', event => {
                     const updateURL = `/api/house/${this.houseData.house_uuid}/update/`;
                     const response = await fetch(updateURL, {
                         method: "PUT",
-                        headers: {'Content-type': 'application/json'},
+                        headers: { "Content-type": "application/json" },
                         body: JSON.stringify(this.houseData),
                     });
 
                     const data = await response.json();
 
                     if (data.success) {
-                        const index = this.houses.findIndex(house => house.house_uuid === this.houseData.house_uuid);
+                        const index = this.houses.findIndex(
+                            (house) => house.house_uuid === this.houseData.house_uuid
+                        );
                         this.houses.splice(index, 1, this.houseData);
                         this.houseData = { ...HOUSE_DATA };
                         await this.getHouses();
@@ -155,12 +232,15 @@ window.addEventListener('DOMContentLoaded', event => {
                         this.messageAlert = data.message;
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.error("FETCH ERROR:", error);
                     this.showMessageAlert = true;
-                    this.messageAlert = "Une erreur est survenue lors de la mise à jour de cette propriété";
+                    this.messageAlert =
+                        "Une erreur est survenue lors de la mise à jour de cette propriété";
                 } finally {
                     this.houseData.house_uuid = null;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('updateHouseConfirm'));
+                    const modal = bootstrap.Modal.getInstance(
+                        document.getElementById("updateHouseConfirm")
+                    );
                     modal.hide();
                 }
             },
@@ -171,14 +251,16 @@ window.addEventListener('DOMContentLoaded', event => {
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {
-                            'Content-type': 'application/json'
-                        }
+                            "Content-type": "application/json",
+                        },
                     });
 
                     const data = await response.json();
 
                     if (data.success) {
-                        this.houses = this.houses.filter(house => house.house_uuid !== this.deleteHouseUUID);
+                        this.houses = this.houses.filter(
+                            (house) => house.house_uuid !== this.deleteHouseUUID
+                        );
                         await this.getHouses();
 
                         this.showMessageAlert = true;
@@ -193,10 +275,13 @@ window.addEventListener('DOMContentLoaded', event => {
                 } catch (error) {
                     console.error(error);
                     this.showMessageAlert = true;
-                    this.messageAlert = "Une erreur est survenue lors de la suppression de cette propriété";
+                    this.messageAlert =
+                        "Une erreur est survenue lors de la suppression de cette propriété";
                 } finally {
                     this.deleteHouseUUID = null;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteHouseModal'));
+                    const modal = bootstrap.Modal.getInstance(
+                        document.getElementById("deleteHouseModal")
+                    );
                     modal.hide();
                 }
             },
@@ -207,11 +292,11 @@ window.addEventListener('DOMContentLoaded', event => {
                     const response = await fetch(assignURL, {
                         method: "PATCH",
                         headers: {
-                            'Content-type': 'application/json'
+                            "Content-type": "application/json",
                         },
                         body: JSON.stringify({
                             house_data: this.houseData,
-                            tenant_data: this.tenantData
+                            tenant_data: this.tenantData,
                         }),
                     });
 
@@ -235,9 +320,12 @@ window.addEventListener('DOMContentLoaded', event => {
                 } catch (error) {
                     console.error(error);
                     this.showMessageAlert = true;
-                    this.messageAlert = 'Une erreur est survenue lors de la mise en location.';
+                    this.messageAlert =
+                        "Une erreur est survenue lors de la mise en location.";
                 } finally {
-                    const modelElement = document.getElementById('assignHouseToTenantModal');
+                    const modelElement = document.getElementById(
+                        "assignHouseToTenantModal"
+                    );
                     const modal = bootstrap.Modal.getInstance(modelElement);
                     modal.hide();
                 }
@@ -246,13 +334,13 @@ window.addEventListener('DOMContentLoaded', event => {
             prevPage() {
                 this.currentPage--;
                 this.getHouses();
-                window.scrollTo({top: 0, behavior: 'smooth'});
+                window.scrollTo({ top: 0, behavior: "smooth" });
             },
 
             nextPage() {
                 this.currentPage++;
                 this.getHouses();
-                window.scrollTo({top: 0, behavior: 'smooth'});
+                window.scrollTo({ top: 0, behavior: "smooth" });
             },
         },
     });

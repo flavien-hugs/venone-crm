@@ -27,8 +27,9 @@ var app = Vue.createApp({
 
     async mounted() {
         await this.getUser();
-
-        await this.getOwnerData();
+        if (this.user.is_company) {
+            await this.getOwnerData();
+        }
         await this.getTenantData();
         await this.getOpenHousesData();
         await this.getTrendPriceData();
@@ -47,17 +48,15 @@ var app = Vue.createApp({
                     },
                 });
 
-                this.isLoading = false;
-
                 if (response.status == 200) {
+                    this.isLoading = false;
                     const data = await response.json();
                     this.user = data.user;
                 } else {
                     this.isLoading = false;
-                    console.log(error);
+                    throw new Error("NETWORK RESPONSE ERROR");
                 }
             } catch (error) {
-                console.log("FETCH ERROR:", error);
                 this.showMessageAlert = true;
                 this.messageAlert = 'Oops, problème de connexion au serveur.';
             }

@@ -1,4 +1,3 @@
-from datetime import date
 from threading import Thread
 
 from flask import current_app
@@ -27,16 +26,11 @@ def send_email(to, subject, template, **kwargs):
 
 
 def send_email_reminder(tenant, house):
-    today = date.today()
-    if (
-        today >= house.vn_house_lease_start_date
-        and today < house.vn_house_lease_end_date
-    ):
-        print(f"Email sent to {tenant.vn_addr_email}")
-        send_email(
-            tenant.vn_addr_email,
-            f"Paiement de votre loyer du mois de {today}",
-            "message/email",
-            tenant=tenant,
-            today=today,
-        )
+    date = house.vn_house_lease_end_date
+    send_email(
+        tenant.vn_addr_email,
+        f"Paiement de votre loyer du mois de {date}",
+        "message/email",
+        tenant=tenant,
+        house=house,
+    )

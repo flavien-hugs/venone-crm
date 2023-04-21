@@ -1,83 +1,207 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-    <section id="houseApp">
+<section id="houseApp">
 
-        <message-component
-            :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">
-        </message-component>
+    <message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
+    </message-component>
 
-        <div v-if="user.house_count == 0" class="card card-body shadow-none bg-transparent border-0">
-            <div class="text-center py-2">
-                <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
+    <div v-if="user.houses_count == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div class="text-center py-2">
+            <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
 
-                <p class="d-flex justify-content-center text-muted mb-4">
-                    Vous n'avez aucune propriété enregistrée en ce moment.
-                </p>
+            <p class="d-flex justify-content-center text-muted mb-4">
+                Vous n'avez aucune propriété enregistrée en ce moment.
+            </p>
+            <button v-if="user.percent > 0" @click="createHouse" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                <i class="me-2" data-feather="home"></i>
+                Enregistrer une propriété
+            </button>
+        </div>
+    </div>
+
+    <div v-if="isLoading" class="preloader">
+        <div class="preloader-body">
+            <p>Chargement en cours...</p>
+            <div class="cssload-container">
+                <div class="cssload-speeding-wheel"></div>
             </div>
         </div>
+    </div>
 
-        <div v-else-if="user.house_count > 0" class="card card-header-actions">
-            <div v-if="isLoading" class="preloader">
-                <div class="preloader-body">
-                    <p>Chargement en cours...</p>
-                    <div class="cssload-container">
-                        <div class="cssload-speeding-wheel"></div>
+    <div v-if="user.houses_count > 0" class="row g-2">
+        <div :class="{ 'col-xl-4': user.is_owner, 'col-md-3': user.is_company }" class="mb-4">
+            <div class="card border-start-lg border-start-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-primary mb-2 text-uppercase">total loyer à collecter</div>
+                            <div class="h1">{ user.total_house_amount } { user.devise }</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="card-header">
-                <span class="fw-700">{ user.house_count } propriétés</span>
-            </div>
-
-            <div class="card-body">
-                <div class="input-group input-group-joined input-group-solid shadow-none">
-                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
-                    <input
-                        type="text"
-                        placeholder="Rechercher une proprété ..."
-                        class="form-control shadow-none ps-0"
-                        aria-label="Rechercher"
-                    >
+        <div v-if="user.is_company" class="col-md-3 mb-4">
+            <div class="card border-start-lg border-start-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-primary mb-2 text-uppercase">total pourcentage perçu</div>
+                            <div class="h1">{ user.total_house_percent } { user.devise }</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                    </div>
                 </div>
-
-                <div class="table-responsive">
-                   <table class="table table-hover">
-                        <thead class="small">
-                            <tr>
-                                <th scope="col">ID Propriété</th>
-                                <th scope="col">ID Propriétaire</th>
-                                <th scope="col">Locataire</th>
-                                <th scope="col">Propriété &amp; Localisation</th>
-                                <th scope="col">Loyer/mois</th>
-                                <th scope="col">Ajouté le</th>
-                                <th scope="col">Status location</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% include "tenant/paths/_house.html" %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <paginate-component
-                    :current-page="currentPage"
-                    :total-pages="totalPages"
-                    :next-page="nextPage"
-                    :prev-page="prevPage"
-                ></paginate-component>
-
             </div>
         </div>
-    </section>
+
+        <div :class="{ 'col-xl-4': user.is_owner, 'col-md-3': user.is_company }" class="mb-4">
+            <div class="card border-start-lg border-start-secondary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-secondary mb-2 text-uppercase">total propriétés</div>
+                            <div class="h1">{ user.houses_count }</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-home fa-2x text-gray-200"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div :class="{ 'col-xl-4': user.is_owner, 'col-md-3': user.is_company }" class="mb-4">
+            <div class="card border-start-lg border-start-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-success text-uppercase mb-2">total locataires</div>
+                            <div class="h1">{ user.tenants_count }</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="user.houses_count > 0" class="row">
+        <div class="col-12">
+            <div class="card card-header-actions">
+                <div class="card-header">
+                    <span class="fw-700">Vos propriétés</span>
+                    <div>
+                        <button @click.prevent="createHouse" class="btn btn-sm btn-outline-success text-uppercase fw-700 shadow-none" type="button">
+                            <i class="me-2" data-feather="home"></i>
+                            Enregistrer une propriété
+                        </button>
+
+                        <button @click.prevent="downloadHouseCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none ms-3">
+                            <i class="me-2" data-feather="download"></i>
+                            télécharger le csv
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="input-group input-group-joined input-group-solid shadow-none">
+                        <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                        <input type="text" placeholder="Rechercher une proprété ..." class="form-control shadow-none ps-0" aria-label="Rechercher">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="small">
+                                <tr>
+                                    <th scope="col">ID Propriété</th>
+                                    <th v-if="user.is_company" scope="col">ID Propriétaire</th>
+                                    <th scope="col">Locataire</th>
+                                    <th scope="col">Propriété &amp; Localisation</th>
+                                    <th scope="col">Loyer/mois</th>
+                                    <th scope="col">Ajouté le</th>
+                                    <th scope="col">Status location</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% include "tenant/paths/_house.html" %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <paginate-component :current-page="currentPage" :total-pages="totalPages" :next-page="nextPage" :prev-page="prevPage"></paginate-component>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- add house -->
+    <div class="modal fade" data-bs-backdrop="static" id="createHouseModal">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            Enregistrer une propriété
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row gx-3 mb-4">
+                            <div class="col-3">
+                                <label for="house_type" class="form-label small">Type de propriétés</label>
+                                <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
+                            </div>
+
+                            <div class="col-3">
+                                <label for="house_rent" class="form-label small">Loyer/mois</label>
+                                <input placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
+                            </div>
+
+                            <div class="col-3">
+                                <label for="house_number_room" class="form-label small">Nombre de pièces</label>
+                                <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
+                            </div>
+
+                            <div class="col-3">
+                                <label for="house_address" class="form-label small">Situation géographique</label>
+                                <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
+                            </div>
+                        </div>
+
+                        <div class="row gx-3 mb-4">
+                            <div class="col-3">
+                                <label for="house_month" class="form-label small">Nombre de mois de caution</label>
+                                <input placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
+                            </div>
+
+                            <div class="col-3">
+                                <label for="house_guaranty" class="form-label small">Caution</label>
+                                <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" @click.prevent="onCreateHouse" class="btn btn-success shadow-none">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+            </div>
+    </div>
+</section>
 {% endblock dashboard_content %}
 
 
 {% block other_js_src %}
-    {{ super() }}
-    <script type="module" src="{{ url_for('static', filename="js/app/house.js") }}"></script>
+{{ super() }}
+<script type="module" src="{{ url_for('static', filename="js/app/house.js") }}"></script>
 {% endblock other_js_src %}
+src %}

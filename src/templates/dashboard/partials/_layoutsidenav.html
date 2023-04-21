@@ -5,7 +5,8 @@
                 <div class="sidenav-menu-heading d-sm-none">
                     Mon Compte
                 </div>
-                <a class="nav-link d-sm-none" href="#!">
+
+                <!--<a class="nav-link d-sm-none" href="#!">
                     <div class="nav-link-icon">
                         <i data-feather="bell"></i>
                     </div>
@@ -18,11 +19,11 @@
                     </div>
                     Messages
                     <span class="badge bg-success-soft text-success ms-auto">2 New!</span>
-                </a>
+                </a>  -->
 
                 <div class="sidenav-menu-heading">Menu Venone</div>
 
-                <a class="nav-link" href="{{ url_for('owner_bp.dashboard', uuid=current_user.uuid) }}">
+                <a class="nav-link" href="{{ url_for('owner_bp.dashboard') }}">
                     <div class="nav-link-icon">
                         <i data-feather="home"></i>
                     </div> Tableau de board
@@ -32,12 +33,17 @@
                 <a class="nav-link" href="{{ url_for('checkout_bp.checkout') }}">
                     <div class="nav-link-icon">
                         <i data-feather="dollar-sign"></i>
-                    </div> Loyers
+                    </div> Paiements (Loyers)
+                </a>
+                <a class="nav-link" href="#">
+                    <div class="nav-link-icon">
+                        <i data-feather="dollar-sign"></i>
+                    </div> Retraits
                 </a>
 
                 {% if current_user.vn_company %}
                     <div class="sidenav-menu-heading">Gestion locataires</div>
-                    <a class="nav-link" href="{{ url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid) }}">
+                    <a class="nav-link" href="{{ url_for("agency_bp.agency_create_tenant") }}">
                         <div class="nav-link-icon">
                             <i data-feather="users"></i>
                         </div>
@@ -51,44 +57,34 @@
                     </a>
 
                     <div class="sidenav-menu-heading">Gestion Bailleurs</div>
-                    <a class="nav-link" href="{{ url_for("agency_bp.agency_owner_list", uuid=current_user.uuid) }}">
+                    <a class="nav-link" href="{{ url_for("agency_bp.agency_owner_list") }}">
                         <div class="nav-link-icon">
                             <i data-feather="users"></i>
                         </div>
                         Bailleurs
                     </a>
-                    <a class="nav-link" href="#!">
-                        <div class="nav-link-icon">
-                            <i data-feather="file"></i>
-                        </div>
-                        Contrats
-                    </a>
                 {% endif %}
 
                 {% if current_user.vn_house_owner %}
                     <div class="sidenav-menu-heading">Gestion locataires</div>
-                    <a class="nav-link" href="{{ url_for("agency_bp.agency_create_tenant", uuid=current_user.uuid) }}">
+                    <a class="nav-link" href="{{ url_for("agency_bp.agency_create_tenant") }}">
                         <div class="nav-link-icon">
                             <i data-feather="users"></i>
                         </div>
                         Locataires
                     </a>
-
-                    <a class="nav-link" href="#!">
-                        <div class="nav-link-icon">
-                            <i data-feather="grid"></i>
-                        </div> Regularités
-                    </a>
                 {% endif %}
 
                 <div class="sidenav-menu-heading">Gestion Propriétés</div>
-                <a class="nav-link" href="{{ url_for('agency_bp.agency_house_list', uuid=current_user.uuid)}}">
+                <a class="nav-link" href="{{ url_for('agency_bp.agency_house_list')}}">
                     <div class="nav-link-icon">
                         <i data-feather="home"></i>
                     </div> Propriétés
                 </a>
 
-                <div class="sidenav-menu-heading">Rapports</div>
+                {% if current_user.vn_company %}
+
+                <!--<div class="sidenav-menu-heading">Rapports</div>
                 <a class="nav-link" href="#!">
                     <div class="nav-link-icon">
                         <i data-feather="bar-chart"></i>
@@ -100,18 +96,28 @@
                         <i data-feather="bell"></i>
                     </div>
                     Notifications
-                </a>
+                </a>-->
+
+                {% endif %}
 
                 <div class="sidenav-menu-heading">paramètres</div>
+
                 {% if current_user.vn_house_owner %}
-                    <a class="nav-link" href="{{ url_for("owner_bp.owner_setting", uuid=current_user.uuid) }}">
+                    <a class="nav-link" href="{{ url_for("owner_bp.owner_setting") }}">
                         <div class="nav-link-icon">
                             <i data-feather="settings"></i>
                         </div>
                         Paramètre du compte
                     </a>
                 {% elif current_user.vn_company %}
-                    <a class="nav-link" href="{{ url_for("agency_bp.agency_setting", uuid=current_user.uuid) }}">
+                    <a class="nav-link" href="{{ url_for("agency_bp.agency_billing") }}">
+                        <div class="nav-link-icon">
+                            <i data-feather="credit-card"></i>
+                        </div>
+                        Facturation
+                    </a>
+
+                    <a class="nav-link" href="{{ url_for("agency_bp.agency_setting") }}">
                         <div class="nav-link-icon">
                             <i data-feather="settings"></i>
                         </div>

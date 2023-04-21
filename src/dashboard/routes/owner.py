@@ -1,3 +1,5 @@
+import os
+
 from flask import Blueprint
 from flask import current_app
 from flask import flash
@@ -13,28 +15,26 @@ from src import csrf
 from src.auth.forms.auth_form import ChangePasswordForm
 from src.dashboard.forms import OwnerSettingForm
 from src.mixins.decorators import owner_required
-from src.tenant import tasks
-from src.tenant import VNHouse
+
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(owner_bp)
 
 
-@owner_bp.route("/<string:uuid>/index/", methods=["GET"])
+@owner_bp.route("/index/", methods=["GET"])
 @login_required
-def dashboard(uuid):
+# @cache.cached(timeout=500)
+def dashboard():
     page_title = "Tableau de board"
-    VNHouse.update_expired_lease_end_dates()
-    tasks.send_payment_reminders.delay()
     return render_template(
         "dashboard/dashboard.html", page_title=page_title, current_user=current_user
     )
 
 
-@owner_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
+@owner_bp.route("/parameters/", methods=["GET", "POST"])
 @login_required
 @owner_required
-def owner_setting(uuid):
+def owner_setting():
     page_title = "Paramètres"
     form = OwnerSettingForm()
 
@@ -55,7 +55,7 @@ def owner_setting(uuid):
 
         current_user.save()
         flash("Votre compte a été mise à jour avec succès.", "success")
-        return redirect(url_for("owner_bp.owner_setting", uuid=current_user.uuid))
+        return redirect(url_for("owner_bp.owner_setting"))
     elif request.method == "GET":
 
         form.gender.data = current_user.vn_gender
@@ -79,9 +79,9 @@ def owner_setting(uuid):
     )
 
 
-@owner_bp.route("/<string:uuid>/change_paswword/", methods=["GET", "POST"])
+@owner_bp.route("/change_paswword/", methods=["GET", "POST"])
 @login_required
-def change_password(uuid):
+def change_password():
     page_title = "Changer votre mot de passe"
     form = ChangePasswordForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -90,7 +90,7 @@ def change_password(uuid):
             current_user.set_password(form.new_password.data)
             current_user.save()
             flash("Votre mot de passe a été mise à jour avec succès.", "success")
-            return redirect(url_for("owner_bp.change_password", uuid=current_user.uuid))
+            return redirect(url_for("owner_bp.change_password"))
         else:
             flash("Le mot de passe est invalide.", category="danger")
 
@@ -103,6 +103,14 @@ def change_password(uuid):
 
 
 @owner_bp.route("/<filename>/")
-@cache.cached(timeout=100)
+@cache.cached(timeout=500)
 def avatar(filename):
     return send_from_directory(current_app.config["UPLOAD_FOLDER_PATH"], filename)
+
+
+@owner_bp.route("/favicon.png")
+@cache.cached(timeout=500)
+def favicon():
+    return send_from_directory(
+        os.path.join(current_app.root_path, "static"), "img/logo/favicon.png"
+    )

@@ -1,8 +1,13 @@
+import secrets
 import uuid
 from datetime import datetime
 
 from src import db
 from src.utils import Updateable
+
+
+def id_generator():
+    return secrets.randbelow(100000)
 
 
 class CRUDMixin(object):
@@ -20,7 +25,7 @@ class CRUDMixin(object):
     @classmethod
     def get_by_id(cls, id):
         if any(
-            (isinstance(id, basestring) and id.isdigit(), isinstance(id, (int, float))),
+            (isinstance(id, str) and id.isdigit(), isinstance(id, (int, float))),
         ):
             return cls.query.get(int(id))
         return None

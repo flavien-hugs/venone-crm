@@ -1,0 +1,53 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_content %}
+	<div id="billingApp">
+
+		<message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
+    	</message-component>
+
+		<div class="row">
+			<div class="col-md-6 mb-4">
+				<div class="card h-100 border-start-lg border-start-primary">
+					<div class="card-body">
+						<div class="small text-muted mb-2">Total loyer en location</div>
+						<div class="h1">{ user.total_house_amount } { user.devise }</div>
+					</div>
+				</div>
+			</div>
+
+	        <div class="col-md-6 mb-4">
+	            <div class="card h-100 border-start-lg border-start-secondary">
+	                <div class="card-body">
+	                    <div class="small text-muted mb-2">Total de vos pourcentages</div>
+	                    <div class="h1">{ user.total_house_percent } { user.devise }</div>
+	                </div>
+	            </div>
+	        </div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-12">
+			    <div class="card mb-4">
+			    	<div class="card-header">Historique de vos retraits effectués</div>
+			    	<div class="card-body px-0">
+			    		<div class="d-flex align-items-center justify-content-between px-4">
+				    		<div class="d-flex align-items-center">
+				    			<i class="fab fa-cc-visa fa-2x cc-color-visa"></i>
+				    			<div class="ms-4">
+				    				<div class="small">Retrait effectué le 21 Avril 2023 sur le 07070707</div>
+				    				<div class="text-xs text-muted">le 04/2024</div>
+				    			</div>
+				    		</div>
+			    		</div>
+			    	</div>
+			    </div>
+		    </div>
+	    </div>
+    </div>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script type="module" src="{{ url_for('static', filename="js/app/billing.js") }}"></script>
+{% endblock other_js_src %}

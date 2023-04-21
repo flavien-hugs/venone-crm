@@ -25,7 +25,6 @@ flask-flatpages = "*"
 flask-bcrypt = "*"
 email-validator = "*"
 pyjwt = "*"
-flask-htmlmin = "*"
 flask-caching = "*"
 psycopg2-binary = "*"
 pillow = "*"
@@ -35,12 +34,15 @@ celery = {extras = ["redis"], version = "*"}
 redis = "*"
 flower = "*"
 pyshorteners = "*"
+httpx = "*"
+flask-minify = "*"
 
 [dev-packages]
 pre-commit = "*"
 black = "*"
 flake8 = "*"
 isort = "*"
+flask-debugtoolbar = "*"
 
 [requires]
 python_version = "3.10"

@@ -6,6 +6,7 @@ window.addEventListener('DOMContentLoaded', event => {
         owner_uuid: '',
         fullname: '',
         addr_email: '',
+        percent: '',
         card_number: '',
         profession: '',
         location: '',
@@ -66,7 +67,7 @@ window.addEventListener('DOMContentLoaded', event => {
                 showMessageAlert: false,
                 ownerData: { ...OWNER_DATA },
                 houseData: { ...HOUSE_DATA },
-                tenantData: { ...TENANT_DATA }
+                tenantData: { ...TENANT_DATA },
             }
         },
         delimiters: ["{", "}"],
@@ -140,6 +141,10 @@ window.addEventListener('DOMContentLoaded', event => {
                 return  ("" + e).replace(/[^0-9]/g, '');
             },
 
+            downloadTenantCSV() {
+                window.location.href = `/dashboard/export-tenants-data`;
+            },
+
             formatPhoneNumber(n) {
                 return ("" + n)
                     .replace(/\D/g, "")
@@ -200,7 +205,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onCreateOwnerTenant() {
                 try {
-                    const ownerTenantRegisterURL = `/api/owner/create_tenant/`;
+                    const ownerTenantRegisterURL = `/api/owner/tenant_register/`;
                     const response = await fetch(ownerTenantRegisterURL, {
                         method: "POST",
                         headers: {
@@ -215,7 +220,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     const data = await response.json();
 
                     if (data.success) {
-                        await this.getOwners();
+                        await this.getTenants();
                         this.tenantData = { ...TENANT_DATA };
                         this.houseData = { ...HOUSE_DATA };
                         this.showMessageAlert = true;

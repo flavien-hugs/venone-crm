@@ -21,7 +21,7 @@ COUNTRY = (
     (GUI, "GN - Guinée"),
     (CON, "CD - Congo (Kinshasa)"),
     (NIG, "NE - Niger"),
-    (BEN, "BN - Benin"),
+    (BEN, "BJ - Benin"),
     (MAL, "ML - Mali"),
     (COM, "KM - Comores"),
 )

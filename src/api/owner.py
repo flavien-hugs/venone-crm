@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from flask import jsonify
+from flask import make_response
 from flask import request
 from flask import url_for
 from flask_login import current_user
@@ -33,16 +34,18 @@ def get_all_houseowners():
     if pagination.has_next:
         next = url_for("api.get_all_houseowners", page=page + 1, _external=True)
 
-    return jsonify(
-        {
-            "houseowners": [owner.to_json() for owner in owners],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-            "user": current_user.to_json(),
-        }
+    return make_response(
+        jsonify(
+            {
+                "houseowners": [owner.to_json() for owner in owners],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+                "user": current_user.to_json(),
+            }
+        )
     )
 
 
@@ -68,18 +71,22 @@ def delete_houseowner(owner_uuid):
         [h.remove() for h in owner.houses]
         [t.remove() for t in owner.tenants]
         owner.remove()
-        return jsonify(
-            {
-                "success": True,
-                "message": f"Le compte du bailleur\
+        return make_response(
+            jsonify(
+                {
+                    "success": True,
+                    "message": f"Le compte du bailleur\
                     #{owner.vn_owner_id} a été supprimé avec succès.",
+                }
+            )
+        )
+    return make_response(
+        jsonify(
+            {
+                "success": False,
+                "message": "Oups ! L'élément n'a pas été trouvé.",
             }
         )
-    return jsonify(
-        {
-            "success": False,
-            "message": "Oups ! L'élément n'a pas été trouvé.",
-        }
     )
 
 
@@ -100,6 +107,7 @@ def update_houseowner(owner_uuid):
     parent_name = data.get("parent_name")
     phonenumber_one = data.get("phonenumber_one")
     phonenumber_two = data.get("phonenumber_two")
+    percent = data.get("percent")
 
     owner.vn_fullname = fullname
     owner.vn_addr_email = addr_email
@@ -110,18 +118,27 @@ def update_houseowner(owner_uuid):
     owner.vn_phonenumber_one = phonenumber_one
     owner.vn_phonenumber_two = phonenumber_two
 
-    owner.save()
+    if (
+        percent is not None
+        and isinstance(percent, (int, float))
+        and 0 <= percent <= 100
+    ):
+        owner.vn_owner_percent = percent
+        owner.save()
+        response_data = {
+            "success": True,
+            "message": f"Propriétaire #{owner.vn_owner_id} mis à jour avec succès.",
+            "owner": owner.to_json(),
+        }
+        status_code = 200
+    else:
+        response_data = {
+            "success": False,
+            "message": "Valeur de pourcentage invalide. Le pourcentage doit être un nombre entre 0 et 100.",
+        }
+        status_code = 400
 
-    return (
-        jsonify(
-            {
-                "success": True,
-                "message": f"Propriétaire #{owner.vn_owner_id} mise à jour avec succès.",
-                "owner": owner.to_json(),
-            }
-        ),
-        200,
-    )
+    return make_response(jsonify(response_data), status_code)
 
 
 @api.post("/owner/<string:owner_uuid>/create_tenant/")
@@ -195,7 +212,7 @@ def owner_create_tenant(owner_uuid):
         db.session.add_all([house, tenant])
         db.session.commit()
 
-        return (
+        return make_response(
             jsonify(
                 {
                     "success": True,
@@ -231,15 +248,17 @@ def get_houseowner_houses(owner_uuid):
             "api.get_houseowner_houses", uuid=owner_uuid, page=page + 1, _external=True
         )
 
-    return jsonify(
-        {
-            "houses": [house.to_json() for house in houses],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
+    return make_response(
+        jsonify(
+            {
+                "houses": [house.to_json() for house in houses],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
     )
 
 
@@ -266,13 +285,15 @@ def get_houseowner_tenants(owner_uuid):
             "api.get_houseowner_tenants", uuid=owner_uuid, page=page + 1, _external=True
         )
 
-    return jsonify(
-        {
-            "tenants": [tenant.to_json() for tenant in tenants],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
+    return make_response(
+        jsonify(
+            {
+                "tenants": [tenant.to_json() for tenant in tenants],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
     )

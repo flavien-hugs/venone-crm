@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from flask import jsonify
+from flask import make_response
 from flask import request
 from flask import url_for
 from flask_login import current_user
@@ -36,15 +37,17 @@ def get_all_users():
     if pagination.has_next:
         next = url_for("api.get_all_users", page=page + 1, _external=True)
 
-    return jsonify(
-        {
-            "users": [user.to_json() for user in users],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
+    return make_response(
+        jsonify(
+            {
+                "users": [user.to_json() for user in users],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
     )
 
 
@@ -52,20 +55,12 @@ def get_all_users():
 @login_required
 def get_user():
     user = current_user.get_user_logged()
-    return jsonify(
-        {
-            "user": user.to_json(),
-            "user_houseowners": [ow.to_json() for ow in user.houseowners],
-            "user_houses": [h.to_json() for h in user.houses],
-            "user_tenants": [t.to_json() for t in user.tenants],
-            "user_payments": [p.to_json() for p in user.payments],
-        }
-    )
+    return make_response(jsonify({"user": user.to_json()}))
 
 
-@api.get("/user/<string:user_uuid>/owners/")
+@api.get("/user/owners/")
 @login_required
-def get_user_owners(user_uuid):
+def get_user_owners():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -81,21 +76,23 @@ def get_user_owners(user_uuid):
     if pagination.has_next:
         next = url_for("api.get_user_owners", page=page + 1, _external=True)
 
-    return jsonify(
-        {
-            "owners": [owner.to_json() for owner in owners],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
+    return make_response(
+        jsonify(
+            {
+                "owners": [owner.to_json() for owner in owners],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
     )
 
 
-@api.get("/user/<string:user_uuid>/tenants/")
+@api.get("/user/tenants/")
 @login_required
-def get_user_tenants(user_uuid):
+def get_user_tenants():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -111,21 +108,23 @@ def get_user_tenants(user_uuid):
     if pagination.has_next:
         next = url_for("api.get_user_tenants", page=page + 1, _external=True)
 
-    return jsonify(
-        {
-            "tenants": [tenant.to_json() for tenant in tenants],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
+    return make_response(
+        jsonify(
+            {
+                "tenants": [tenant.to_json() for tenant in tenants],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
     )
 
 
-@api.get("/user/<string:user_uuid>/houses/")
+@api.get("/user/houses/")
 @login_required
-def get_user_houses(user_uuid):
+def get_user_houses():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -141,21 +140,23 @@ def get_user_houses(user_uuid):
     if pagination.has_next:
         next = url_for("api.get_user_houses", page=page + 1, _external=True)
 
-    return jsonify(
-        {
-            "houses": [house.to_json() for house in houses],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
+    return make_response(
+        jsonify(
+            {
+                "houses": [house.to_json() for house in houses],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
     )
 
 
-@api.get("/user/<string:user_uuid>/payments/")
+@api.get("/user/payments/")
 @login_required
-def get_user_payments(user_uuid):
+def get_user_payments():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
@@ -171,15 +172,17 @@ def get_user_payments(user_uuid):
     if pagination.has_next:
         next = url_for("api.get_user_payments", page=page + 1, _external=True)
 
-    return jsonify(
-        {
-            "payments": [pay.to_json() for pay in payments],
-            "prev": prev,
-            "next": next,
-            "page": page,
-            "per_page": per_page,
-            "total": pagination.total,
-        }
+    return make_response(
+        jsonify(
+            {
+                "payments": [pay.to_json() for pay in payments],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
     )
 
 
@@ -247,12 +250,12 @@ def user_owner_register_tenant():
         db.session.add_all([house, tenant])
         db.session.commit()
 
-        return (
+        return make_response(
             jsonify({"success": True, "message": "Locataire ajouté avec succès !"}),
             201,
         )
 
-    return jsonify({"success": False, "message": "Erreur"})
+    return make_response(jsonify({"success": False, "message": "Erreur"}))
 
 
 @api.post("/company/tenant_register/")
@@ -341,9 +344,36 @@ def user_company_register_tenant():
         db.session.add_all([owner, house, tenant])
         db.session.commit()
 
-        return (
+        return make_response(
             jsonify({"success": True, "message": "Locataire ajouté avec succès !"}),
             201,
         )
 
-    return jsonify({"success": False, "message": "Erreur"})
+    return make_response(jsonify({"success": False, "message": "Erreur"}))
+
+
+@api.post("/house-register/")
+@login_required
+def user_owner_register_house():
+
+    if request.method == "POST":
+
+        house_data = request.json.get("house_data")
+        house = VNHouse()
+        house.vn_house_type = house_data.get("house_type")
+        house.vn_house_rent = house_data.get("house_rent")
+        house.vn_house_month = house_data.get("house_month")
+        house.vn_house_guaranty = house_data.get("house_guaranty")
+        house.vn_house_number_room = house_data.get("house_number_room")
+        house.vn_house_address = house_data.get("house_address")
+        house.vn_house_is_open = False
+
+        current_user.houses.append(house)
+        house.save()
+
+        return make_response(
+            jsonify({"success": True, "message": "Propriété ajoutée avec succès !"}),
+            201,
+        )
+
+    return make_response(jsonify({"success": False, "message": "Erreur"}))

@@ -8,6 +8,7 @@ from flask_login import current_user
 from flask_login import UserMixin
 from src import db
 from src import login_manager
+from src.constants import COUNTRY_DEFAULT
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
 from src.tenant.models import VNHouse
@@ -87,11 +88,10 @@ class VNUser(
 
     __tablename__ = "user"
 
-    vn_country = db.Column(db.String(80), nullable=False)
+    vn_country = db.Column(db.String(80), default=COUNTRY_DEFAULT, nullable=False)
     vn_avatar = db.Column(
         db.String(80), nullable=True, default="/static/img/element/avatar.png"
     )
-    vn_activated = db.Column(db.Boolean, nullable=False, default=False)
     vn_password = db.Column(db.String(180), nullable=False)
     vn_birthdate = db.Column(db.Date, nullable=True)
     vn_last_seen = db.Column(db.DateTime, onupdate=datetime.utcnow())
@@ -157,17 +157,21 @@ class VNUser(
             "is_owner": self.vn_house_owner,
             "is_admin": self.is_administrator(),
             "is_activated": self.vn_activated,
-            "total_payment_month": self.total_payments_month(),
-            "payment_count": self.payments.filter_by(
-                vn_payee_id=current_user.id
-            ).count(),
-            "house_count": self.houses.filter_by(vn_user_id=current_user.id).count(),
-            "owner_count": self.houseowners.filter_by(
-                vn_user_id=current_user.id
-            ).count(),
-            "tenant_count": self.tenants.filter_by(vn_user_id=current_user.id).count(),
             "last_seen": self.vn_last_seen,
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "total_house_amount": self.total_houses_amount(),
+            "total_house_percent": self.total_houses_percent(),
+            "payments_list": self.get_payments_list(),
+            "payments_count": self.get_payments_count(),
+            "total_payment_month": self.total_payments_month(),
+            "houses_count": self.get_houses_count(),
+            "houses_close_count": self.get_houses_close_count(),
+            "houses_open_count": self.get_houses_open_count(),
+            "houses_list": self.get_houses_list(),
+            "tenants_list": self.get_tenants_list(),
+            "tenants_count": self.get_tenants_count(),
+            "owners_list": self.get_houseowners_list(),
+            "owners_count": self.get_houseowners_count(),
         }
         return json_user
 
@@ -176,6 +180,54 @@ class VNUser(
 
     def verify_password(self, password):
         return check_password_hash(self.vn_password, password)
+
+    def get_payments_list(self):
+        payments_list = self.payments.filter_by(vn_payee_id=current_user.id).all()
+        return [p.to_json() for p in payments_list]
+
+    def get_payments_count(self):
+        payments_count = self.payments.filter_by(
+            vn_payee_id=current_user.id, vn_pay_status=True
+        ).count()
+        return payments_count
+
+    def get_houseowners_list(self):
+        owners_list = self.houseowners.filter_by(vn_user_id=current_user.id).all()
+        return [o.to_json() for o in owners_list]
+
+    def get_houseowners_count(self):
+        houseowners_count = self.houseowners.filter_by(
+            vn_user_id=current_user.id
+        ).count()
+        return houseowners_count
+
+    def get_houses_list(self):
+        houses_list = self.houses.filter_by(vn_user_id=current_user.id).all()
+        return [h.to_json() for h in houses_list]
+
+    def get_houses_count(self):
+        houses_count = self.houses.filter_by(vn_user_id=current_user.id).count()
+        return houses_count
+
+    def get_houses_close_count(self):
+        houses_close_count = self.houses.filter_by(
+            vn_house_is_open=True, vn_user_id=current_user.id
+        ).count()
+        return houses_close_count
+
+    def get_houses_open_count(self):
+        houses_open_count = self.houses.filter_by(
+            vn_house_is_open=False, vn_user_id=current_user.id
+        ).count()
+        return houses_open_count
+
+    def get_tenants_list(self):
+        tenants_list = self.tenants.filter_by(vn_user_id=current_user.id).all()
+        return [t.to_json() for t in tenants_list]
+
+    def get_tenants_count(self):
+        tenants_count = self.tenants.filter_by(vn_user_id=current_user.id).count()
+        return tenants_count
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -252,6 +304,25 @@ class VNUser(
         user = VNUser.query.filter_by(id=current_user.id, vn_activated=True).first()
         return user
 
+    def total_houses_amount(self):
+        user_houses = self.houses.filter_by(
+            vn_house_is_open=True, vn_user_id=current_user.id
+        ).all()
+        total = sum(house.vn_house_rent for house in user_houses)
+        return "{:,.2f}".format(total)
+
+    def total_houses_percent(self):
+        user_houses = (
+            self.houses.filter_by(vn_house_is_open=True, vn_user_id=current_user.id)
+            .join(VNHouseOwner)
+            .filter(VNHouseOwner.vn_user_id.isnot(None))
+            .all()
+        )
+        total_percent = sum(
+            house.get_house_rent_with_percent() for house in user_houses
+        )
+        return "{:,.2f}".format(total_percent)
+
     def total_payments_month(self):
 
         from src.payment import VNPayment
@@ -269,14 +340,14 @@ class VNUser(
             .join(VNUser)
             .filter(
                 VNUser.uuid == current_user.uuid,
-                VNUser.id == self.id,
+                VNPayment.vn_pay_status,
                 db.extract("month", VNPayment.vn_pay_date) == month,
                 db.extract("year", VNPayment.vn_pay_date) == year,
             )
             .scalar()
         )
-        total_payments = total_payments or 0
-        return total_payments
+        total_payment_month = total_payments or 0
+        return "{:,.2f}".format(total_payment_month)
 
     @staticmethod
     def get_label(user):
@@ -344,28 +415,20 @@ class VNUser(
 
     @staticmethod
     def count_available_properties():
-        vn_house_is_open = VNHouse.vn_house_is_open
         current_user_id = current_user.id
 
         available_properties = (
             db.session.query(
                 db.func.sum(
-                    db.case(
-                        (
-                            (vn_house_is_open == True) & (VNUser.id == current_user_id),
-                            1,
-                        ),
-                        else_=0,
+                    db.cast(
+                        VNHouse.vn_house_is_open & (VNUser.id == current_user_id),
+                        db.Integer,
                     )
                 ),
                 db.func.sum(
-                    db.case(
-                        (
-                            (vn_house_is_open == False)
-                            & (VNUser.id == current_user_id),
-                            1,
-                        ),
-                        else_=0,
+                    db.cast(
+                        ~VNHouse.vn_house_is_open & (VNUser.id == current_user_id),
+                        db.Integer,
                     )
                 ),
             )
@@ -374,6 +437,34 @@ class VNUser(
         )
 
         return available_properties
+
+    @staticmethod
+    def create_admin():
+
+        """
+        Create the admin user.
+        """
+        import logging
+
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+
+        addr_email = current_app.config["ADMIN_EMAIL"]
+        fullname = current_app.config["ADMIN_USERNAME"]
+        password = current_app.config["ADMIN_PASSWORD"]
+        phonenumber_one = current_app.config["ADMIN_PHONE_NUMBER"]
+
+        try:
+            user = VNUser(vn_addr_email=addr_email)
+            user.vn_fullname = fullname
+            user.vn_password = generate_password_hash(password)
+            user.vn_phonenumber_one = phonenumber_one
+            user.vn_role_id = Permission.ADMIN
+            db.session.add(user)
+            db.session.commit()
+            logger.info(f"Admin with email {addr_email} created successfully!")
+        except Exception as e:
+            logger.warning(f"Couldn't create admin user, because {e}")
 
 
 class AnonymousUser(AnonymousUserMixin):
