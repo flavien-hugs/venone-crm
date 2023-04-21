@@ -62,8 +62,8 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
             "phonenumber_two": self.vn_phonenumber_two,
             "devise": current_user.vn_device,
             "amount_repaid": self.get_amount_repaid(),
-            "amount": '{:,.2f}'.format(self.get_owner_property_values()),
-            "total_percent": '{:,.2f}'.format(self.total_houses_amount()),
+            "amount": "{:,.2f}".format(self.get_owner_property_values()),
+            "total_percent": "{:,.2f}".format(self.total_houses_amount()),
             "houses": [h.vn_house_id for h in self.houses],
             "tenants": [t.vn_tenant_id for t in self.tenants],
             "houses_list": [h.to_json() for h in self.houses],
@@ -168,7 +168,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
     def get_amount_repaid(self):
         total = self.get_owner_property_values() - self.total_houses_amount()
-        return '{:,.2f}'.format(total)
+        return "{:,.2f}".format(total)
 
 
 class VNHouse(TimestampMixin):

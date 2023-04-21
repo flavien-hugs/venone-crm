@@ -41,7 +41,6 @@ window.addEventListener('DOMContentLoaded', event => {
     };
 
     var app = Vue.createApp({
-
         components: {
             paginateComponent,
             messageComponent,
@@ -65,20 +64,29 @@ window.addEventListener('DOMContentLoaded', event => {
                 isLoading: false,
                 ownerData: { ...OWNER_DATA },
                 houseData: { ...HOUSE_DATA },
-                tenantData: { ...TENANT_DATA }
-            }
+                tenantData: { ...TENANT_DATA },
+            };
         },
 
         delimiters: ["{", "}"],
         compilerOptions: {
-            delimiters: ["{", "}"]
+            delimiters: ["{", "}"],
+        },
+
+        watch: {
+            "ownerData.percent": function (f) {
+                this.ownerData.percent = this.filterNumber(f);
+            },
         },
 
         mounted() {
-            this.getOwners()
+            this.getOwners();
         },
 
         methods: {
+            filterNumber(e) {
+                return ("" + e).replace(/[^0-9]/g, "");
+            },
 
             nextStep() {
                 this.currentStep++;
@@ -100,8 +108,8 @@ window.addEventListener('DOMContentLoaded', event => {
                     const response = await fetch(ownersURL, {
                         method: "GET",
                         headers: {
-                            'Content-type': 'application/json'
-                        }
+                            "Content-type": "application/json",
+                        },
                     });
 
                     if (response.ok) {
@@ -124,13 +132,15 @@ window.addEventListener('DOMContentLoaded', event => {
                     const ownerURL = `/api/owner/${ownerUUID}/`;
                     const response = await fetch(ownerURL, {
                         method: "GET",
-                        headers: {'Content-type': 'application/json'},
+                        headers: { "Content-type": "application/json" },
                     });
 
-                    if (response.status == 200){
+                    if (response.status == 200) {
                         const data = await response.json();
                         this.owner = data.owner;
-                        const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+                        const modal = new bootstrap.Modal(
+                            document.getElementById("detailModal")
+                        );
                         modal.show();
                     } else {
                         throw new Error("NETWORK RESPONSE ERROR");
@@ -142,13 +152,17 @@ window.addEventListener('DOMContentLoaded', event => {
 
             updateOwnerConfirm(owner) {
                 this.ownerData = { ...owner } ?? {};
-                const modal = new bootstrap.Modal(document.getElementById('editModal'));
+                const modal = new bootstrap.Modal(
+                    document.getElementById("editModal")
+                );
                 modal.show();
             },
 
             deleteOwnerConfirm(ownerUUID) {
                 this.ownerUUID = ownerUUID;
-                const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                const modal = new bootstrap.Modal(
+                    document.getElementById("deleteModal")
+                );
                 modal.show();
             },
 
@@ -156,7 +170,9 @@ window.addEventListener('DOMContentLoaded', event => {
                 this.ownerUUID = ownerUUID;
                 this.houseData = { ...ownerUUID } ?? {};
                 this.tenantData = { ...ownerUUID } ?? {};
-                const modal = new bootstrap.Modal(document.getElementById('addOwnerTenantModal'));
+                const modal = new bootstrap.Modal(
+                    document.getElementById("addOwnerTenantModal")
+                );
                 modal.show();
             },
 
@@ -166,11 +182,11 @@ window.addEventListener('DOMContentLoaded', event => {
                     const response = await fetch(registerURL, {
                         method: "POST",
                         headers: {
-                            'Content-type': 'application/json'
+                            "Content-type": "application/json",
                         },
                         body: JSON.stringify({
                             house_data: this.houseData,
-                            tenant_data: this.tenantData
+                            tenant_data: this.tenantData,
                         }),
                     });
 
@@ -193,9 +209,12 @@ window.addEventListener('DOMContentLoaded', event => {
                 } catch (error) {
                     console.error(error);
                     this.showMessageAlert = true;
-                    this.messageAlert = 'Une erreur est survenue lors de la création du locataire.';
+                    this.messageAlert =
+                        "Une erreur est survenue lors de la création du locataire.";
                 } finally {
-                    const modelElement = document.getElementById('addOwnerTenantModal');
+                    const modelElement = document.getElementById(
+                        "addOwnerTenantModal"
+                    );
                     const modal = bootstrap.Modal.getInstance(modelElement);
                     modal.hide();
                 }
@@ -204,16 +223,34 @@ window.addEventListener('DOMContentLoaded', event => {
             async onUpdateOwner() {
                 try {
                     const updateURL = `/api/owner/${this.ownerData.owner_uuid}/update/`;
+
+                    if (
+                        this.ownerData.percent === "" ||
+                        isNaN(this.ownerData.percent) ||
+                        this.ownerData.percent < 0 ||
+                        this.ownerData.percent > 100
+                    ) {
+                        this.showMessageAlert = true;
+                        this.messageAlert =
+                            "Valeur de pourcentage invalide. Le pourcentage doit être un nombre entre 0 et 100.";
+                        return;
+                    }
+
+                    this.ownerData.percent = parseFloat(this.ownerData.percent);
+
                     const response = await fetch(updateURL, {
                         method: "PUT",
-                        headers: {'Content-type': 'application/json'},
+                        headers: { "Content-type": "application/json" },
                         body: JSON.stringify(this.ownerData),
                     });
 
                     const data = await response.json();
 
                     if (data.success) {
-                        const index = this.owners.findIndex(owner => owner.owner_uuid === this.ownerData.owner_uuid);
+                        const index = this.owners.findIndex(
+                            (owner) =>
+                                owner.owner_uuid === this.ownerData.owner_uuid
+                        );
                         this.owners.splice(index, 1, this.ownerData);
                         this.ownerData = { ...OWNER_DATA };
                         await this.getOwners();
@@ -228,12 +265,14 @@ window.addEventListener('DOMContentLoaded', event => {
                         this.messageAlert = data.message;
                     }
                 } catch (error) {
-                    console.error(error);
                     this.showMessageAlert = true;
-                    this.messageAlert = 'Une erreur est survenue lors de la mise à du compte propriétaire.';
+                    this.messageAlert =
+                        "Une erreur est survenue lors de la mise à du compte propriétaire.";
                 } finally {
                     this.ownerData.owner_uuid = null;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    const modal = bootstrap.Modal.getInstance(
+                        document.getElementById("editModal")
+                    );
                     modal.hide();
                 }
             },
@@ -244,14 +283,16 @@ window.addEventListener('DOMContentLoaded', event => {
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {
-                            'Content-type': 'application/json'
-                        }
+                            "Content-type": "application/json",
+                        },
                     });
 
                     const data = await response.json();
 
                     if (data.success) {
-                        this.owners = this.owners.filter(owner => owner.owner_uuid !== this.ownerUUID);
+                        this.owners = this.owners.filter(
+                            (owner) => owner.owner_uuid !== this.ownerUUID
+                        );
                         await this.getOwners();
                         this.showMessageAlert = true;
                         this.messageAlert = data.message;
@@ -265,10 +306,13 @@ window.addEventListener('DOMContentLoaded', event => {
                 } catch (error) {
                     console.error(error);
                     this.showMessageAlert = true;
-                    this.messageAlert = 'Une erreur est survenue lors de la suppresion de ce propriétaire.';
+                    this.messageAlert =
+                        "Une erreur est survenue lors de la suppresion de ce propriétaire.";
                 } finally {
                     this.ownerUUID = null;
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                    const modal = bootstrap.Modal.getInstance(
+                        document.getElementById("deleteModal")
+                    );
                     modal.hide();
                 }
             },
@@ -276,16 +320,16 @@ window.addEventListener('DOMContentLoaded', event => {
             prevPage() {
                 this.currentPage--;
                 this.getOwners();
-                window.scrollTo({top: 0, behavior: 'smooth'});
+                window.scrollTo({ top: 0, behavior: "smooth" });
             },
 
             nextPage() {
                 this.currentPage++;
                 this.getOwners();
-                window.scrollTo({top: 0, behavior: 'smooth'});
+                window.scrollTo({ top: 0, behavior: "smooth" });
             },
         },
-    })
+    });
 
     app.mount('#houseOwnerTable');
 });

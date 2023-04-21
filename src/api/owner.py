@@ -107,7 +107,7 @@ def update_houseowner(owner_uuid):
     parent_name = data.get("parent_name")
     phonenumber_one = data.get("phonenumber_one")
     phonenumber_two = data.get("phonenumber_two")
-    percent = data.get('percent')
+    percent = data.get("percent")
 
     owner.vn_fullname = fullname
     owner.vn_addr_email = addr_email
@@ -117,20 +117,28 @@ def update_houseowner(owner_uuid):
     owner.vn_parent_name = parent_name
     owner.vn_phonenumber_one = phonenumber_one
     owner.vn_phonenumber_two = phonenumber_two
-    owner.vn_owner_percent = percent
 
-    owner.save()
+    if (
+        percent is not None
+        and isinstance(percent, (int, float))
+        and 0 <= percent <= 100
+    ):
+        owner.vn_owner_percent = percent
+        owner.save()
+        response_data = {
+            "success": True,
+            "message": f"Propriétaire #{owner.vn_owner_id} mis à jour avec succès.",
+            "owner": owner.to_json(),
+        }
+        status_code = 200
+    else:
+        response_data = {
+            "success": False,
+            "message": "Valeur de pourcentage invalide. Le pourcentage doit être un nombre entre 0 et 100.",
+        }
+        status_code = 400
 
-    return make_response(
-        jsonify(
-            {
-                "success": True,
-                "message": f"Propriétaire #{owner.vn_owner_id} mise à jour avec succès.",
-                "owner": owner.to_json(),
-            }
-        ),
-        200,
-    )
+    return make_response(jsonify(response_data), status_code)
 
 
 @api.post("/owner/<string:owner_uuid>/create_tenant/")

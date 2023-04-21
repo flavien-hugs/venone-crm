@@ -273,7 +273,6 @@ def user_company_register_tenant():
 
         # Add owner objects
         owner = VNHouseOwner()
-        owner.vn_owner_percent = owner_data.get('percent')
         owner.vn_gender = owner_data.get("gender")
         owner.vn_fullname = owner_data.get("fullname")
         owner.vn_addr_email = owner_data.get("addr_email")

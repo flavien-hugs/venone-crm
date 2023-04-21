@@ -48,7 +48,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     }
                 } catch (error) {
                     this.showMessageAlert = true;
-                    this.messageAlert = 'Oops, problème de connexion au serveur.';
+                    this.messageAlert = "Oops, problème de connexion au serveur.";
                 }
             },
         },

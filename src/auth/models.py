@@ -305,12 +305,11 @@ class VNUser(
         return user
 
     def total_houses_amount(self):
-        user_houses = (
-            self.houses.filter_by(vn_house_is_open=True, vn_user_id=current_user.id)
-            .all()
-        )
+        user_houses = self.houses.filter_by(
+            vn_house_is_open=True, vn_user_id=current_user.id
+        ).all()
         total = sum(house.vn_house_rent for house in user_houses)
-        return '{:,.2f}'.format(total)
+        return "{:,.2f}".format(total)
 
     def total_houses_percent(self):
         user_houses = (
@@ -322,7 +321,7 @@ class VNUser(
         total_percent = sum(
             house.get_house_rent_with_percent() for house in user_houses
         )
-        return '{:,.2f}'.format(total_percent)
+        return "{:,.2f}".format(total_percent)
 
     def total_payments_month(self):
 
@@ -348,7 +347,7 @@ class VNUser(
             .scalar()
         )
         total_payment_month = total_payments or 0
-        return '{:,.2f}'.format(total_payment_month)
+        return "{:,.2f}".format(total_payment_month)
 
     @staticmethod
     def get_label(user):
