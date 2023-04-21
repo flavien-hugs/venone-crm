@@ -45,9 +45,6 @@ jobs:
       - name: Vérifier la fusion
         run: git diff --exit-code --quiet dev
 
-      - name: Pousser les modifications vers la branche cible
-        run: git push origin dev
-
       - name: Créer une demande de fusion
         uses: peter-evans/create-pull-request@v3
         with:
