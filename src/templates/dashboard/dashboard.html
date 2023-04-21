@@ -6,13 +6,6 @@
 
 {% block dashboard_content %}
     <section id="dashboardApp">
-        <div v-if="user.is_company && !user.percent" class="alert alert-danger alert-dismissible my-2">
-            <span>
-                Veuillez renseigner le pourcentage relatif à vos bien immobilier d'enregister un bien !
-                Veuillez cliquer sur ce <a class="fw-bold" href="{{ url_for('agency_bp.agency_billing') }}">lien</a> pour le définir.
-            </span>
-        </div>
-
         <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row mb-4">
             <div class="me-4 mb-3 mb-sm-0">
                 <h1 class="mb-0">{{ page_title | e}}</h1>

@@ -7,13 +7,6 @@
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-if="user.is_company && !user.percent" class="alert alert-danger alert-dismissible my-2">
-            <span>
-                Veuillez renseigner le pourcentage relatif à vos bien immobilier d'enregister un bien !
-                Veuillez cliquer sur ce <a class="fw-bold" href="{{ url_for("agency_bp.agency_billing") }}">lien</a> pour le définir.
-            </span>
-        </div>
-
         <div v-if="user.tenants_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
 
@@ -28,7 +21,7 @@
                     Enregistrer un locataire
                 </button>
 
-                <button v-if="user.is_company && user.percent > 0" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                <button v-if="user.is_company" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
                     <i class="me-2" data-feather="user-plus"></i>
                     Enregistrer un locataire
                 </button>
@@ -158,6 +151,13 @@
                                     <div class="col-6">
                                         <label for="card_number" class="form-label small">N° Carte Nationale d'Identité/Attestion/Passport</label>
                                         <input placeholder="N° Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model.trim="ownerData.card_number">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label for="percent" class="form-label">Pourcentage (&#37;)</label>
+                                        <input placeholder="Entrer votre pourcentage sur les loyers de ce propriétaire" class="form-control" id="percent" v-model.num="ownerData.percent">
                                     </div>
                                 </div>
 
