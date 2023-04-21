@@ -284,9 +284,12 @@ class VNHouse(TimestampMixin):
         return tenant.vn_phonenumber_one if tenant is not None else None
 
     def get_house_rent_with_percentage(self):
-        percent = self.user_houses.vn_percentage / 100
-        result = self.vn_house_rent * percent
-        return result
+        if self.user_houses.vn_percentage is not None and self.user_houses.vn_percentage != 0:
+            percent = self.user_houses.vn_percentage / 100
+            result = self.vn_house_rent * percent
+            return result
+        else:
+            return 0
 
     def update_lease_end_date(self):
         today = date.today()
