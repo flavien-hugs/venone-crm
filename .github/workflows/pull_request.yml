@@ -16,8 +16,8 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/:owner/:repo/merges
-          base: dev
-          head: main
+          base: main
+          head: dev
 
       - name: Vérifier la fusion
         run: git diff --exit-code --quiet main
