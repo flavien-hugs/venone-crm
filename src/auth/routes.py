@@ -39,7 +39,7 @@ def before_request():
 def login():
 
     if current_user.is_authenticated:
-        return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
+        return redirect(url_for("owner_bp.dashboard"))
 
     form = LoginForm(request.form)
     if request.method == "POST" and form.validate_on_submit():
@@ -49,7 +49,7 @@ def login():
             login_user(user, form.remember_me.data)
             next_page = request.args.get("next")
             if next_page is None or not next_page.startswith("/"):
-                next_page = url_for("owner_bp.dashboard", uuid=user.uuid)
+                next_page = url_for("owner_bp.dashboard")
 
             flash(
                 f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
@@ -75,7 +75,7 @@ def registerowner_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
         flash("Vous êtes déjà inscrit(e).", category="info")
-        return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
+        return redirect(url_for("owner_bp.dashboard"))
 
     form = OwnerHouseSignupForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -107,7 +107,7 @@ def agencieregister_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
         flash("Vous êtes déjà inscrit(e).", category="info")
-        return redirect(url_for("owner_bp.dashboard", uuid=current_user.uuid))
+        return redirect(url_for("owner_bp.dashboard"))
 
     form = AgencieSignupForm(request.form)
     if request.method == "POST" and form.validate_on_submit():
