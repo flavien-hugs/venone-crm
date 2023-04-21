@@ -3,7 +3,7 @@ name: Automatic Pull Request
 on:
   push:
     branches:
-      - tenant
+      - dev
 
 jobs:
   create_pull_request:
@@ -13,14 +13,22 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Fusionner les branches
-        run: git merge dev
+        uses: octokit/request-action@v2.x
+        with:
+          route: PUT /repos/:owner/:repo/merges
+          base: dev
+          head: main
 
       - name: Vérifier la fusion
-        run: git diff --exit-code --quiet dev
+        run: git diff --exit-code --quiet main
 
       - name: Pousser les modifications vers la branche cible
-        run: git push dev
+        run: git push origin main
 
-      - name: Envoyer une notification en cas d'échec
-        if: failure()
-        run: echo "La fusion a échoué."
+      - name: Créer une demande de fusion
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: dev
+          head: main
+          title: "Mise à jour de la branche main"
+          body: "Cette demande de fusion met à jour la branche main avec les derniers changements."
