@@ -2,7 +2,6 @@ from flask import Blueprint
 from flask import render_template
 from flask_login import current_user
 from flask_login import login_required
-
 from src import cache
 
 
