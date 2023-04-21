@@ -21,20 +21,20 @@ owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(owner_bp)
 
 
-@owner_bp.route("/<string:uuid>/index/", methods=["GET"])
+@owner_bp.route("/index/", methods=["GET"])
 @login_required
-@cache.cached(timeout=500)
-def dashboard(uuid):
+# @cache.cached(timeout=500)
+def dashboard():
     page_title = "Tableau de board"
     return render_template(
         "dashboard/dashboard.html", page_title=page_title, current_user=current_user
     )
 
 
-@owner_bp.route("/<string:uuid>/parameters/", methods=["GET", "POST"])
+@owner_bp.route("/parameters/", methods=["GET", "POST"])
 @login_required
 @owner_required
-def owner_setting(uuid):
+def owner_setting():
     page_title = "Paramètres"
     form = OwnerSettingForm()
 
@@ -55,7 +55,7 @@ def owner_setting(uuid):
 
         current_user.save()
         flash("Votre compte a été mise à jour avec succès.", "success")
-        return redirect(url_for("owner_bp.owner_setting", uuid=current_user.uuid))
+        return redirect(url_for("owner_bp.owner_setting"))
     elif request.method == "GET":
 
         form.gender.data = current_user.vn_gender
@@ -79,9 +79,9 @@ def owner_setting(uuid):
     )
 
 
-@owner_bp.route("/<string:uuid>/change_paswword/", methods=["GET", "POST"])
+@owner_bp.route("/change_paswword/", methods=["GET", "POST"])
 @login_required
-def change_password(uuid):
+def change_password():
     page_title = "Changer votre mot de passe"
     form = ChangePasswordForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -90,7 +90,7 @@ def change_password(uuid):
             current_user.set_password(form.new_password.data)
             current_user.save()
             flash("Votre mot de passe a été mise à jour avec succès.", "success")
-            return redirect(url_for("owner_bp.change_password", uuid=current_user.uuid))
+            return redirect(url_for("owner_bp.change_password"))
         else:
             flash("Le mot de passe est invalide.", category="danger")
 

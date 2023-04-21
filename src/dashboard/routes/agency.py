@@ -27,10 +27,10 @@ agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(agency_bp)
 
 
-@agency_bp.route("/<string:uuid>/parametres/", methods=["GET", "POST"])
+@agency_bp.route("/parametres/", methods=["GET", "POST"])
 @login_required
 @agency_required
-def agency_setting(uuid):
+def agency_setting():
     page_title = "Paramètres"
     form = CompanySettingForm()
 
@@ -50,7 +50,7 @@ def agency_setting(uuid):
 
         current_user.save()
         flash("Votre compte a été mise à jour avec succès.", "success")
-        return redirect(url_for("agency_bp.agency_setting", uuid=current_user.uuid))
+        return redirect(url_for("agency_bp.agency_setting"))
     elif request.method == "GET":
         form.gender.data = current_user.vn_gender
         form.fullname.data = current_user.vn_fullname
@@ -72,9 +72,9 @@ def agency_setting(uuid):
     )
 
 
-@agency_bp.get("/<string:uuid>/tenants/")
+@agency_bp.get("/tenants/")
 @login_required
-def agency_create_tenant(uuid):
+def agency_create_tenant():
     page_title = "Vos locataires"
 
     return render_template(
@@ -84,9 +84,22 @@ def agency_create_tenant(uuid):
     )
 
 
-@agency_bp.get("/<string:uuid>/houses/")
+@agency_bp.get("/billing/")
 @login_required
-def agency_house_list(uuid):
+@agency_required
+def agency_billing():
+    page_title = "Facturation"
+
+    return render_template(
+        "dashboard/account/billing.html",
+        page_title=page_title,
+        current_user=current_user,
+    )
+
+
+@agency_bp.get("/houses/")
+@login_required
+def agency_house_list():
     page_title = "Propriétés"
 
     return render_template(
@@ -96,10 +109,10 @@ def agency_house_list(uuid):
     )
 
 
-@agency_bp.get("/<string:uuid>/homeowners/")
+@agency_bp.get("/homeowners/")
 @login_required
 @agency_required
-def agency_owner_list(uuid):
+def agency_owner_list():
     page_title = "Vos bailleurs"
 
     return render_template(
@@ -109,10 +122,10 @@ def agency_owner_list(uuid):
     )
 
 
-@agency_bp.route("/<string:uuid>/delete_account/", methods=["POST"])
+@agency_bp.route("/delete_account/", methods=["POST"])
 @login_required
-def delete_account(uuid):
-    user = VNUser.query.filter_by(uuid=uuid).first()
+def delete_account():
+    user = VNUser.get_user_logged()
     if current_user != user:
         abort(400)
     try:
