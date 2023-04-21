@@ -57,7 +57,6 @@ var app = Vue.createApp({
                     throw new Error("NETWORK RESPONSE ERROR");
                 }
             } catch (error) {
-                console.log("FETCH ERROR:", error);
                 this.showMessageAlert = true;
                 this.messageAlert = 'Oops, problème de connexion au serveur.';
             }

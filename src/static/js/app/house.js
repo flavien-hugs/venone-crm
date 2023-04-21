@@ -9,9 +9,9 @@ window.addEventListener('DOMContentLoaded', event => {
         house_rent: '',
         house_guaranty: '',
         house_month: '',
-        house_number_room: '',
         house_address: '',
-        lease_start_date: '',
+        house_number_room: '',
+        lease_start_date: new Date().toISOString().substring(0, 10),
     }
 
     const TENANT_DATA = {
@@ -57,6 +57,24 @@ window.addEventListener('DOMContentLoaded', event => {
             delimiters: ["{", "}"],
         },
 
+        watch: {
+            'houseData.house_rent': function (f){
+                this.houseData.house_rent = this.filterNumber(f);
+            },
+            'houseData.house_number_room': function (f){
+                this.houseData.house_number_room = this.filterNumber(f);
+            },
+            'houseData.vn_house_month': function (f){
+                this.houseData.vn_house_month = this.filterNumber(f);
+            },
+            'houseData.house_month': function (f){
+                this.houseData.house_month = this.filterNumber(f);
+            },
+            'houseData.house_guaranty': function (f){
+                this.houseData.house_guaranty = this.filterNumber(f);
+            },
+        },
+
         async mounted() {
             await this.getHouses();
         },
@@ -65,6 +83,10 @@ window.addEventListener('DOMContentLoaded', event => {
 
             downloadHouseCSV() {
                 window.location.href = `/dashboard/export-houses-data`;
+            },
+
+            filterNumber(e) {
+                return  ("" + e).replace(/[^0-9]/g, '');
             },
 
             nextStep() {
@@ -113,6 +135,11 @@ window.addEventListener('DOMContentLoaded', event => {
                 }
             },
 
+            createHouse() {
+                const modal = new bootstrap.Modal(document.getElementById('createHouseModal'));
+                modal.show();
+            },
+
             updateHouse(house) {
                 this.houseData = { ...house } ?? {};
                 const modal = new bootstrap.Modal(
@@ -139,6 +166,44 @@ window.addEventListener('DOMContentLoaded', event => {
                 modal.show();
             },
 
+            async onCreateHouse() {
+                try {
+                    const houseRegisterURL = `/api/house-register/`;
+                    const response = await fetch(houseRegisterURL, {
+                        method: "POST",
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            house_data: this.houseData,
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.houseData = { ...HOUSE_DATA };
+                        await this.getHouses();
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                        setTimeout(() => {
+                            this.showMessageAlert = false;
+                        }, 3000);
+                    } else {
+                        this.showMessageAlert = true;
+                        this.messageAlert = data.message;
+                    }
+                } catch (error) {
+                    console.log(error);
+                    this.showMessageAlert = true;
+                    this.messageAlert = "Une erreur est survenue lors de l'enregistrement.";
+                } finally {
+                    this.houseData.house_uuid = null;
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createHouseModal'));
+                    modal.hide();
+                }
+            },
+
             async onUpdateHouse() {
                 try {
                     const updateURL = `/api/house/${this.houseData.house_uuid}/update/`;
@@ -152,8 +217,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
                     if (data.success) {
                         const index = this.houses.findIndex(
-                            (house) =>
-                                house.house_uuid === this.houseData.house_uuid
+                            (house) => house.house_uuid === this.houseData.house_uuid
                         );
                         this.houses.splice(index, 1, this.houseData);
                         this.houseData = { ...HOUSE_DATA };
