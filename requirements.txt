@@ -20,7 +20,7 @@ psycopg2-binary
 pillow
 -i https://test.pypi.org/simple/ cinetpay-sdk==0.1.1
 requests
-celery["redis"]
+celery
 redis
 flower
 pyshorteners
