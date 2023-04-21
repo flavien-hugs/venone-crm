@@ -12,15 +12,11 @@ jobs:
       - name: Checkout référentiel
         uses: actions/checkout@v2
 
-      - name: Fusionner les branches
-        uses: octokit/request-action@v2.x
-        with:
-          route: PUT /repos/:owner/:repo/merges
-          base: main
-          head: dev
-
       - name: Vérifier la fusion
         run: git diff --exit-code --quiet main
+
+      - name: Exécuter les tests
+        run: python3 -m unittest discover -s tests
 
       - name: Pousser les modifications vers la branche cible
         run: git push origin main
