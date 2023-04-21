@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Vérifier la fusion
-        run: git diff --exit-code --quiet main
+        run: git diff --exit-code --quiet dev
 
       - name: Exécuter les tests
         run: python3 -m unittest discover -s tests
