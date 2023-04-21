@@ -10,6 +10,7 @@ window.addEventListener('DOMContentLoaded', event => {
         addr_email: '',
         card_number: '',
         location: '',
+        percent: '',
         profession: '',
         parent_name: '',
         phonenumber_one: '',

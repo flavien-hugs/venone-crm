@@ -6,6 +6,7 @@ window.addEventListener('DOMContentLoaded', event => {
         owner_uuid: '',
         fullname: '',
         addr_email: '',
+        percent: '',
         card_number: '',
         profession: '',
         location: '',
