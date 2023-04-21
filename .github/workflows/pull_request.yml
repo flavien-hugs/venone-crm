@@ -8,15 +8,41 @@ on:
 jobs:
   create_pull_request:
     runs-on: ubuntu-latest
+
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version:
+          - '3.x'
+
     steps:
-      - name: Checkout référentiel
+      - name: Vérification du code
         uses: actions/checkout@v2
 
-      - name: Vérifier la fusion
-        run: git diff --exit-code --quiet dev
+      - name: Dépendances du cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Installation de Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: 'x64'
+
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Exécuter les tests
         run: python3 -m unittest discover -s tests
+
+      - name: Vérifier la fusion
+        run: git diff --exit-code --quiet dev
 
       - name: Pousser les modifications vers la branche cible
         run: git push origin main
