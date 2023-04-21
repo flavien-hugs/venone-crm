@@ -98,7 +98,6 @@ class VNUser(
 
     vn_house_owner = db.Column(db.Boolean(), default=False)
     vn_company = db.Column(db.Boolean(), default=False)
-    vn_percentage = db.Column(db.Float, default=0, nullable=True)
 
     vn_device = db.Column(db.String(80), nullable=True)
     vn_find_us = db.Column(db.String(100), nullable=True)
@@ -152,7 +151,6 @@ class VNUser(
             "agencie_name": self.vn_agencie_name,
             "business_number": self.vn_business_number,
             "devise": self.vn_device,
-            "percent": self.vn_percentage,
             "find_us": self.vn_find_us,
             "ip_address": self.vn_ip_address,
             "is_company": self.vn_company,
@@ -161,8 +159,8 @@ class VNUser(
             "is_activated": self.vn_activated,
             "last_seen": self.vn_last_seen,
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "total_houses_amount": self.total_houses_amount(),
-            "total_houses_percent": self.total_houses_percent(),
+            "total_house_amount": self.total_houses_amount(),
+            "total_house_percent": self.total_houses_percent(),
             "payments_list": self.get_payments_list(),
             "payments_count": self.get_payments_count(),
             "total_payment_month": self.total_payments_month(),
@@ -309,12 +307,10 @@ class VNUser(
     def total_houses_amount(self):
         user_houses = (
             self.houses.filter_by(vn_house_is_open=True, vn_user_id=current_user.id)
-            .join(VNHouseOwner)
-            .filter(VNHouseOwner.vn_user_id.isnot(None))
             .all()
         )
         total = sum(house.vn_house_rent for house in user_houses)
-        return total
+        return '{:,.2f}'.format(total)
 
     def total_houses_percent(self):
         user_houses = (
@@ -323,10 +319,10 @@ class VNUser(
             .filter(VNHouseOwner.vn_user_id.isnot(None))
             .all()
         )
-        total_percentage = sum(
-            house.get_house_rent_with_percentage() for house in user_houses
+        total_percent = sum(
+            house.get_house_rent_with_percent() for house in user_houses
         )
-        return total_percentage
+        return '{:,.2f}'.format(total_percent)
 
     def total_payments_month(self):
 
@@ -351,8 +347,8 @@ class VNUser(
             )
             .scalar()
         )
-        total_payments = total_payments or 0
-        return total_payments
+        total_payment_month = total_payments or 0
+        return '{:,.2f}'.format(total_payment_month)
 
     @staticmethod
     def get_label(user):
