@@ -14,6 +14,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_flatpages import FlatPages
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_minify import Minify
 from flask_moment import Moment
@@ -23,6 +24,7 @@ from sqlalchemy import MetaData
 
 from celery import Celery
 from celery import Task
+
 
 metadata = MetaData(
     naming_convention={
@@ -37,6 +39,7 @@ metadata = MetaData(
 cors = CORS()
 mail = Mail()
 bcrypt = Bcrypt()
+ma = Marshmallow()
 db = SQLAlchemy(metadata=metadata)
 moment = Moment()
 migrate = Migrate()
@@ -76,14 +79,19 @@ def create_venone_app(config_name):
     login_manager.init_app(venone_app)
 
     minify.init_app(venone_app)
-    toolbar.init_app(venone_app)
-
     db.init_app(venone_app)
     migrate.init_app(venone_app, db)
+    ma.init_app(venone_app)
 
     cors.init_app(venone_app, origins="*", supports_credentials=True)
 
     celery_init_app(venone_app)
+
+    if venone_app.debug:
+        from werkzeug.middleware.profiler import ProfilerMiddleware as prof
+
+        # venone_app.wsgi_app = prof(venone_app.wsgi_app)
+        toolbar.init_app(venone_app)
 
     with venone_app.app_context():
 
