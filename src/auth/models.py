@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import jwt
 from flask import current_app
 from flask import request
 from flask_login import AnonymousUserMixin
@@ -228,56 +227,6 @@ class VNUser(
     def get_tenants_count(self):
         tenants_count = self.tenants.filter_by(vn_user_id=current_user.id).count()
         return tenants_count
-
-    @staticmethod
-    def verify_reset_password_token(token):
-        try:
-            user_id = jwt.decode(
-                token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
-            )["reset_password"]
-        except Exception as e:
-            print(e)
-            return
-        return db.session(VNUser).query.get(int(user_id))
-
-    def generate_reset_token(self, expires_in=3600):
-        secret_key = current_app.config["SECRET_KEY"]
-        return jwt.encode(
-            {"auth_view.reset_password": self.id, "exp": expires_in},
-            secret_key,
-            algorithm="HS256",
-        )
-
-    def generate_email_change_token(self, new_email, expiration=3600):
-        secret_key = current_app.config["SECRET_KEY"]
-        return jwt.decode(
-            {"auth_view.change_email": self.id, "new_email": new_email},
-            secret_key,
-            algorithm=["HS256"],
-        )
-
-    def change_email(self, token):
-        secret_key = current_app.config["SECRET_KEY"]
-        try:
-            data = jwt.decode(token, secret_key, algorithm="HS256")
-        except Exception as e:
-            print(e)
-            return False
-
-        if data.get("change_email") != self.id:
-            return False
-        new_email = data.get("new_email")
-
-        if new_email is None:
-            return False
-
-        if self.query.filter_by(vn_addr_email=new_email).first() is not None:
-            return False
-
-        self.email = new_email
-        db.session.add(self)
-
-        return True
 
     def can(self, perm):
         return self.role is not None and self.role.has_permission(perm)
