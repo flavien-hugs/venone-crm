@@ -36,6 +36,7 @@ flower = "*"
 pyshorteners = "*"
 httpx = "*"
 flask-minify = "*"
+flask-marshmallow = "*"
 
 [dev-packages]
 pre-commit = "*"

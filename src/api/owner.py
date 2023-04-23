@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from http import HTTPStatus
 
 from flask import jsonify
 from flask import make_response
@@ -96,7 +97,10 @@ def update_houseowner(owner_uuid):
     owner = VNHouseOwner.get_owner(owner_uuid)
 
     if not owner:
-        return jsonify({"message": "Oups ! L'élément n'a pas été trouvé."}), 404
+        return (
+            jsonify({"message": "Oups ! L'élément n'a pas été trouvé."}),
+            HTTPStatus.NOT_FOUND,
+        )
 
     data = request.get_json()
     fullname = data.get("fullname")
@@ -130,11 +134,12 @@ def update_houseowner(owner_uuid):
             "message": f"Propriétaire #{owner.vn_owner_id} mis à jour avec succès.",
             "owner": owner.to_json(),
         }
-        status_code = 200
+        status_code = HTTPStatus.OK
     else:
         response_data = {
             "success": False,
-            "message": "Valeur de pourcentage invalide. Le pourcentage doit être un nombre entre 0 et 100.",
+            "message": "Valeur de pourcentage invalide.\
+                Le pourcentage doit être un nombre entre 0 et 100.",
         }
         status_code = 400
 

@@ -11,6 +11,7 @@ from flask_login import login_user
 from flask_login import logout_user
 from src import db
 from src import login_manager
+from src.auth import utils
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
 from src.auth.forms.auth_form import LoginForm
@@ -50,7 +51,6 @@ def login():
             next_page = request.args.get("next")
             if next_page is None or not next_page.startswith("/"):
                 next_page = url_for("owner_bp.dashboard")
-
             flash(
                 f"Hello, bienvenue sur votre tableau de bord: {user.vn_fullname!r}",
                 category="success",
@@ -135,15 +135,15 @@ def agencieregister_page():
     return render_template("auth/signup/agencie.html", form=form, page_title=page_title)
 
 
-@auth_bp.route("/reset_password/", methods=["GET", "POST"])
+@auth_bp.route("/reset-password/", methods=["GET", "POST"])
 def password_reset_request():
 
     form = PasswordResetRequestForm(request.form)
     if request.method == "POST" and form.validate_on_submit():
-        email_lower = form.addr_email.data.lower()
-        user = VNUser.query.filter_by(vn_addr_email=email_lower).first()
+        email = form.addr_email.data.lower()
+        user = VNUser.query.filter_by(vn_addr_email=email).first()
         if user:
-            token = user.generate_reset_token()
+            token = utils.generate_confirm_token(email)
             send_email(
                 user.vn_addr_email,
                 "Réinitialiser votre mot de passe",
@@ -152,58 +152,71 @@ def password_reset_request():
                 token=token,
             )
             flash(
-                """Un courriel contenant les instructions pour
-                réinitialiser votre mot de passe vous a été envoyé.""",
+                """Un e-mail avec les instructions de réinitialisation\
+                    de mot de passe a été envoyé à votre adresse e-mail.""",
                 category="info",
             )
             return redirect(url_for("auth_bp.login"))
-        flash(
-            f"""L'utilisateur avec l'adresse e-mail '{email_lower}!r'
-            n'existe pas ou le compte a été désactivé !
-            Veuillez contacter l'administrateur.""",
-            category="danger",
-        )
+        else:
+            flash(
+                f"""L'adresse e-mail '{email}!r' n'est pas enregistrée ou\
+                    le compte a été désactivé ! Veuillez contacter l'administrateur.""",
+                category="danger",
+            )
+            return redirect(url_for("auth_bp.password_reset_request"))
 
     page_title = "Réinitialiser votre mot de passe"
     return render_template("auth/reset_password.html", page_title=page_title, form=form)
 
 
-@auth_bp.route("/resetpassword/<token>/", methods=["GET", "POST"])
+@auth_bp.route("/reset-password-confirm/<token>/", methods=["GET", "POST"])
 def password_reset(token):
-    if current_user.is_authenticated:
-        if current_user.vn_house_owner:
-            flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("owner_bp.dashboard"))
-        elif current_user.vn_company:
-            flash("Vous êtes déjà inscrit(e).", category="info")
-            return redirect(url_for("agency_bp.dashboard"))
+    try:
+        email = utils.confirm_token(token)
+    except Exception:
+        flash(
+            "Le lien de réinitialisation de mot de passe est invalide ou expiré.",
+            "error",
+        )
+        return redirect(url_for("auth_bp.login"))
 
-    user = VNUser.verify_reset_password_token(token)
-
+    user = VNUser.query.filter_by(vn_addr_email=email).first()
     if not user:
+        flash(
+            "Le lien de réinitialisation de mot de passe est invalide ou expiré.",
+            "error",
+        )
         return redirect(url_for("auth_bp.login"))
 
     form = PasswordResetForm(request.form)
-    if form.validate_on_submit():
-        user.password(form.new_password.data)
-        db.session.commit()
-        flash("Votre mot de passe a été mis à jour.", category="success")
-        return redirect(url_for("auth_bp.login"))
+    if request.method == "POST" and form.validate_on_submit():
+        if form.new_password.data != form.confirm_password.data:
+            flash("Les mots de passe ne correspondent pas.", "error")
+            return redirect(url_for("auth_bp.password_reset", token=token))
+        else:
+            user.set_password(form.new_password.data)
+            db.session.commit()
+            flash(
+                "Votre mot de passe a été réinitialisé avec succès.\
+                    Vous pouvez maintenant vous connecter.",
+                category="success",
+            )
+            return redirect(url_for("auth_bp.login"))
 
     page_title = "Réinitialiser votre mot de passe"
     return render_template(
-        "auth/change_password.html", page_title=page_title, form=form
+        "auth/change_password.html", page_title=page_title, form=form, token=token
     )
 
 
-@auth_bp.route("/change_email/", methods=["GET", "POST"])
+@auth_bp.route("/change-email/", methods=["GET", "POST"])
 @login_required
 def change_email_request():
     form = ChangeEmailForm()
     if form.validate_on_submit(request.form):
         if current_user.verify_password(form.password.data):
             new_email = form.addr_email.data.lower()
-            token = current_user.generate_email_change_token(new_email)
+            token = utils.generate_confirm_token(new_email)
             send_email(
                 new_email,
                 "Confirmez votre adresse électronique",
@@ -219,25 +232,25 @@ def change_email_request():
             next_url = request.args.get("next")
             return redirect(next_url)
         else:
-            flash("Courriel ou mot de passe non valide.")
+            flash("Courriel ou mot de passe non valide.", category="danger")
 
     page_title = "Confirmez votre adresse électronique"
     return render_template("auth/change_email.html", page_title=page_title, form=form)
 
 
-@auth_bp.route("/change_email/<token>/", methods=["GET"])
+@auth_bp.get("/change-email/<token>/")
 @login_required
 def change_email(token):
-    if current_user.change_email(token):
+    if utils.confirm_token(token):
         db.session.commit()
-        flash("Votre adresse e-mail a été mise à jour.")
+        flash("Votre adresse e-mail a été mise à jour.", category="info")
     else:
-        flash("Demande invalide.")
+        flash("Demande invalide.", category="danger")
     next_url = request.args.get("next")
     return redirect(next_url)
 
 
-@auth_bp.route("/logout/")
+@auth_bp.get("/logout/")
 @login_required
 def logout():
     logout_user()

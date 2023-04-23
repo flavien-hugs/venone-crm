@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from http import HTTPStatus
 
 from flask import abort
 from flask import jsonify
@@ -124,7 +125,7 @@ def get_house_info(house_id):
     ).first()
 
     if not house:
-        abort(404, "Could not find house.")
+        abort(HTTPStatus.NOT_FOUND, "Could not find house.")
 
     return make_response(
         jsonify(
@@ -142,7 +143,9 @@ def get_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return make_response(jsonify({"error": "House not found"}), 404)
+        return make_response(
+            jsonify({"error": "House not found"}), HTTPStatus.NOT_FOUND
+        )
 
     tenants = house.tenants(page=request.args.get("page", 1, type=int))
     payments = house.payments(page=request.args.get("page", 1, type=int))
@@ -182,7 +185,10 @@ def house_assign_tenant(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return make_response(jsonify({"message": "maison introuvable"})), 404
+        return (
+            make_response(jsonify({"message": "maison introuvable"})),
+            HTTPStatus.NOT_FOUND,
+        )
 
     house_data = request.json.get("house_data")
     tenant_data = request.json.get("tenant_data")
@@ -264,7 +270,10 @@ def update_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return make_response(jsonify({"message": "Oops : propriété introuvable"})), 404
+        return (
+            make_response(jsonify({"message": "Oops : propriété introuvable"})),
+            HTTPStatus.NOT_FOUND,
+        )
 
     data = request.json
 
@@ -292,7 +301,7 @@ def update_house(house_uuid):
                 "house": house.to_json(),
             }
         ),
-        200,
+        HTTPStatus.OK,
     )
 
 
@@ -328,7 +337,10 @@ def list_payments_for_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return make_response(jsonify({"message": "Oops! propriété introuvable"})), 404
+        return (
+            make_response(jsonify({"message": "Oops! propriété introuvable"})),
+            HTTPStatus.NOT_FOUND,
+        )
 
     payments = []
     for payment in house.payments:
@@ -340,4 +352,4 @@ def list_payments_for_house(house_uuid):
                 "tenant": payment.tenant.vn_tenant_full_name,
             }
         )
-    return make_response(jsonify({"payments": payments})), 200
+    return make_response(jsonify({"payments": payments})), HTTPStatus.OK

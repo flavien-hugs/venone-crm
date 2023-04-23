@@ -58,7 +58,6 @@ class PasswordResetForm(FlaskForm):
             ),
         ],
     )
-    submit = SubmitField("Réinitialiser le mot de passe")
 
 
 class ChangeEmailForm(FlaskForm):

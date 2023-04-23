@@ -1,0 +1,5 @@
+{{ user.vn_addr_email }},
+
+Nous avons détecté une nouvelle connexion à votre compte Google depuis un Linux.
+Si c'était vous, aucune action de votre part n'est requise.
+Dans le cas contraire, nous vous aiderons à sécuriser votre compte.

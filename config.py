@@ -3,6 +3,7 @@ Global Flask Application Setting
 See `.flaskenv` for default settings.
 """
 import os
+from datetime import timedelta
 from typing import Generator
 
 from dotenv import load_dotenv
@@ -83,6 +84,8 @@ class Config:
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
     ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
     ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+
+    TOKEN_EXPIRATION_TIME = timedelta(days=3)
 
     ALLOWED_COUNTRIES = [
         "SN",

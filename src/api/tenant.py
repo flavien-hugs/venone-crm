@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from flask import jsonify
 from flask import make_response
 from flask import request
@@ -98,7 +100,9 @@ def update_tenant(tenant_uuid):
     tenant = VNTenant.get_tenant(tenant_uuid)
 
     if not tenant:
-        return make_response(jsonify({"message": "tenant not found"}), 404)
+        return make_response(
+            jsonify({"message": "tenant not found"}), HTTPStatus.NOT_FOUND
+        )
 
     data = request.json
 
@@ -128,7 +132,7 @@ def update_tenant(tenant_uuid):
                 "tenant": tenant.to_json(),
             }
         ),
-        200,
+        HTTPStatus.OK,
     )
 
 

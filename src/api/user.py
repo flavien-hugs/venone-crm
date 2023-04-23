@@ -1,5 +1,7 @@
+import re
 from datetime import datetime
 from datetime import timedelta
+from http import HTTPStatus
 
 from flask import jsonify
 from flask import make_response
@@ -16,6 +18,8 @@ from src.tenant import VNHouseOwner
 from src.tenant import VNTenant
 
 from . import api
+
+from src.schemas import users_schema, user_schema
 
 
 @api.get("/users/")
@@ -252,7 +256,7 @@ def user_owner_register_tenant():
 
         return make_response(
             jsonify({"success": True, "message": "Locataire ajouté avec succès !"}),
-            201,
+            HTTPStatus.CREATED,
         )
 
     return make_response(jsonify({"success": False, "message": "Erreur"}))
@@ -271,7 +275,7 @@ def user_company_register_tenant():
         house_data = request.json.get("house_data")
         tenant_data = request.json.get("tenant_data")
 
-        # Add owner objects
+        # add owner objects
         owner = VNHouseOwner()
         owner.vn_gender = owner_data.get("gender")
         owner.vn_fullname = owner_data.get("fullname")
@@ -285,8 +289,7 @@ def user_company_register_tenant():
 
         owner.vn_user_id = current_user_id
 
-        # Add house objects
-
+        # add house objects
         house = VNHouse()
         house.vn_house_type = house_data.get("house_type")
         house.vn_house_rent = house_data.get("house_rent")
@@ -322,8 +325,7 @@ def user_company_register_tenant():
         house.vn_user_id = current_user_id
         house.vn_owner_id = owner.id
 
-        # Add tenant objects
-
+        # add tenant objects
         tenant = VNTenant()
 
         tenant.vn_fullname = tenant_data.get("fullname")
@@ -346,7 +348,7 @@ def user_company_register_tenant():
 
         return make_response(
             jsonify({"success": True, "message": "Locataire ajouté avec succès !"}),
-            201,
+            HTTPStatus.CREATED,
         )
 
     return make_response(jsonify({"success": False, "message": "Erreur"}))
@@ -373,7 +375,155 @@ def user_owner_register_house():
 
         return make_response(
             jsonify({"success": True, "message": "Propriété ajoutée avec succès !"}),
-            201,
+            HTTPStatus.CREATED,
         )
 
     return make_response(jsonify({"success": False, "message": "Erreur"}))
+
+
+def owners_to_json(owner):
+    return {
+        "owner_uuid": owner.uuid,
+        "gender": owner.vn_gender,
+        "fullname": owner.vn_fullname,
+        "addr_email": owner.vn_addr_email,
+        "profession": owner.vn_profession,
+        "parent_name": owner.vn_parent_name,
+        "card_number": owner.vn_cni_number,
+        "location": owner.vn_location,
+        "percent": owner.vn_owner_percent,
+        "phonenumber_one": owner.vn_phonenumber_one,
+        "phonenumber_two": owner.vn_phonenumber_two,
+        "is_activated": owner.vn_activated,
+        "created_at": owner.vn_created_at.strftime("%d-%m-%Y"),
+    }
+
+
+def user_to_json(user):
+    return {
+        "user_id": user.uuid,
+        "fullname": user.vn_fullname,
+        "profession": user.vn_profession,
+        "parent_name": user.vn_parent_name,
+        "phonenumber_one": user.vn_phonenumber_one,
+        "phonenumber_two": user.vn_phonenumber_two,
+        "cni_number": user.vn_cni_number,
+        "location": user.vn_location,
+        "country": user.vn_country,
+        "agencie_name": user.vn_agencie_name,
+        "business_number": user.vn_business_number,
+        "devise": user.vn_device,
+        "find_us": user.vn_find_us,
+        "ip_address": user.vn_ip_address,
+        "is_company": user.vn_company,
+        "is_owner": user.vn_house_owner,
+        "is_activated": user.vn_activated,
+        "last_seen": user.vn_last_seen,
+        "created_at": user.vn_created_at.strftime("%d-%m-%Y"),
+        "tenants_count": user.tenants.count(),
+        "houses_count": user.houses.count(),
+        "owners_count": user.houseowners.count(),
+        "owners_list": [owners_to_json(owner) for owner in user.houseowners.all()],
+    }
+
+
+@api.post("/login/")
+def login():
+
+    data = request.get_json()
+    addr_email = data.get("vn_addr_email", None)
+    passowrd = data.get("vn_password", None)
+
+    user = VNUser.query.filter_by(vn_addr_email=addr_email).first()
+
+    if user and user.verify_password(passowrd) and user.vn_activated:
+        return make_response(
+            jsonify(
+                {
+                    "success": True,
+                    "user": user_to_json(user),
+                    "message": f"Hello, bienvenue sur votre tableau de bord {addr_email}",
+                }
+            ),
+            HTTPStatus.OK,
+        )
+
+    return make_response(
+        jsonify(
+            {
+                "success": True,
+                "message": "L'utilisateur n'existe pas ou le compte à été désactivé !\
+                    Veuillez contacter l'administrateur système.",
+            }
+        ),
+        HTTPStatus.UNAUTHORIZED,
+    )
+
+
+@api.post("/register/")
+def register():
+
+    data = request.get_json()
+    addr_email = data.get("vn_addr_email", None)
+
+    if not data.get("addr_email"):
+        return make_response(
+            jsonify({"message": "The e-mail address cannot be empty."}),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", addr_email):
+        return make_response(
+            jsonify({"message": "The email address is invalid."}),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    if VNUser.query.filter_by(vn_addr_email=addr_email).first():
+        return (
+            make_response(
+                jsonify({"message": f"This address email '{addr_email}!r' is taken !"})
+            ),
+            HTTPStatus.CONFLICT,
+        )
+
+    fullname = data.get("vn_fullname", None)
+    phonenumber_one = data.get("vn_phonenumber_one", None)
+    cni_number = data.get("vn_cni_number", None)
+    country = data.get("vn_country", None)
+    password = data.get("vn_password", None)
+    is_company = data.get("vn_company", None)
+    is_house_owner = data.get("vn_house_owner", None)
+
+    new_user = VNUser(
+        vn_fullname=fullname,
+        vn_addr_email=addr_email.lower(),
+        vn_phonenumber_one=phonenumber_one,
+        vn_cni_number=cni_number,
+        vn_country=country,
+        vn_house_owner=is_house_owner,
+        vn_company=is_company,
+    )
+    new_user.set_password(password)
+    new_user.vn_activated = True
+    new_user.save()
+    return make_response(
+        jsonify(
+            {
+                "success": True,
+                "user": user_to_json(new_user),
+                "message": "account successfully created!",
+            }
+        ),
+        HTTPStatus.CREATED,
+    )
+
+@api.get("/users-all/")
+def users_all():
+    all_users = VNUser.query.all()
+    return users_schema.dump(all_users)
+
+
+@api.get("/users/<id>")
+def user_detail(id):
+    user = VNUser.query.get(id)
+    return user_schema.dump(user)
