@@ -6,7 +6,7 @@
                     Mon Compte
                 </div>
 
-                <!--<a class="nav-link d-sm-none" href="#!">
+                {# <a class="nav-link d-sm-none" href="#!">
                     <div class="nav-link-icon">
                         <i data-feather="bell"></i>
                     </div>
@@ -19,7 +19,7 @@
                     </div>
                     Messages
                     <span class="badge bg-success-soft text-success ms-auto">2 New!</span>
-                </a>  -->
+                </a>  #}
 
                 <div class="sidenav-menu-heading">Menu Venone</div>
 
@@ -49,12 +49,12 @@
                         </div>
                         Locataires
                     </a>
-
-                    <a class="nav-link" href="#!">
+                    
+                    {# <a class="nav-link" href="#!">
                         <div class="nav-link-icon">
                             <i data-feather="grid"></i>
                         </div> Arriérés
-                    </a>
+                    </a> #}
 
                     <div class="sidenav-menu-heading">Gestion Bailleurs</div>
                     <a class="nav-link" href="{{ url_for("agency_bp.agency_owner_list") }}">
@@ -83,20 +83,25 @@
                 </a>
 
                 {% if current_user.vn_company %}
+                    <a class="nav-link" href="~">
+                        <div class="nav-link-icon">
+                            <i data-feather="home"></i>
+                        </div> Locations disponibles
+                    </a>
 
-                <!--<div class="sidenav-menu-heading">Rapports</div>
-                <a class="nav-link" href="#!">
-                    <div class="nav-link-icon">
-                        <i data-feather="bar-chart"></i>
-                    </div>
-                    Rapports
-                </a>
-                <a class="nav-link" href="#!">
-                    <div class="nav-link-icon">
-                        <i data-feather="bell"></i>
-                    </div>
-                    Notifications
-                </a>-->
+                    {# <div class="sidenav-menu-heading">Rapports</div>
+                    <a class="nav-link" href="#!">
+                        <div class="nav-link-icon">
+                            <i data-feather="bar-chart"></i>
+                        </div>
+                        Rapports
+                    </a>
+                    <a class="nav-link" href="#!">
+                        <div class="nav-link-icon">
+                            <i data-feather="bell"></i>
+                        </div>
+                        Notifications
+                    </a> #}
 
                 {% endif %}
 
