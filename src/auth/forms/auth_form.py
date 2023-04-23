@@ -21,12 +21,19 @@ class LoginForm(FlaskForm):
             Email(message="Entrer une adresse email valide."),
         ],
     )
-    password = PasswordField("Mot de passe", render_kw={"required": True}, validators=[DataRequired()])
+    password = PasswordField(
+        "Mot de passe", render_kw={"required": True}, validators=[DataRequired()]
+    )
     remember_me = BooleanField("Se souvenir de moi")
     submit = SubmitField("Se connecter")
 
+
 class PasswordResetForm(FlaskForm):
-    new_password = PasswordField("Nouveau mot de passe", render_kw={"required": True}, validators=[DataRequired()])
+    new_password = PasswordField(
+        "Nouveau mot de passe",
+        render_kw={"required": True},
+        validators=[DataRequired()],
+    )
     confirm_password = PasswordField(
         "Confirmer le mot de passe",
         render_kw={"required": True},
@@ -39,22 +46,31 @@ class PasswordResetForm(FlaskForm):
         ],
     )
 
+
 class ChangePasswordForm(PasswordResetForm):
-    old_password = PasswordField("Ancien mot de passe", render_kw={"required": True}, validators=[DataRequired()])
+    old_password = PasswordField(
+        "Ancien mot de passe", render_kw={"required": True}, validators=[DataRequired()]
+    )
 
 
 class PasswordResetRequestForm(FlaskForm):
     addr_email = StringField(
-        "Votre adresse e-mail", render_kw={"required": True}, validators=[DataRequired(), Length(1, 64), Email()]
+        "Votre adresse e-mail",
+        render_kw={"required": True},
+        validators=[DataRequired(), Length(1, 64), Email()],
     )
     submit = SubmitField("Demander une réinitialisation du mot de passe")
 
 
 class ChangeEmailForm(FlaskForm):
     addr_email = StringField(
-        "Nouvel adresse email", render_kw={"required": True}, validators=[DataRequired(), Length(1, 64), Email()]
+        "Nouvel adresse email",
+        render_kw={"required": True},
+        validators=[DataRequired(), Length(1, 64), Email()],
     )
-    password = PasswordField("Mot de passe", render_kw={"required": True}, validators=[DataRequired()])
+    password = PasswordField(
+        "Mot de passe", render_kw={"required": True}, validators=[DataRequired()]
+    )
     submit = SubmitField("Mise à jour de l'adresse e-mail")
 
     def validate_addr_email(self, field):
