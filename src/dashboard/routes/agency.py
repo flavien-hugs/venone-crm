@@ -17,10 +17,6 @@ from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
 from src.dashboard.services import export_data
 from src.mixins.decorators import agency_required
-from src.payment import VNPayment
-from src.tenant import VNHouse
-from src.tenant import VNHouseOwner
-from src.tenant import VNTenant
 
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
@@ -103,7 +99,7 @@ def agency_house_list():
     )
 
 
-@agency_bp.get("/homeowners/")
+@agency_bp.get("/lessors/")
 @login_required
 @agency_required
 def agency_owner_list():
@@ -111,6 +107,19 @@ def agency_owner_list():
 
     return render_template(
         "tenant/owner.html",
+        page_title=page_title,
+        current_user=current_user,
+    )
+
+
+@agency_bp.get("/check-houses/")
+@login_required
+@agency_required
+def check_houses():
+    page_title = "Trouver des propriétés dans votre zone"
+
+    return render_template(
+        "dashboard/account/houses.html",
         page_title=page_title,
         current_user=current_user,
     )
@@ -147,11 +156,11 @@ def export_tenants_csv():
         "Date d'ajout",
     ]
 
-    data = VNTenant.get_tenants_list()
+    tenants = current_user.tenants.all()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
     response = Response(
-        export_data.generate_tenant_csv(data, headers), mimetype="text/csv"
+        export_data.generate_tenant_csv(tenants, headers), mimetype="text/csv"
     )
 
     response.headers.set(
@@ -177,7 +186,7 @@ def export_owners_csv():
         "Date d'ajout",
     ]
 
-    owners = VNHouseOwner.get_owners_list()
+    owners = current_user.houseowners.all()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
     response = Response(
@@ -209,11 +218,11 @@ def export_houses_csv():
         "Date d'ajout",
     ]
 
-    owners = VNHouse.get_houses_list()
+    houses = current_user.houses.all()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
     response = Response(
-        export_data.generate_house_csv(owners, headers), mimetype="text/csv"
+        export_data.generate_house_csv(houses, headers), mimetype="text/csv"
     )
 
     response.headers.set(
@@ -237,7 +246,7 @@ def export_payments_csv():
         "Date de paiement",
     ]
 
-    payments = VNPayment.get_payment_list()
+    payments = current_user.payments.all()
 
     current_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
     response = Response(

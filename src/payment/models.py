@@ -65,9 +65,9 @@ class VNPayment(TimestampMixin):
     def __repr__(self):
         return f"Payment({self.id}, {self.vn_payment_id}, {self.vn_payment_date})"
 
-    @staticmethod
-    def get_payment_list() -> list:
-        payments = VNPayment.query.filter_by(vn_payee_id=current_user.id)
+    @classmethod
+    def get_payments(cls) -> list:
+        payments = cls.query.filter_by(vn_payee_id=current_user.id)
         return payments
 
     def check_transaction_trx(self):
