@@ -14,42 +14,22 @@ from wtforms.validators import ValidationError
 class LoginForm(FlaskForm):
     addr_email = StringField(
         "Adresse Email",
+        render_kw={"required": True},
         validators=[
             DataRequired(),
             Length(1, 64),
             Email(message="Entrer une adresse email valide."),
         ],
     )
-    password = PasswordField("Mot de passe", validators=[DataRequired()])
+    password = PasswordField("Mot de passe", render_kw={"required": True}, validators=[DataRequired()])
     remember_me = BooleanField("Se souvenir de moi")
     submit = SubmitField("Se connecter")
 
-
-class ChangePasswordForm(FlaskForm):
-    old_password = PasswordField("Ancien mot de passe", validators=[DataRequired()])
-    new_password = PasswordField("Nouveau mot de passe", validators=[DataRequired()])
-    confirm_password = PasswordField(
-        "Confirmer le mot de passe",
-        validators=[
-            DataRequired(),
-            EqualTo(
-                "new_password", message="Les deux mots de passe ne correspondent pas."
-            ),
-        ],
-    )
-
-
-class PasswordResetRequestForm(FlaskForm):
-    addr_email = StringField(
-        "Votre adresse e-mail", validators=[DataRequired(), Length(1, 64), Email()]
-    )
-    submit = SubmitField("Demander une réinitialisation du mot de passe")
-
-
 class PasswordResetForm(FlaskForm):
-    new_password = PasswordField("Nouveau mot de passe", validators=[DataRequired()])
+    new_password = PasswordField("Nouveau mot de passe", render_kw={"required": True}, validators=[DataRequired()])
     confirm_password = PasswordField(
         "Confirmer le mot de passe",
+        render_kw={"required": True},
         validators=[
             DataRequired(),
             EqualTo(
@@ -59,12 +39,22 @@ class PasswordResetForm(FlaskForm):
         ],
     )
 
+class ChangePasswordForm(PasswordResetForm):
+    old_password = PasswordField("Ancien mot de passe", render_kw={"required": True}, validators=[DataRequired()])
+
+
+class PasswordResetRequestForm(FlaskForm):
+    addr_email = StringField(
+        "Votre adresse e-mail", render_kw={"required": True}, validators=[DataRequired(), Length(1, 64), Email()]
+    )
+    submit = SubmitField("Demander une réinitialisation du mot de passe")
+
 
 class ChangeEmailForm(FlaskForm):
     addr_email = StringField(
-        "Nouvel adresse email", validators=[DataRequired(), Length(1, 64), Email()]
+        "Nouvel adresse email", render_kw={"required": True}, validators=[DataRequired(), Length(1, 64), Email()]
     )
-    password = PasswordField("Mot de passe", validators=[DataRequired()])
+    password = PasswordField("Mot de passe", render_kw={"required": True}, validators=[DataRequired()])
     submit = SubmitField("Mise à jour de l'adresse e-mail")
 
     def validate_addr_email(self, field):
