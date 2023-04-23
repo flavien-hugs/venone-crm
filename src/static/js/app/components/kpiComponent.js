@@ -3,7 +3,7 @@ const KpiComponent = {
 
 	template: `
 		<div class="row g-2">
-			<div :class="{ 'col-xl-4': user.is_owner, 'col-xl-3': user.is_company }" class="col-md-6 mb-4">
+			<div :class="{ 'col-xl-3': user.is_owner, 'col-xl-3': user.is_company }" class="col-xl-3 mb-4">
 				<div class="card border-start-lg border-start-primary h-100">
 					<div class="card-body">
 						<div class="d-flex align-items-center">
@@ -31,7 +31,7 @@ const KpiComponent = {
 				</div>
 			</div>
 
-			<div :class="{ 'col-xl-3': user.is_owner, 'col-xl-3': user.is_company }" class="col-md-6 mb-4">
+			<div :class="{ 'col-xl-3': user.is_owner, 'col-xl-3': user.is_company }" class="col-xl-3 mb-4">
 				<div class="card border-start-lg border-start-primary h-100">
 					<div class="card-body">
 						<div class="d-flex align-items-center">
@@ -45,7 +45,7 @@ const KpiComponent = {
 				</div>
 			</div>
 
-			<div :class="{ 'col-xl-3': user.is_owner, 'col-xl-3': user.is_company }" class="col-md-6 mb-4">
+			<div :class="{ 'col-xl-3': user.is_owner, 'col-xl-3': user.is_company }" class="col-xl-3 mb-4">
 				<div class="card border-start-lg border-start-success h-100">
 					<div class="card-body">
 						<div class="d-flex align-items-center">
@@ -59,7 +59,7 @@ const KpiComponent = {
 				</div>
 			</div>
 
-			<div v-if="user.is_company" class="col-xl-3 col-md-6 mb-4">
+			<div v-if="user.is_company" class="col-xl-3 mb-4">
 				<div class="card border-start-lg border-start-info h-100 jut">
 					<div class="card-body">
 						<div class="d-flex align-items-center">
@@ -73,7 +73,7 @@ const KpiComponent = {
 				</div>
 			</div>
 
-			<div :class="{ 'col-xl-3': user.is_owner, 'col-xl-3': user.is_company }" class="col-md-6 mb-4">
+			<div :class="{ 'col-xl-3': user.is_owner, 'col-xl-3': user.is_company }" class="col-xl-3 mb-4">
 				<div class="card border-start-lg border-start-secondary h-100">
 					<div class="card-body">
 						<div class="d-flex align-items-center">

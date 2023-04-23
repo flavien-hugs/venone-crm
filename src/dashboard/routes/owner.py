@@ -36,14 +36,12 @@ def dashboard():
 @owner_required
 def owner_setting():
     page_title = "Paramètres"
-    form = OwnerSettingForm()
+    form = OwnerSettingForm(request.form)
 
     if request.method == "POST" and form.validate_on_submit():
 
         current_user.vn_gender = form.gender.data
         current_user.vn_fullname = form.fullname.data
-
-        current_user.vn_cni_number = form.cni_number.data
         current_user.vn_phonenumber_two = form.phonenumber_two.data
 
         current_user.vn_profession = form.profession.data
@@ -60,8 +58,6 @@ def owner_setting():
 
         form.gender.data = current_user.vn_gender
         form.fullname.data = current_user.vn_fullname
-
-        form.cni_number.data = current_user.vn_cni_number
         form.phonenumber_two.data = current_user.vn_phonenumber_two
 
         form.profession.data = current_user.vn_profession
@@ -79,7 +75,7 @@ def owner_setting():
     )
 
 
-@owner_bp.route("/change_paswword/", methods=["GET", "POST"])
+@owner_bp.route("/change-paswword/", methods=["GET", "POST"])
 @login_required
 def change_password():
     page_title = "Changer votre mot de passe"

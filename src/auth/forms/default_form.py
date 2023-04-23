@@ -17,11 +17,13 @@ class FormMixin:
             DataRequired(),
             Email(message="Entrer une adresse email valide."),
         ],
+        render_kw={"required": True}
     )
-    phonenumber_one = StringField("Numéro de téléphone", validators=[DataRequired()])
+    phonenumber_one = StringField("Numéro de téléphone", render_kw={"required": True}, validators=[DataRequired()])
     country = SelectField("Pays/Région", choices=COUNTRY, coerce=str)
     password = PasswordField(
         "Mot de passe",
+        render_kw={"required": True},
         validators=[
             DataRequired(),
             Length(min=6, max=20, message="Choisissez un mot de passe plus fort."),
@@ -29,6 +31,7 @@ class FormMixin:
     )
     confirm_password = PasswordField(
         "Confirmer le mot de passe",
+        render_kw={"required": True},
         validators=[
             DataRequired(),
             EqualTo("password", message="Les deux mots de passe ne correspondent pas."),

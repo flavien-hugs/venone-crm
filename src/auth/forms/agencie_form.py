@@ -14,13 +14,13 @@ class AgencieSignupForm(FormMixin, FlaskForm):
 
     gender = SelectField("Genre", choices=GENDER, coerce=str)
     fullname = StringField(
-        "Nom du gestionnaire", validators=[DataRequired(), InputRequired()]
+        "Nom du gestionnaire", render_kw={"required": True}, validators=[DataRequired(), InputRequired()]
     )
     business_number = StringField(
-        "N° de votre régistre de commerce", validators=[DataRequired(), InputRequired()]
+        "N° de votre régistre de commerce", render_kw={"required": True}, validators=[DataRequired(), InputRequired()]
     )
     agencie_name = StringField(
-        "Nom de l'entreprise", validators=[DataRequired(), InputRequired()]
+        "Nom de l'entreprise", render_kw={"required": True}, validators=[DataRequired(), InputRequired()]
     )
     submit = SubmitField("Ouvrir mon compte")
 

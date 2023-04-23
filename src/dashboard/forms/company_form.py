@@ -2,24 +2,18 @@ from flask_wtf import FlaskForm
 from src.dashboard.forms.default_form import DefaultForm
 from wtforms import StringField
 from wtforms import SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import Optional
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
 
 class CompanySettingForm(DefaultForm, FlaskForm):
 
-    fullname = StringField(label="Nom du gestionnaire", validators=[InputRequired()])
+    fullname = StringField(label="Nom du gestionnaire",  render_kw={"required": True}, validators=[InputRequired()])
     agencie_name = StringField(
-        label="Nom de votre agence", validators=[DataRequired(), InputRequired()]
+        label="Nom de votre agence",  render_kw={"required": True}, validators=[InputRequired()]
     )
-    business_number = StringField(
-        label="N° Registre de commerce", validators=[DataRequired(), InputRequired()]
-    )
-    cni_number = StringField(
-        label="N° de votre CNI", validators=[DataRequired(), InputRequired()]
-    )
-    location = StringField(label="Situation géographique", validators=[InputRequired()])
+    location = StringField(label="Situation géographique", validators=[Optional()])
     submit = SubmitField(label="Enregistrer les modifications")
 
     def validate_fullname(self, fullname):
