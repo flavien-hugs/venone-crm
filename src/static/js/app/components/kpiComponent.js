@@ -9,7 +9,7 @@ const KpiComponent = {
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
 								<div class="small fw-bold text-primary mb-2 text-uppercase">total loyer à collecter</div>
-								<div class="h1">{{ user.total_house_amount }} {{ user.devise }}</div>
+								<div class="h1 fw-700">{{ user.total_house_amount }} {{ user.devise }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
 						</div>
@@ -23,7 +23,7 @@ const KpiComponent = {
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
 								<div class="small fw-bold text-primary mb-2 text-uppercase">total de vos pourcentages</div>
-								<div class="h1">{{ user.total_house_percent }} {{ user.devise }}</div>
+								<div class="h1 fw-700">{{ user.total_house_percent }} {{ user.devise }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
 						</div>
@@ -37,7 +37,7 @@ const KpiComponent = {
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
 								<div class="small fw-bold text-primary mb-2 text-uppercase">total paiement reçu</div>
-								<div class="h1">{{ user.total_payment_month }} {{ user.devise }}</div>
+								<div class="h1 fw-700">{{ user.total_payment_month }} {{ user.devise }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
 						</div>
@@ -51,7 +51,7 @@ const KpiComponent = {
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
 								<div class="small fw-bold text-success text-uppercase mb-2">total locataires</div>
-								<div class="h1">{{ user.tenants_count }}</div>
+								<div class="h1 fw-700">{{ user.tenants_count }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
 						</div>
@@ -65,7 +65,7 @@ const KpiComponent = {
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
 								<div class="small fw-bold text-info mb-2 text-uppercase">total bailleurs</div>
-								<div class="h1">{{ user.owners_count }}</div>
+								<div class="h1 fw-700">{{ user.owners_count }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
 						</div>
@@ -79,7 +79,7 @@ const KpiComponent = {
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
 								<div class="small fw-bold text-secondary mb-2 text-uppercase">total propriétés</div>
-								<div class="h1">{{ user.houses_count }}</div>
+								<div class="h1 fw-700">{{ user.houses_count }}</div>
 							</div>
 							<div class="ms-2"><i class="fas fa-home fa-2x text-gray-200"></i></div>
 						</div>
