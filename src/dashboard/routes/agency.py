@@ -27,7 +27,7 @@ agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(agency_bp)
 
 
-@agency_bp.route("/parametres/", methods=["GET", "POST"])
+@agency_bp.route("/settings/", methods=["GET", "POST"])
 @login_required
 @agency_required
 def agency_setting():
@@ -38,12 +38,9 @@ def agency_setting():
 
         current_user.vn_gender = form.gender.data
         current_user.vn_fullname = form.fullname.data
-
-        current_user.vn_cni_number = form.cni_number.data
         current_user.vn_phonenumber_two = form.phonenumber_two.data
 
         current_user.vn_agencie_name = form.agencie_name.data
-        current_user.vn_business_number = form.business_number.data
 
         current_user.vn_location = form.location.data
         current_user.vn_device = form.devise.data
@@ -55,11 +52,8 @@ def agency_setting():
         form.gender.data = current_user.vn_gender
         form.fullname.data = current_user.vn_fullname
 
-        form.cni_number.data = current_user.vn_cni_number
         form.phonenumber_two.data = current_user.vn_phonenumber_two
-
         form.agencie_name.data = current_user.vn_agencie_name
-        form.business_number.data = current_user.vn_business_number
 
         form.location.data = current_user.vn_location
         form.devise.data = current_user.vn_device
@@ -122,7 +116,7 @@ def agency_owner_list():
     )
 
 
-@agency_bp.route("/delete_account/", methods=["POST"])
+@agency_bp.route("/delete-account/", methods=["POST"])
 @login_required
 def delete_account():
     user = VNUser.get_user_logged()
