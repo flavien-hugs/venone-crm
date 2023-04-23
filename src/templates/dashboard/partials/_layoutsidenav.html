@@ -49,7 +49,7 @@
                         </div>
                         Locataires
                     </a>
-                    
+
                     {# <a class="nav-link" href="#!">
                         <div class="nav-link-icon">
                             <i data-feather="grid"></i>
@@ -76,17 +76,17 @@
                 {% endif %}
 
                 <div class="sidenav-menu-heading">Gestion Propriétés</div>
-                <a class="nav-link" href="{{ url_for('agency_bp.agency_house_list')}}">
+                <a class="nav-link" href="{{ url_for('agency_bp.agency_house_list') }}">
                     <div class="nav-link-icon">
                         <i data-feather="home"></i>
                     </div> Propriétés
                 </a>
 
                 {% if current_user.vn_company %}
-                    <a class="nav-link" href="~">
+                    <a class="nav-link" href="{{ url_for('agency_bp.check_houses') }}">
                         <div class="nav-link-icon">
                             <i data-feather="home"></i>
-                        </div> Locations disponibles
+                        </div> Autres propriétés
                     </a>
 
                     {# <div class="sidenav-menu-heading">Rapports</div>
