@@ -261,9 +261,11 @@ class VNUser(
     @staticmethod
     def get_houses_by_country(page, per_page):
         user_country = current_user.vn_country
-        pagination = VNHouse.query.join(VNUser, VNHouse.vn_user_id == VNUser.id)\
-            .filter(VNUser.vn_country == user_country)\
+        pagination = (
+            VNHouse.query.join(VNUser, VNHouse.vn_user_id == VNUser.id)
+            .filter(VNHouse.vn_house_is_open == False, VNUser.vn_country == user_country)
             .paginate(page=page, per_page=per_page)
+        )
 
         user_houses = pagination.items
         return pagination, user_houses

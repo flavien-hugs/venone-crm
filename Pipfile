@@ -9,7 +9,6 @@ verify_ssl = true
 name = "testpypi"
 
 [packages]
-flask = "*"
 python-dotenv = "*"
 flask-migrate = "*"
 flask-sqlalchemy = "*"
@@ -37,6 +36,7 @@ pyshorteners = "*"
 httpx = "*"
 flask-minify = "*"
 flask-marshmallow = "*"
+flask = {extras = ["async"], version = "*"}
 
 [dev-packages]
 pre-commit = "*"

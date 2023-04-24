@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime
 
 from src import db
-from src.utils import Updateable
 
 
 def id_generator():
@@ -35,10 +34,9 @@ class CRUDMixin(object):
         instance = cls(**kwargs)
         return instance.save()
 
-    def update(self, commit=True, **kwargs):
-        for attr, value in kwargs.iteritems():
+    def update(self, data):
+        for attr, value in data.items():
             setattr(self, attr, value)
-        return commit and self.save() or self
 
     def save(self, commit=True):
         db.session.add(self)
@@ -56,7 +54,7 @@ class CRUDMixin(object):
         db.session.commit()
 
 
-class TimestampMixin(CRUDMixin, Updateable, db.Model):
+class TimestampMixin(CRUDMixin, db.Model):
 
     __abstract__ = True
 
@@ -65,7 +63,7 @@ class TimestampMixin(CRUDMixin, Updateable, db.Model):
     vn_updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow())
 
 
-class DefaultUserInfoModel(Updateable):
+class DefaultUserInfoModel(db.Model):
 
     __abstract__ = True
 

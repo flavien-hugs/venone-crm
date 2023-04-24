@@ -112,7 +112,7 @@ window.addEventListener('DOMContentLoaded', event => {
                         },
                     });
 
-                    if (response.ok) {
+                    if (response.status == 200) {
                         const data = await response.json();
                         this.user = data.user;
                         this.owners = data.houseowners;
@@ -129,7 +129,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async getOwner(ownerUUID) {
                 try {
-                    const ownerURL = `/api/owner/${ownerUUID}/`;
+                    const ownerURL = `/api/owners/${ownerUUID}/`;
                     const response = await fetch(ownerURL, {
                         method: "GET",
                         headers: { "Content-type": "application/json" },
@@ -178,7 +178,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onCreateOwnerTenant() {
                 try {
-                    const registerURL = `/api/owner/${this.ownerUUID}/create_tenant/`;
+                    const registerURL = `/api/owners/${this.ownerUUID}/create_tenant/`;
                     const response = await fetch(registerURL, {
                         method: "POST",
                         headers: {
@@ -222,7 +222,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onUpdateOwner() {
                 try {
-                    const updateURL = `/api/owner/${this.ownerData.owner_uuid}/update/`;
+                    const updateURL = `/api/owners/${this.ownerData.owner_uuid}/update/`;
 
                     if (
                         this.ownerData.percent === "" ||
@@ -279,7 +279,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onDeleteOwner() {
                 try {
-                    const deleteURL = `/api/owner/${this.ownerUUID}/delete/`;
+                    const deleteURL = `/api/owners/${this.ownerUUID}/delete/`;
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {

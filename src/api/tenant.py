@@ -1,19 +1,17 @@
-from http import HTTPStatus
-
-from flask import jsonify
-from flask import make_response
 from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src import db
 from src.tenant import VNTenant
+from src.utils import jsonify_response
 
 from . import api
 
 
 @api.get("/tenants/")
 @login_required
+@jsonify_response
 def get_all_tenants():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
@@ -42,67 +40,56 @@ def get_all_tenants():
     pagination = tenants_query.paginate(page=page, per_page=per_page, error_out=False)
     tenants = pagination.items
 
-    prev = None
-    if pagination.has_prev:
-        prev = url_for(
-            "api.get_all_tenants", page=page - 1, q=search_term, _external=True
-        )
-    next = None
-    if pagination.has_next:
-        next = url_for(
-            "api.get_all_tenants", page=page - 1, q=search_term, _external=True
-        )
-
-    return make_response(
-        jsonify(
-            {
-                "tenants": [tenant.to_json() for tenant in tenants],
-                "prev": prev,
-                "next": next,
-                "page": page,
-                "per_page": per_page,
-                "total": pagination.total,
-                "user": current_user.to_json(),
-            }
-        )
+    prev = (
+        url_for("api.get_all_tenants", page=page - 1, _external=True)
+        if pagination.has_prev
+        else None
+    )
+    next = (
+        url_for("api.get_all_tenants", page=page + 1, _external=True)
+        if pagination.has_next
+        else None
     )
 
+    return {
+        "tenants": [tenant.to_json() for tenant in tenants],
+        "prev": prev,
+        "next": next,
+        "page": page,
+        "per_page": per_page,
+        "total": pagination.total,
+        "user": current_user.to_json(),
+    }
 
-@api.delete("/tenant/<string:tenant_uuid>/delete/")
+
+@api.delete("/tenants/<string:tenant_uuid>/delete/")
 @login_required
+@jsonify_response
 def delete_tenant(tenant_uuid):
     tenant = VNTenant.get_tenant(tenant_uuid)
 
     if tenant is not None:
         tenant.house_tenant.house_disable()
         tenant.remove()
-        return make_response(
-            jsonify(
-                {
-                    "success": True,
-                    "message": f"Locataire #{tenant.vn_tenant_id} a été supprimé avec succès !",
-                }
-            )
-        )
-    return make_response(
-        jsonify(
-            {
-                "success": False,
-                "message": "Oups ! L'élément n'a pas été trouvé.",
-            }
-        )
-    )
+        return {
+            "success": True,
+            "message": f"Locataire #{tenant.vn_tenant_id} a été supprimé avec succès !",
+        }
+
+    return {
+        "success": False,
+        "message": "Oups ! L'élément n'a pas été trouvé.",
+    }
 
 
-@api.put("/tenant/<string:tenant_uuid>/update/")
+@api.put("/tenants/<string:tenant_uuid>/update/")
 @login_required
+@jsonify_response
 def update_tenant(tenant_uuid):
     tenant = VNTenant.get_tenant(tenant_uuid)
 
     if not tenant:
-        return make_response(
-            jsonify({"message": "tenant not found"}), HTTPStatus.NOT_FOUND
-        )
+        return {"message": "tenant not found"}
 
     data = request.json
 
@@ -124,20 +111,20 @@ def update_tenant(tenant_uuid):
 
     tenant.save()
 
-    return make_response(
-        jsonify(
-            {
-                "success": True,
-                "message": f"Locataire #{tenant.vn_tenant_id} mise à jour avec succès !",
-                "tenant": tenant.to_json(),
-            }
-        ),
-        HTTPStatus.OK,
-    )
+    return {
+        "success": True,
+        "message": f"Locataire #{tenant.vn_tenant_id} mise à jour avec succès !",
+    }
 
 
-@api.get("/tenant/<string:tenant_uuid>/")
+@api.get("/tenants/<string:tenant_uuid>/")
 @login_required
+@jsonify_response
 def get_tenant(tenant_uuid):
     tenant = VNTenant.get_tenant(tenant_uuid)
-    return make_response(jsonify({"tenant": tenant.to_json()}))
+    if not tenant:
+        return {
+            "message": "Oups ! L'élément n'a pas été trouvé !",
+        }
+
+    return {"tenant": tenant.to_json()}

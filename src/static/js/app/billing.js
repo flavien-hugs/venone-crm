@@ -29,7 +29,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
             async getUser() {
                 try {
                     this.isLoading = true;
-                    const userURL = `/api/user/`;
+                    const userURL = `/api/users/`;
 
                     const response = await fetch(userURL, {
                         method: "GET",
