@@ -8,7 +8,7 @@ const months = Array.from({ length: 12 }, (_, i) => {
 
 var app = Vue.createApp({
     components: {
-        "kpi-component": KpiComponent,
+        KpiComponent,
     },
 
     data() {
@@ -39,7 +39,7 @@ var app = Vue.createApp({
         async getUser() {
             try {
                 this.isLoading = true;
-                const userURL = `/api/user/`;
+                const userURL = `/api/users/`;
 
                 const response = await fetch(userURL, {
                     method: "GET",
@@ -185,7 +185,7 @@ var app = Vue.createApp({
 
         async getOpenHousesData() {
             try {
-                const houseOpenDataURL = `/api/available_properties/data/`;
+                const houseOpenDataURL = `/api/availables-houses/data/`;
 
                 const response = await fetch(houseOpenDataURL, {
                     method: "GET",

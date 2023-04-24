@@ -62,7 +62,7 @@ def login():
                     été désactivé ! Veuillez contacter l'administrateur système."
             if not user.verify_password(form.password.data):
                 error_message = "Le mot de passe invalide."
-            
+
             flash(error_message, category="danger")
 
     page_title = "Se connecter"

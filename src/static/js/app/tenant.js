@@ -205,7 +205,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onCreateOwnerTenant() {
                 try {
-                    const ownerTenantRegisterURL = `/api/owner/tenant_register/`;
+                    const ownerTenantRegisterURL = `/api/owners/tenant-register/`;
                     const response = await fetch(ownerTenantRegisterURL, {
                         method: "POST",
                         headers: {
@@ -244,7 +244,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onUpdateTenant() {
                 try {
-                    const updateURL = `/api/tenant/${this.tenantData.tenant_uuid}/update/`;
+                    const updateURL = `/api/tenants/${this.tenantData.tenant_uuid}/update/`;
                     const response = await fetch(updateURL, {
                         method: "PUT",
                         headers: {'Content-type': 'application/json'},
@@ -281,7 +281,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onCreateComapnyTenant() {
                 try {
-                    const registerURL = `/api/company/tenant_register/`;
+                    const registerURL = `/api/companies/tenant-register/`;
                     const response = await fetch(registerURL, {
                         method: "POST",
                         headers: {
@@ -321,7 +321,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onDeleteTenant() {
                 try {
-                    const deleteURL = `/api/tenant/${this.deleteTenantUUID}/delete/`;
+                    const deleteURL = `/api/tenants/${this.deleteTenantUUID}/delete/`;
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {

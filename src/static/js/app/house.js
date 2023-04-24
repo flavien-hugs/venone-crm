@@ -206,16 +206,17 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onUpdateHouse() {
                 try {
-                    const updateURL = `/api/house/${this.houseData.house_uuid}/update/`;
+                    const updateURL = `/api/houses/${this.houseData.house_uuid}/update/`;
+                    console.log(updateURL)
                     const response = await fetch(updateURL, {
                         method: "PUT",
                         headers: { "Content-type": "application/json" },
                         body: JSON.stringify(this.houseData),
                     });
 
-                    const data = await response.json();
+                    if (response.status == 200) {
+                        const data = await response.json();
 
-                    if (data.success) {
                         const index = this.houses.findIndex(
                             (house) => house.house_uuid === this.houseData.house_uuid
                         );
@@ -224,7 +225,7 @@ window.addEventListener('DOMContentLoaded', event => {
                         await this.getHouses();
 
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = 'Location mise à jour avec succès !';
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
@@ -247,7 +248,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onDeleteHouse() {
                 try {
-                    const deleteURL = `/api/house/${this.deleteHouseUUID}/delete/`;
+                    const deleteURL = `/api/houses/${this.deleteHouseUUID}/delete/`;
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {
@@ -288,7 +289,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onAssignHouseToTenant() {
                 try {
-                    const assignURL = `/api/house/${this.houseData.house_uuid}/house_assign_tenant/`;
+                    const assignURL = `/api/houses/${this.houseData.house_uuid}/house-assign-tenant/`;
                     const response = await fetch(assignURL, {
                         method: "PATCH",
                         headers: {

@@ -3,51 +3,52 @@ from datetime import timedelta
 from http import HTTPStatus
 
 from flask import abort
-from flask import jsonify
-from flask import make_response
 from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src import db
-
+from src.auth.models import VNUser
 from src.tenant import VNHouse
 from src.tenant import VNTenant
-from src.auth.models import VNUser
+from src.utils import jsonify_response
 
 from . import api
 
 
 @api.get("/houses/")
 @login_required
+@jsonify_response
 def get_all_houses():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
-    pagination = VNHouse.get_houses_list().paginate(page=page, per_page=per_page, error_out=False)
+    pagination = VNHouse.get_houses_list().paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     houses = pagination.items
 
-    prev = None
-    if pagination.has_prev:
-        prev = url_for("api.get_all_houses", page=page - 1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for("api.get_all_houses", page=page + 1, _external=True)
-
-    return make_response(
-        jsonify(
-            {
-                "houses": [house.to_json() for house in houses],
-                "prev": prev,
-                "next": next,
-                "page": page,
-                "per_page": per_page,
-                "total": pagination.total,
-                "user": current_user.to_json(),
-            }
-        )
+    prev = (
+        url_for("api.get_all_houses", page=page - 1, _external=True)
+        if pagination.has_prev
+        else None
     )
+    next = (
+        url_for("api.get_all_houses", page=page + 1, _external=True)
+        if pagination.has_next
+        else None
+    )
+
+    return {
+        "houses": [house.to_json() for house in houses],
+        "prev": prev,
+        "next": next,
+        "page": page,
+        "per_page": per_page,
+        "total": pagination.total,
+        "user": current_user.to_json(),
+    }
 
 
 def house_to_json(house):
@@ -68,34 +69,35 @@ def house_to_json(house):
 
 @api.get("/check-houses-country/")
 @login_required
+@jsonify_response
 def get_houses_country():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 12, type=int)
     pagination, houses = VNUser.get_houses_by_country(page, per_page)
 
-    prev = None
-    if pagination.has_prev:
-        prev = url_for("api.get_houses_country", page=page - 1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for("api.get_houses_country", page=page + 1, _external=True)
-
-    return make_response(
-        jsonify(
-            {
-                "houses": [house_to_json(house) for house in houses],
-                "prev": prev,
-                "next": next,
-                "page": page,
-                "per_page": per_page,
-                "total": pagination.total,
-            }
-        )
+    prev = (
+        url_for("api.get_houses_country", page=page - 1, _external=True)
+        if pagination.has_prev
+        else None
     )
+    next = (
+        url_for("api.get_houses_country", page=page + 1, _external=True)
+        if pagination.has_next
+        else None
+    )
+    return {
+        "houses": [house_to_json(house) for house in houses],
+        "prev": prev,
+        "next": next,
+        "page": page,
+        "per_page": per_page,
+        "total": pagination.total,
+    }
 
 
 @api.get("/available-houses/")
+@jsonify_response
 def get_houses_listing():
 
     """
@@ -122,19 +124,16 @@ def get_houses_listing():
     houses = VNHouse.query.filter_by(vn_house_is_open=False).order_by(
         VNHouse.vn_created_at.desc()
     )
+
     pagination = houses.paginate(page=page, per_page=per_page)
 
-    return make_response(
-        jsonify(
-            {
-                "houses": [house_to_json(house) for house in pagination.items],
-            }
-        )
-    )
+    return {
+        "houses": [house_to_json(house) for house in pagination.items],
+    }
 
 
-
-@api.get("/available-house/<int:house_id>/")
+@api.get("/available-houses/<int:house_id>/")
+@jsonify_response
 def get_house_info(house_id):
 
     """
@@ -148,7 +147,7 @@ def get_house_info(house_id):
 
     Exemple:
         Pour récupérer les informations de la maison avec l'identifiant 123 :
-        /api/available-house/123/
+        /api/available-houses/123/
     """
 
     house = VNHouse.query.filter_by(
@@ -158,54 +157,44 @@ def get_house_info(house_id):
     if not house:
         abort(HTTPStatus.NOT_FOUND, "Could not find house.")
 
-    return make_response(
-        jsonify(
-            {
-                "house": house_to_json(house),
-            }
-        )
-    )
+    return {"house": house_to_json(house)}
 
 
-@api.get("/house/<string:house_uuid>/")
+@api.get("/houses/<string:house_uuid>/")
 @login_required
+@jsonify_response
 def get_house(house_uuid):
 
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return make_response(
-            jsonify({"error": "House not found"}), HTTPStatus.NOT_FOUND
-        )
+        return {"error": "House not found"}
 
     tenants = house.tenants(page=request.args.get("page", 1, type=int))
     payments = house.payments(page=request.args.get("page", 1, type=int))
 
-    return make_response(
-        jsonify(
-            {
-                "house": house.to_json(),
-                "house_tenant": [t.to_json() for t in tenants.items],
-                "house_tenants_pagination": {
-                    "page": tenants.page,
-                    "per_page": tenants.per_page,
-                    "total": tenants.total,
-                    "pages": tenants.pages,
-                },
-                "house_payment": [p.to_json() for p in payments.items],
-                "house_payments_pagination": {
-                    "page": payments.page,
-                    "per_page": payments.per_page,
-                    "total": payments.total,
-                    "pages": payments.pages,
-                },
-            }
-        )
-    )
+    return {
+        "house": house.to_json(),
+        "house_tenant": [t.to_json() for t in tenants.items],
+        "house_tenants_pagination": {
+            "page": tenants.page,
+            "per_page": tenants.per_page,
+            "total": tenants.total,
+            "pages": tenants.pages,
+        },
+        "house_payment": [p.to_json() for p in payments.items],
+        "house_payments_pagination": {
+            "page": payments.page,
+            "per_page": payments.per_page,
+            "total": payments.total,
+            "pages": payments.pages,
+        },
+    }
 
 
-@api.patch("/house/<string:house_uuid>/house_assign_tenant/")
+@api.patch("/houses/<string:house_uuid>/house-assign-tenant/")
 @login_required
+@jsonify_response
 def house_assign_tenant(house_uuid):
 
     """
@@ -216,10 +205,7 @@ def house_assign_tenant(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return (
-            make_response(jsonify({"message": "maison introuvable"})),
-            HTTPStatus.NOT_FOUND,
-        )
+        return {"message": "maison introuvable"}
 
     house_data = request.json.get("house_data")
     tenant_data = request.json.get("tenant_data")
@@ -280,31 +266,20 @@ def house_assign_tenant(house_uuid):
     db.session.add_all([house, tenant])
     db.session.commit()
 
-    return make_response(
-        jsonify(
-            {
-                "success": True,
-                "message": "Nouveau locataire ajouté avec succès",
-            }
-        ),
-        201,
-    )
-
-    return make_response(
-        jsonify({"success": False, "message": "Une erreur s'est lors de l'ajout !"})
-    )
+    return {
+        "success": True,
+        "message": "Nouveau locataire ajouté avec succès",
+    }
 
 
-@api.put("/house/<string:house_uuid>/update/")
+@api.put("/houses/<string:house_uuid>/update/")
 @login_required
+@jsonify_response
 def update_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return (
-            make_response(jsonify({"message": "Oops : propriété introuvable"})),
-            HTTPStatus.NOT_FOUND,
-        )
+        return {"message": "Oops : propriété introuvable"}
 
     data = request.json
 
@@ -324,54 +299,36 @@ def update_house(house_uuid):
 
     house.save()
 
-    return make_response(
-        jsonify(
-            {
-                "success": True,
-                "message": f"Location #{house.vn_house_id} mise à jour avec succès !",
-                "house": house.to_json(),
-            }
-        ),
-        HTTPStatus.OK,
-    )
+    return {"message": f"Location #{house.vn_house_id} mise à jour avec succès !"}
 
 
-@api.delete("/house/<string:house_uuid>/delete/")
+@api.delete("/houses/<string:house_uuid>/delete/")
 @login_required
+@jsonify_response
 def delete_house(house_uuid):
     house = VNHouse.get_house(house_uuid)
     if house is not None:
         house.remove()
-        return make_response(
-            jsonify(
-                {
-                    "success": True,
-                    "message": f"Propriété #{house.vn_house_id} retirée avec succès.",
-                }
-            )
-        )
+        return {
+            "success": True,
+            "message": f"Propriété #{house.vn_house_id} retirée avec succès.",
+        }
 
-    return make_response(
-        jsonify(
-            {
-                "success": False,
-                "message": "Oups ! L'élément n'a pas été trouvé.",
-            }
-        )
-    )
+    return {
+        "success": False,
+        "message": "Oups ! L'élément n'a pas été trouvé.",
+    }
 
 
-@api.get("/house/<string:house_uuid>/payments/")
+@api.get("/houses/<string:house_uuid>/payments/")
 @login_required
+@jsonify_response
 def list_payments_for_house(house_uuid):
 
     house = VNHouse.get_house(house_uuid)
 
     if not house:
-        return (
-            make_response(jsonify({"message": "Oops! propriété introuvable"})),
-            HTTPStatus.NOT_FOUND,
-        )
+        return {"message": "Oops! propriété introuvable"}
 
     payments = []
     for payment in house.payments:
@@ -383,4 +340,4 @@ def list_payments_for_house(house_uuid):
                 "tenant": payment.tenant.vn_tenant_full_name,
             }
         )
-    return make_response(jsonify({"payments": payments})), HTTPStatus.OK
+    return {"payments": payments}

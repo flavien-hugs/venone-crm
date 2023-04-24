@@ -1,15 +1,22 @@
 import logging
+from functools import wraps
 
 import httpx
+from flask import jsonify
+from flask import make_response
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class Updateable:
-    def update(self, data):
-        for attr, value in data.items():
-            setattr(self, attr, value)
+def jsonify_response(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        response = make_response(jsonify(func(*args, **kwargs)))
+        response.headers["Content-Type"] = "application/json"
+        return response
+
+    return wrapper
 
 
 def get_address_ip():
