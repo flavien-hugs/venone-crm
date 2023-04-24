@@ -54,7 +54,6 @@ var app = Vue.createApp({
                 if (response.status == 200) {
                     this.isLoading = false;
                     const data = await response.json();
-                    console.log(data.houses)
                     this.houses = data.houses;
                     this.totalPages = Math.ceil(data.total / this.perPage);
                     this.currentPage = data.page;
