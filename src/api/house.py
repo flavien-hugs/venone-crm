@@ -10,8 +10,10 @@ from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src import db
+
 from src.tenant import VNHouse
 from src.tenant import VNTenant
+from src.auth.models import VNUser
 
 from . import api
 
@@ -23,11 +25,9 @@ def get_all_houses():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
-    pagination = VNHouse.get_houses_list().paginate(
-        page=page, per_page=per_page, error_out=False
-    )
-
+    pagination = VNHouse.get_houses_list().paginate(page=page, per_page=per_page, error_out=False)
     houses = pagination.items
+
     prev = None
     if pagination.has_prev:
         prev = url_for("api.get_all_houses", page=page - 1, _external=True)
@@ -55,14 +55,44 @@ def house_to_json(house):
         "house_id": house.vn_house_id,
         "house_type": house.vn_house_type,
         "house_month": house.vn_house_month,
-        "house_guaranty": house.vn_house_guaranty,
-        "house_rent": house.vn_house_rent,
+        "house_guaranty": "{:,.2f}".format(house.vn_house_guaranty),
+        "house_rent": "{:,.2f}".format(house.vn_house_rent),
         "house_devise": house.user_houses.vn_device,
         "house_number_room": house.vn_house_number_room,
         "house_address": house.vn_house_address,
         "house_country": house.user_houses.vn_country,
+        "house_closed": house.vn_house_is_open,
         "created_at": house.vn_created_at.isoformat(),
     }
+
+
+@api.get("/check-houses-country/")
+@login_required
+def get_houses_country():
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 12, type=int)
+    pagination, houses = VNUser.get_houses_by_country(page, per_page)
+
+    prev = None
+    if pagination.has_prev:
+        prev = url_for("api.get_houses_country", page=page - 1, _external=True)
+    next = None
+    if pagination.has_next:
+        next = url_for("api.get_houses_country", page=page + 1, _external=True)
+
+    return make_response(
+        jsonify(
+            {
+                "houses": [house_to_json(house) for house in houses],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
+    )
 
 
 @api.get("/available-houses/")
@@ -101,6 +131,7 @@ def get_houses_listing():
             }
         )
     )
+
 
 
 @api.get("/available-house/<int:house_id>/")

@@ -16,7 +16,7 @@ def get_all_payments():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
-    pagination = VNPayment.get_payment_list().paginate(
+    pagination = VNPayment.get_payments().paginate(
         page=page, per_page=per_page, error_out=False
     )
 

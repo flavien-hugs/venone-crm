@@ -11,6 +11,7 @@ from flask_login import current_user
 from flask_login import login_required
 from src import db
 from src.auth.models import VNUser
+from src.mixins.decorators import admin_required
 from src.mixins.decorators import agency_required
 from src.mixins.decorators import owner_required
 from src.tenant import VNHouse
@@ -19,7 +20,8 @@ from src.tenant import VNTenant
 
 from . import api
 
-from src.schemas import users_schema, user_schema
+# from src.schemas import user_schema
+# from src.schemas import users_schema
 
 
 @api.get("/users/")
@@ -45,6 +47,74 @@ def get_all_users():
         jsonify(
             {
                 "users": [user.to_json() for user in users],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
+    )
+
+
+@api.get("/companies/")
+@login_required
+@admin_required
+def get_all_companies():
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+
+    pagination = VNUser.get_companies_list().paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+
+    companies = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for("api.get_all_users", page=page - 1, _external=True)
+    next = None
+    if pagination.has_next:
+        next = url_for("api.get_all_users", page=page + 1, _external=True)
+
+    return make_response(
+        jsonify(
+            {
+                "companies": [user.to_json() for user in companies],
+                "prev": prev,
+                "next": next,
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+            }
+        )
+    )
+
+
+@api.get("/lessors/")
+@login_required
+@admin_required
+def get_all_lessors():
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+
+    pagination = VNUser.get_lessors_list().paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+
+    lessors = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for("api.get_all_users", page=page - 1, _external=True)
+    next = None
+    if pagination.has_next:
+        next = url_for("api.get_all_users", page=page + 1, _external=True)
+
+    return make_response(
+        jsonify(
+            {
+                "lessors": [user.to_json() for user in lessors],
                 "prev": prev,
                 "next": next,
                 "page": page,
@@ -517,6 +587,8 @@ def register():
         HTTPStatus.CREATED,
     )
 
+
+"""
 @api.get("/users-all/")
 def users_all():
     all_users = VNUser.query.all()
@@ -527,3 +599,4 @@ def users_all():
 def user_detail(id):
     user = VNUser.query.get(id)
     return user_schema.dump(user)
+"""

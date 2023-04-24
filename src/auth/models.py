@@ -166,8 +166,8 @@ class VNUser(
             "houses_count": self.get_houses_count(),
             "houses_close_count": self.get_houses_close_count(),
             "houses_open_count": self.get_houses_open_count(),
-            "houses_list": self.get_houses_list(),
-            "tenants_list": self.get_tenants_list(),
+            "houses_list": self.get_houses(),
+            "tenants_list": self.get_tenants(),
             "tenants_count": self.get_tenants_count(),
             "owners_list": self.get_houseowners_list(),
             "owners_count": self.get_houseowners_count(),
@@ -200,7 +200,7 @@ class VNUser(
         ).count()
         return houseowners_count
 
-    def get_houses_list(self):
+    def get_houses(self):
         houses_list = self.houses.filter_by(vn_user_id=current_user.id).all()
         return [h.to_json() for h in houses_list]
 
@@ -220,7 +220,7 @@ class VNUser(
         ).count()
         return houses_open_count
 
-    def get_tenants_list(self):
+    def get_tenants(self):
         tenants_list = self.tenants.filter_by(vn_user_id=current_user.id).all()
         return [t.to_json() for t in tenants_list]
 
@@ -243,14 +243,34 @@ class VNUser(
         self.vn_last_seen = datetime.utcnow()
         db.session.add(self)
 
-    @staticmethod
-    def get_users_list():
-        users = VNUser.query.filter_by(vn_activated=True)
+    @classmethod
+    def get_users_list(cls):
+        users = cls.query.filter_by(vn_activated=True)
         return users
 
+    @classmethod
+    def get_companies_list(cls):
+        companies = cls.query.filter_by(vn_company=True)
+        return companies
+
+    @classmethod
+    def get_lessors_list(cls):
+        lessors = cls.query.filter_by(vn_house_owner=True)
+        return lessors
+
     @staticmethod
-    def get_user_logged():
-        user = VNUser.query.filter_by(id=current_user.id, vn_activated=True).first()
+    def get_houses_by_country(page, per_page):
+        user_country = current_user.vn_country
+        pagination = VNHouse.query.join(VNUser, VNHouse.vn_user_id == VNUser.id)\
+            .filter(VNUser.vn_country == user_country)\
+            .paginate(page=page, per_page=per_page)
+
+        user_houses = pagination.items
+        return pagination, user_houses
+
+    @classmethod
+    def get_user_logged(cls):
+        user = cls.query.filter_by(id=current_user.id, vn_activated=True).first()
         return user
 
     def total_houses_amount(self):

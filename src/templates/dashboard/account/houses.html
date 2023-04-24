@@ -1,0 +1,116 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_content %}
+	<div id="othersHousesApp">
+
+		<message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
+    	</message-component>
+
+    	<div v-if="houses.length == 0" class="card card-body shadow-none bg-transparent border-0">
+	        <div class="text-center py-2">
+	            <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/house.svg")}}" alt="">
+
+	            <p class="d-flex justify-content-center text-muted mb-4">
+	                Aucune propriété n'a été trouver dans votre zone.
+	            </p>
+	        </div>
+    	</div>
+
+    	<div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
+                </div>
+            </div>
+        </div>
+
+		<div v-if="houses.length > 0" class="row">
+			<div class="card mb-4">
+				<div class="card-header border-bottom bg-transparent">
+					<div class="input-group input-group-joined input-group-solid shadow-none">
+	                    <input
+	                        type="search"
+	                        placeholder="Rechercher une propriété ..."
+	                        class="form-control shadow-none ps-3"
+	                    >
+	                    <button type="submit" class="input-group-text"><i class="fas fa-search text-primary fs-6"></i></button>
+	                </div>
+				</div>
+
+				<div class="card-body">
+					<div class="row g-3">
+						<template v-for="house in houses" :key="house.house_id">
+							<div class="col-md-6 col-xxl-4">
+								<div class="card p-2 shadow-sm h-100">
+									<div class="card-image-scale rounded-3 position-relative bg-light">
+										<img width="100" height="150" loading="lazy" class="card-img" src="/static/img/element/house.svg" alt="card-image">
+										<div class="card-img-overlay d-flex flex-column p-2 z-index-1">
+											<img height="50" width="50" loading="lazy" class="rounded-2" src="/static/img/logo/favicon.png" alt="venone-logo">
+									    </div>
+									</div>
+									<div class="card-body px-2">
+										<p class="mb-2 mb-sm-0">
+											<span class="badge bg-blue-soft text-blue p-2 fw-700 rounded-1 text-uppercase">{ house.house_type }</span>
+											<span v-if="house.house_closed" class="ms-2 badge bg-red-soft text-red p-2 fw-700 rounded-1 text-uppercase">
+												indisponible
+											</span>
+										</p>
+										<p class="mb-2">
+											<h2 class="h1 fw-700">
+												<i class="fas fa-dollar-sign text-primary me-1"></i>
+												{ house.house_rent } { house.house_devise }
+											</h2>
+										</p>
+										<p class="mb-2">
+											<span class="h4">
+												<i class="fas fa-map-marker-alt me-2 text-primary"></i>
+												{ house.house_address }
+											</span>
+										</p>
+										<p class="mb-2">
+											<h2 class="h4 fw-600"><u>Conditions</u>: </h2>
+											<ul class="list-group mb-4">
+												<li class="list-group-item fw-light d-flex">
+													<i class="fas fa-check-circle text-success me-2"></i>
+													<span>{ house.house_month } mois loyer</span>
+												</li>
+												<li class="list-group-item fw-light d-flex mb-0">
+													<i class="fas fa-check-circle text-success me-2"></i>
+													<span>{ house.house_number_room } pièces</span>
+												</li>
+												<li class="list-group-item fw-light d-flex mb-0">
+													<i class="fas fa-check-circle text-success me-2"></i>
+													<span>{ house.house_guaranty } { house.house_devise } caution</span>
+												</li>
+											</ul>
+										</p>
+										<div v-if="!house.house_closed" class="mb-0">
+											<a rel="nofollow"
+												target="_blank"
+												href="https://wa.me/+2250747473627?text=Puis-je avoir plus d'information sur cette proprété ?"
+												class="btn btn-success"
+											>Contacter l'agence</a>
+										</div>
+									</div>	
+								</div>
+							</div>
+						</template>
+					</div>
+
+					<paginate-component
+						:current-page="currentPage"
+						:total-pages="totalPages"
+						:next-page="nextPage"
+						:prev-page="prevPage"
+					></paginate-component>
+				</div>
+			</div>
+	    </div>
+    </div>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script type="module" src="{{ url_for('static', filename="js/app/hscheck.js") }}"></script>
+{% endblock other_js_src %}

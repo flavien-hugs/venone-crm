@@ -23,7 +23,7 @@ def get_all_houseowners():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
-    pagination = VNHouseOwner.get_owners_list().paginate(
+    pagination = current_user.houseowners.paginate(
         page=page, per_page=per_page, error_out=False
     )
 

@@ -6,12 +6,21 @@
 		<message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
     	</message-component>
 
+    	<div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
+                </div>
+            </div>
+        </div>
+
 		<div class="row">
 			<div class="col-md-6 mb-4">
 				<div class="card h-100 border-start-lg border-start-primary">
 					<div class="card-body">
 						<div class="small text-muted mb-2">Total loyer en location</div>
-						<div class="h1">{ user.total_house_amount } { user.devise }</div>
+						<div class="h1 fw-700">{ user.total_house_amount } { user.devise }</div>
 					</div>
 				</div>
 			</div>
@@ -20,7 +29,7 @@
 	            <div class="card h-100 border-start-lg border-start-secondary">
 	                <div class="card-body">
 	                    <div class="small text-muted mb-2">Total de vos pourcentages</div>
-	                    <div class="h1">{ user.total_house_percent } { user.devise }</div>
+	                    <div class="h1 fw-700">{ user.total_house_percent } { user.devise }</div>
 	                </div>
 	            </div>
 	        </div>

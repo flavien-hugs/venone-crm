@@ -17,9 +17,11 @@ class FormMixin:
             DataRequired(),
             Email(message="Entrer une adresse email valide."),
         ],
-        render_kw={"required": True}
+        render_kw={"required": True},
     )
-    phonenumber_one = StringField("Numéro de téléphone", render_kw={"required": True}, validators=[DataRequired()])
+    phonenumber_one = StringField(
+        "Numéro de téléphone", render_kw={"required": True}, validators=[DataRequired()]
+    )
     country = SelectField("Pays/Région", choices=COUNTRY, coerce=str)
     password = PasswordField(
         "Mot de passe",

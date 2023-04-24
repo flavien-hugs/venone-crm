@@ -2,7 +2,6 @@ from src import ma
 
 
 class UserSchema(ma.Schema):
-
     class Meta:
         fields = ("vn_addr_email", "vn_fullname", "_links")
 
