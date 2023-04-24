@@ -43,10 +43,10 @@ def login():
         return redirect(url_for("owner_bp.dashboard"))
 
     form = LoginForm(request.form)
-    if request.method == "POST" and form.validate_on_submit():
+    if form.validate_on_submit():
         addr_email = form.addr_email.data
         user = VNUser.query.filter_by(vn_addr_email=addr_email.lower()).first()
-        if user and user.verify_password(form.password.data) and user.vn_activated:
+        if user and user.vn_activated and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
             next_page = request.args.get("next")
             if next_page is None or not next_page.startswith("/"):
@@ -58,19 +58,18 @@ def login():
             return redirect(next_page)
         else:
             if not user.vn_activated:
-                flash(
-                    "L'utilisateur n'existe pas ou le compte à été désactivé ! \
-                    Veuillez contacter l'administrateur système.",
-                    category="danger",
-                )
+                error_message = "L'utilisateur n'existe pas ou le compte a\
+                    été désactivé ! Veuillez contacter l'administrateur système."
             if not user.verify_password(form.password.data):
-                flash("Le mot de passe invalide.", category="danger")
+                error_message = "Le mot de passe invalide."
+            
+            flash(error_message, category="danger")
 
     page_title = "Se connecter"
     return render_template("auth/login.html", page_title=page_title, form=form)
 
 
-@auth_bp.route("/owner/signup/", methods=["POST", "GET"])
+@auth_bp.route("/owner/signup/", methods=["GET", "POST"])
 def registerowner_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
@@ -78,7 +77,7 @@ def registerowner_page():
         return redirect(url_for("owner_bp.dashboard"))
 
     form = OwnerHouseSignupForm()
-    if request.method == "POST" and form.validate_on_submit():
+    if form.validate_on_submit():
         user_to_create = VNUser(
             vn_gender=form.gender.data,
             vn_fullname=form.fullname.data,
@@ -102,7 +101,7 @@ def registerowner_page():
     return render_template("auth/signup/owner.html", form=form, page_title=page_title)
 
 
-@auth_bp.route("/company/signup/", methods=["POST", "GET"])
+@auth_bp.route("/company/signup/", methods=["GET", "POST"])
 def agencieregister_page():
 
     if current_user.is_authenticated and current_user.vn_activated:
@@ -110,7 +109,7 @@ def agencieregister_page():
         return redirect(url_for("owner_bp.dashboard"))
 
     form = AgencieSignupForm(request.form)
-    if request.method == "POST" and form.validate_on_submit():
+    if form.validate_on_submit():
         user_to_create = VNUser(
             vn_gender=form.gender.data,
             vn_fullname=form.fullname.data,
@@ -139,7 +138,7 @@ def agencieregister_page():
 def password_reset_request():
 
     form = PasswordResetRequestForm(request.form)
-    if request.method == "POST" and form.validate_on_submit():
+    if form.validate_on_submit():
         email = form.addr_email.data.lower()
         user = VNUser.query.filter_by(vn_addr_email=email).first()
         if user:
@@ -189,7 +188,7 @@ def password_reset(token):
         return redirect(url_for("auth_bp.login"))
 
     form = PasswordResetForm(request.form)
-    if request.method == "POST" and form.validate_on_submit():
+    if form.validate_on_submit():
         if form.new_password.data != form.confirm_password.data:
             flash("Les mots de passe ne correspondent pas.", "error")
             return redirect(url_for("auth_bp.password_reset", token=token))
@@ -212,8 +211,8 @@ def password_reset(token):
 @auth_bp.route("/change-email/", methods=["GET", "POST"])
 @login_required
 def change_email_request():
-    form = ChangeEmailForm()
-    if form.validate_on_submit(request.form):
+    form = ChangeEmailForm(request.form)
+    if form.validate_on_submit():
         if current_user.verify_password(form.password.data):
             new_email = form.addr_email.data.lower()
             token = utils.generate_confirm_token(new_email)
