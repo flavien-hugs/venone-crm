@@ -8,6 +8,7 @@ from src import db
 from src.mixins.models import id_generator
 from src.mixins.models import TimestampMixin
 
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -108,3 +109,47 @@ class VNPayment(TimestampMixin):
             db.session.commit()
         else:
             self.vn_pay_late_penalty = 0
+
+
+class VNTransferRequest(TimestampMixin):
+
+    __tablename__ = "transfer_request"
+
+    vn_transfer_id = db.Column(
+        db.String(5), nullable=True, unique=True, default=id_generator
+    )
+    vn_user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+    vn_trans_amount = db.Column(db.Float, nullable=False)
+    vn_trans_status = db.Column(db.Boolean, default=False)
+    vn_withdrawal_number = db.Column(db.String(50), nullable=True)
+    vn_withdrawal_method = db.Column(db.String(50), nullable=True)
+    vn_cinetpay_data = db.Column(db.JSON, default=False)
+
+    def __str__(self):
+        return self.vn_user_id
+
+    def to_json(self):
+        data = {
+            "transfer_uuid": self.uuid,
+            "transfer_id": self.vn_transfer_id,
+            "amount": "{:,.2f}".format(self.vn_trans_amount),
+            "status": self.vn_trans_status,
+            "message": self.get_status_transfer(),
+            "withdrawal_number": self.vn_withdrawal_number,
+            "withdrawal_method": self.vn_withdrawal_method,
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+        }
+        return data
+
+    def __repr__(self):
+        return f"VNTransferRequest({self.id}, {self.vn_trans_amount}, {self.vn_trans_status})"
+
+    @classmethod
+    def get_transfers_request(cls) -> list:
+        transfers = cls.query.filter_by(vn_user_id=current_user.id)
+        return transfers
+
+    def get_status_transfer(self) -> bool:
+        return "en cours" if self.vn_trans_status else "en cours"

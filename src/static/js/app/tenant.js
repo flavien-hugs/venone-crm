@@ -128,7 +128,6 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         methods: {
-
             nextStep() {
                 this.currentStep++;
             },
@@ -282,6 +281,21 @@ window.addEventListener('DOMContentLoaded', event => {
             async onCreateComapnyTenant() {
                 try {
                     const registerURL = `/api/companies/tenant-register/`;
+
+                    if (
+                        this.ownerData.percent === "" ||
+                        isNaN(this.ownerData.percent) ||
+                        this.ownerData.percent < 0 ||
+                        this.ownerData.percent > 100
+                    ) {
+                        this.showMessageAlert = true;
+                        this.messageAlert =
+                            "Valeur de pourcentage invalide. Le pourcentage doit être un nombre entre 0 et 100.";
+                        return;
+                    }
+
+                    this.ownerData.percent = parseFloat(this.ownerData.percent);
+
                     const response = await fetch(registerURL, {
                         method: "POST",
                         headers: {
