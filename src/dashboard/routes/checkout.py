@@ -16,3 +16,12 @@ def checkout():
     return render_template(
         "checkout/checkout.html", page_title=page_title, current_user=current_user
     )
+
+
+@checkout_bp.get("/requests/")
+@login_required
+def transfer_request():
+    page_title = "Retraits"
+    return render_template(
+        "checkout/transfer.html", page_title=page_title, current_user=current_user
+    )
