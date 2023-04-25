@@ -1,0 +1,186 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_content %}
+    <section id="requestTransferTable">
+
+        <!-- Alert message -->
+        <message-component
+            :show-message-alert="showMessageAlert"
+            :message-alert="messageAlert">
+        </message-component>
+
+        <div v-if="isLoading" class="preloader">
+            <div class="preloader-body">
+                <p>Chargement en cours...</p>
+                <div class="cssload-container">
+                    <div class="cssload-speeding-wheel"></div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="user.houses_count > 0" class="row g-2 border-bottom mb-5 mb-sm-2">
+            <div class="col-xl-6 mb-4">
+                <div class="card border-start-lg border-start-primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">Total loyers collectés</div>
+                                <div class="h1 fw-700">{ user.total_payment_month } { user.devise }</div>
+                            </div>
+                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6 mb-4">
+                <div class="card border-start-lg border-start-primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">total de vos gains</div>
+                                <div class="h1 fw-700">{ user.total_house_percent } { user.devise }</div>
+                            </div>
+                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="user.transfers_count == 0" class="card card-body shadow-none bg-transparent border-0">
+            <div class="text-center">
+                <img loading="lazy" class="img-account-profile mb-4" src="{{ url_for('static', filename="img/element/credit_card.svg")}}">
+
+                <h4 class="text-muted mb-4">
+                    Vous n'aviez effectué aucune demande de transfert pour le moment.
+                </h4>
+
+                <button @click="createTransferRequest" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                    <i class="me-2" data-feather="credit-card"></i>
+                    Faire retrait
+                </button>
+            </div>
+        </div>
+
+        <div v-else-if="user.transfers_count > 0" class="card card-header-actions mx-auto">
+            <div class="card-header">
+                <span class="fw-700">{{ page_title }}</span>
+                <div>
+                    <button @click="createTransferRequest" class="btn btn-sm btn-success text-uppercase text-white fw-500 me-2" type="button">
+                        <i class="me-2 fa fa-credit-card"></i>
+                        Faire retrait
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-500 shadow-none">
+                        <i class="fa fa-file-csv me-2"></i>
+                        télécharger le csv
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="input-group input-group-joined input-group-solid shadow-none">
+                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
+                    <input
+                        type="text"
+                        placeholder="Rechercher un locataire ..."
+                        v-model="searchQuery"
+                        class="form-control shadow-none ps-0"
+                    >
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="small">
+                            <tr>
+                                <th scope="col">ID Transfert</th>
+                                <th scope="col">Numero de retrait</th>
+                                <th scope="col">Montant</th>
+                                <th scope="col">Date de retrait</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="ts in transfers" v-bind:key="ts.transfer_uuid">
+                                <tr>
+                                    <td><span class="badge bg-primary-soft text-primary">#{ ts.transfer_id }</span></td>
+                                    <td>{ ts.withdrawal_number }</td>
+                                    <td>{ ts.amount } { user.devise }</td>
+                                    <td>{ ts.created_at }</td>
+                                    <td>
+                                        <span :class="{ 'bg-red-soft text-red': !ts.status, 'bg-blue-soft text-blue': ts.status }" class="badge text-uppercase fw-500 p-2 rounded-0">
+                                            <i :class="{ 'fa-spinner': !ts.status, 'fa-check': ts.status }" class="fa me-1"></i>
+                                            { ts.message }
+                                        </span>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <paginate-component
+                    :current-page="currentPage"
+                    :total-pages="totalPages"
+                    :next-page="nextPage"
+                    :prev-page="prevPage"
+                ></paginate-component>
+            </div>
+        </div>
+
+        {# modal create transfer request #}
+        <div class="modal fade" data-bs-backdrop="static" id="createTransferRequestModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Demande transfert</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="trans_amount" class="form-label">Montant du transfert</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 text-primary">
+                                        <i class="fa fa-dollar-sign"></i>
+                                    </span>
+                                    <input placeholder="Ex:20000" class="form-control bg-light border-0" id="trans_amount" v-model.num="transferData.trans_amount">
+                                </div>
+                            </div>
+
+                            <div class="mb-4 col-md-12">
+                                <label for="withdrawal_number" class="form-label">Numéro de téléphone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 text-primary">
+                                        <i class="far fa-credit-card"></i>
+                                    </span>
+                                    <input placeholder="Entrer le numéro de téléphone" class="form-control border-0 bg-light" id="withdrawal_number" v-model.num="transferData.withdrawal_number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-6 d-grid">
+                                <button class="btn btn-outline-primary text-uppercase shadow-none me-1" type="button" data-bs-dismiss="modal">
+                                Annuler</button>
+                            </div>
+
+                            <div class="col-6 d-grid">
+                                <button :class="{ 'btn-danger': isFormValid, 'btn-light': !isFormValid }" type="sumbit" @click.prevent="onCreateTransferRequest" :disabled="!isFormValid" class="btn text-uppercase shadow-none">
+                                Valider</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock dashboard_content %}
+
+{% block other_js_src %}
+    {{ super() }}
+    <script type="module" src="{{ url_for('static', filename="js/app/transfer.js") }}"></script>
+{% endblock other_js_src %}
