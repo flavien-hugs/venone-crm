@@ -128,6 +128,13 @@ class VNUser(
         backref="user_payments",
         order_by="desc(VNPayment.vn_pay_date)",
     )
+    transfers = db.relationship(
+        "VNTransferRequest",
+        lazy="dynamic",
+        backref="user_transfer_requests",
+        order_by="desc(VNTransferRequest.vn_created_at)",
+    )
+    percent = db.relationship("VNPercent", uselist=False, back_populates="user")
 
     def __str__(self):
         return self.vn_fullname or self.vn_agencie_name
@@ -157,12 +164,16 @@ class VNUser(
             "is_admin": self.is_administrator(),
             "is_activated": self.vn_activated,
             "last_seen": self.vn_last_seen,
+            "owner_percent": self.get_owner_percent(),
+            "amount_apply_percent": self.amount_apply_percent(),
+            "company_percent": self.get_company_percent(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "total_house_amount": self.total_houses_amount(),
-            "total_house_percent": self.total_houses_percent(),
+            "total_house_receive": "{:,.2f}".format(self.total_houses_percent()),
+            "total_house_amount": "{:,.2f}".format(self.total_houses_amount()),
+            "total_house_percent": "{:,.2f}".format(self.get_amount_receive()),
             "payments_list": self.get_payments_list(),
             "payments_count": self.get_payments_count(),
-            "total_payment_month": self.total_payments_month(),
+            "total_payment_month": "{:,.2f}".format(self.total_payments_month()),
             "houses_count": self.get_houses_count(),
             "houses_close_count": self.get_houses_close_count(),
             "houses_open_count": self.get_houses_open_count(),
@@ -171,6 +182,8 @@ class VNUser(
             "tenants_count": self.get_tenants_count(),
             "owners_list": self.get_houseowners_list(),
             "owners_count": self.get_houseowners_count(),
+            "transfers_list": self.get_transfers_list(),
+            "transfers_count": self.get_transfers_count(),
         }
         return json_user
 
@@ -180,17 +193,31 @@ class VNUser(
     def verify_password(self, password):
         return check_password_hash(self.vn_password, password)
 
-    def get_payments_list(self):
+    def get_owner_percent(self) -> float:
+        return getattr(self.percent, "vn_owner_percent", 7)
+
+    def get_company_percent(self) -> float:
+        return getattr(self.percent, "vn_company_percent", 6)
+
+    def get_payments_list(self) -> list:
         payments_list = self.payments.filter_by(vn_payee_id=current_user.id).all()
         return [p.to_json() for p in payments_list]
 
-    def get_payments_count(self):
+    def get_payments_count(self) -> int:
         payments_count = self.payments.filter_by(
             vn_payee_id=current_user.id, vn_pay_status=True
         ).count()
         return payments_count
 
-    def get_houseowners_list(self):
+    def get_transfers_list(self) -> list:
+        transfers_list = self.transfers.filter_by(vn_user_id=current_user.id).all()
+        return [t.to_json() for t in transfers_list]
+
+    def get_transfers_count(self) -> int:
+        transfers_count = self.transfers.filter_by(vn_user_id=current_user.id).count()
+        return transfers_count
+
+    def get_houseowners_list(self) -> list:
         owners_list = self.houseowners.filter_by(vn_user_id=current_user.id).all()
         return [o.to_json() for o in owners_list]
 
@@ -263,7 +290,9 @@ class VNUser(
         user_country = current_user.vn_country
         pagination = (
             VNHouse.query.join(VNUser, VNHouse.vn_user_id == VNUser.id)
-            .filter(VNHouse.vn_house_is_open == False, VNUser.vn_country == user_country)
+            .filter(
+                VNHouse.vn_house_is_open == False, VNUser.vn_country == user_country
+            )
             .paginate(page=page, per_page=per_page)
         )
 
@@ -280,45 +309,29 @@ class VNUser(
             vn_house_is_open=True, vn_user_id=current_user.id
         ).all()
         total = sum(house.vn_house_rent for house in user_houses)
-        return "{:,.2f}".format(total)
+        return total
 
     def total_houses_percent(self):
-        user_houses = (
-            self.houses.filter_by(vn_house_is_open=True, vn_user_id=current_user.id)
-            .join(VNHouseOwner)
-            .filter(VNHouseOwner.vn_user_id.isnot(None))
-            .all()
-        )
-        total_percent = sum(
-            house.get_house_rent_with_percent() for house in user_houses
-        )
-        return "{:,.2f}".format(total_percent)
 
-    def total_payments_month(self):
-
-        from src.payment import VNPayment
-        from src.tenant import VNHouse, VNHouseOwner, VNTenant
-
-        now = datetime.now()
-        month = now.month
-        year = now.year
-
-        total_payments = (
-            db.session.query(db.func.sum(VNPayment.vn_pay_amount))
-            .join(VNHouse)
-            .join(VNTenant)
-            .join(VNHouseOwner)
-            .join(VNUser)
-            .filter(
-                VNUser.uuid == current_user.uuid,
-                VNPayment.vn_pay_status,
-                db.extract("month", VNPayment.vn_pay_date) == month,
-                db.extract("year", VNPayment.vn_pay_date) == year,
+        if current_user.vn_house_owner:
+            user_houses = self.houses.filter_by(vn_user_id=current_user.id, vn_house_is_open=True).all()
+            total_percent = sum(
+                house.vn_house_rent for house in user_houses
             )
-            .scalar()
-        )
-        total_payment_month = total_payments or 0
-        return "{:,.2f}".format(total_payment_month)
+        elif current_user.vn_company:
+            user_houses = (
+                self.houses.filter_by(vn_house_is_open=True, vn_user_id=current_user.id)
+                .join(VNHouseOwner)
+                .filter(VNHouseOwner.vn_user_id.isnot(None))
+                .all()
+            )
+            total_percent = sum(
+                house.get_house_rent_with_percent() for house in user_houses
+            )
+        else:
+            return 0
+
+        return total_percent or 0
 
     @staticmethod
     def get_label(user):
@@ -409,6 +422,67 @@ class VNUser(
 
         return available_properties
 
+    def total_payments_month(self):
+
+        from src.payment import VNPayment
+        from src.tenant import VNHouse, VNHouseOwner, VNTenant
+
+        now = datetime.now()
+        month = now.month
+        year = now.year
+
+        if current_user.vn_house_owner:
+            total_payments = (
+                db.session.query(db.func.sum(VNPayment.vn_pay_amount))
+                .join(VNHouse)
+                .join(VNTenant)
+                .join(VNUser)
+                .filter(
+                    VNUser.uuid == current_user.uuid,
+                    VNPayment.vn_pay_status,
+                    db.extract("month", VNPayment.vn_pay_date) == month,
+                    db.extract("year", VNPayment.vn_pay_date) == year,
+                )
+                .scalar()
+            )
+        elif current_user.vn_company:
+            total_payments = (
+                db.session.query(db.func.sum(VNPayment.vn_pay_amount))
+                .join(VNHouse)
+                .join(VNTenant)
+                .join(VNHouseOwner)
+                .join(VNUser)
+                .filter(
+                    VNUser.uuid == current_user.uuid,
+                    VNPayment.vn_pay_status,
+                    db.extract("month", VNPayment.vn_pay_date) == month,
+                    db.extract("year", VNPayment.vn_pay_date) == year,
+                )
+                .scalar()
+            )
+        else:
+            return 0
+        return total_payments or 0
+
+    def amount_apply_percent(self):
+        if current_user.vn_house_owner:
+            percent = self.get_owner_percent() / 100
+            houses = self.houses.filter_by(vn_house_is_open=True).all()
+            total_percents = sum((house.vn_house_rent * percent) for house in houses)
+            # total_percents = self.total_payments_month() * percent
+        elif current_user.vn_company:
+            percent = self.get_company_percent() / 100
+            houses = self.houses.join(VNHouseOwner).filter( VNHouseOwner.vn_user_id == current_user.id, VNHouse.vn_house_is_open == True).all()
+            total_percents = sum((house.get_house_rent_with_percent() * percent) for house in houses)
+            # total_percents = self.total_payments_month() * percent
+        else:
+            return 0
+        return total_percents or 0
+
+    def get_amount_receive(self):
+        total = self.total_houses_percent() - self.amount_apply_percent()
+        return total
+
     @staticmethod
     def create_admin():
 
@@ -436,6 +510,32 @@ class VNUser(
             logger.info(f"Admin with email {addr_email} created successfully!")
         except Exception as e:
             logger.warning(f"Couldn't create admin user, because {e}")
+
+
+class VNPercent(TimestampMixin):
+
+    __tablename__ = "percent"
+
+    vn_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    user = db.relationship("VNUser", back_populates="percent")
+    vn_owner_percent = db.Column(db.Float, default=7, nullable=True)
+    vn_company_percent = db.Column(db.Float, default=6, nullable=True)
+
+    def __init__(self, user, vn_owner_percent=7, vn_company_percent=6):
+        self.user = user
+        self.vn_owner_percent = vn_owner_percent
+        self.vn_company_percent = vn_company_percent
+
+    def __str__(self):
+        return self.user
+
+    def __repr__(self):
+        return f"VNPercent({self.id}, {self.owner_percent}, {self.company_percent})"
 
 
 class AnonymousUser(AnonymousUserMixin):

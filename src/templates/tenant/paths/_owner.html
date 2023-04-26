@@ -5,7 +5,7 @@
 		</td>
 		<td>{ own.fullname } ({own.phonenumber_one})</td>
 		<td>{ own.amount.toLocaleString() } { own.devise }</td>
-		<td>{ own.total_percent } { own.devise }</td>
+		<td>{ own.amount_repaid } { own.devise }</td>
 		<td>
 			<span v-for="h in own.houses" class="badge bg-green-soft text-green me-1" v-if="own.number_houses > 0">
 			#{ h }</span>
@@ -105,7 +105,7 @@
                                         <i class="fa fa-dollar-sign fa-3x cc-color-visa"></i>
                                         <div class="ms-4">
                                             <div class="text-lg fw-700">{ owner.amount_repaid } { owner.devise }</div>
-                                            <small>Montant à reverser ce mois</small>
+                                            <small>Montant à reverser</small>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">

@@ -59,7 +59,7 @@ class PasswordResetRequestForm(FlaskForm):
         render_kw={"required": True},
         validators=[DataRequired(), Length(1, 64), Email()],
     )
-    submit = SubmitField("Demander une réinitialisation du mot de passe")
+    submit = SubmitField("envoyer le lien de réinitialisation")
 
 
 class ChangeEmailForm(FlaskForm):
