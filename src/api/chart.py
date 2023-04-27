@@ -9,7 +9,7 @@ from . import api
 @login_required
 @jsonify_response
 def get_owners_data():
-    data = current_user.get_ownerbymonth()
+    data = current_user.get_owner_per_month()
     return [{"year": d[0], "month": d[1], "count": d[2]} for d in data]
 
 
@@ -17,7 +17,7 @@ def get_owners_data():
 @login_required
 @jsonify_response
 def get_tenants_data():
-    data = current_user.get_tenantbymonth()
+    data = current_user.get_tenant_per_month()
     return [{"year": d[0], "month": d[1], "count": d[2]} for d in data]
 
 
@@ -33,5 +33,5 @@ def get_trendprices_data():
 @login_required
 @jsonify_response
 def get_available_properties_data():
-    data = current_user.count_available_properties()
+    data = current_user.houses_opened_count()
     return [{"isOpen": d[0], "notOpen": d[1]} for d in data]
