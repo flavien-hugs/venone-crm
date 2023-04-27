@@ -15,24 +15,48 @@
             </div>
         </div>
 
-		<div class="row">
-			<div class="col-md-6 mb-4">
-				<div class="card h-100 border-start-lg border-start-primary">
-					<div class="card-body">
-						<div class="small text-muted mb-2">Total loyer en location</div>
-						<div class="h1 fw-700">{ user.total_house_amount } { user.devise }</div>
-					</div>
-				</div>
-			</div>
+		<div class="row g-2">
+			<div class="col-md-4 mb-4">
+                <div class="card border-start-lg border-start-primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">solde</div>
+                                <div class="h1 fw-700">{ user.total_payments_received } { user.devise }</div>
+                            </div>
+                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-	        <div class="col-md-6 mb-4">
-	            <div class="card h-100 border-start-lg border-start-secondary">
-	                <div class="card-body">
-	                    <div class="small text-muted mb-2">Total de vos gains</div>
-	                    <div class="h1 fw-700">{ user.total_house_percent } { user.devise }</div>
-	                </div>
-	            </div>
-	        </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-start-lg border-start-primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">Total loyers à collecter</div>
+                                <div class="h1 fw-700">{ user.total_house_amount } { user.devise }</div>
+                            </div>
+                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card border-start-lg border-start-primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">gains sur loyers à collectés</div>
+                                <div class="h1 fw-700">{ user.total_house_percent } { user.devise }</div>
+                            </div>
+                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 		</div>
 
 		<div class="row">
