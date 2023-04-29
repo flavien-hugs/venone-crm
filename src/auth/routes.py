@@ -151,8 +151,7 @@ def password_reset_request():
                 token=token,
             )
             flash(
-                """Un e-mail avec les instructions de réinitialisation\
-                    de mot de passe a été envoyé à votre adresse e-mail.""",
+                """Nous venons de vous envoyer un e-mail avec un lien pour réinitialiser votre mot de passe !""",
                 category="info",
             )
             return redirect(url_for("auth_bp.login"))
