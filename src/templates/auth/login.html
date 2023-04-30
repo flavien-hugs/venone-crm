@@ -14,15 +14,15 @@
             <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3">
                 <i class="far fa-envelope"></i>
             </span>
-            {% if form.addr_email.errors %}
-            {{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
-            <div class="invalid-feedback">
-                {% for error in form.addr_email.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
+            {% if form.email_or_phone.errors %}
+                {{ form.email_or_phone(class="form-control border-0 bg-light shadow-none p-3 is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email_or_phone.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
             {% else %}
-            {{ form.addr_email(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.addr_email.label.text) }}
+                {{ form.email_or_phone(class="form-control border-0 bg-light shadow-none p-3", placeholder=form.email_or_phone.label.text) }}
             {% endif %}
         </div>
     </div>
