@@ -385,16 +385,19 @@ def user_to_json(user):
 def login():
 
     data = request.get_json()
-    addr_email = data.get("vn_addr_email", None)
+    email_or_phone = data.get("email_or_phone", None)
     passowrd = data.get("vn_password", None)
 
-    user = VNUser.query.filter_by(vn_addr_email=addr_email).first()
+    user = VNUser.query.filter(
+        (VNUser.vn_addr_email == email_or_phone)
+        | (VNUser.vn_phonenumber_one == email_or_phone)
+    ).first()
 
     if user and user.verify_password(passowrd) and user.vn_activated:
         return {
             "success": True,
             "user": user_to_json(user),
-            "message": f"Hello, bienvenue sur votre tableau de bord {addr_email}",
+            "message": f"Hello, bienvenue sur votre tableau de bord {email_or_phone}",
         }
 
     return {

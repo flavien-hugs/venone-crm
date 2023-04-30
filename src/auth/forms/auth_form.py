@@ -12,14 +12,10 @@ from wtforms.validators import ValidationError
 
 
 class LoginForm(FlaskForm):
-    addr_email = StringField(
-        "Adresse Email",
+    email_or_phone = StringField(
+        "Adresse e-mail ou numéro de téléphone",
         render_kw={"required": True},
-        validators=[
-            DataRequired(),
-            Length(1, 64),
-            Email(message="Entrer une adresse email valide."),
-        ],
+        validators=[DataRequired()],
     )
     password = PasswordField(
         "Mot de passe", render_kw={"required": True}, validators=[DataRequired()]
@@ -57,7 +53,11 @@ class PasswordResetRequestForm(FlaskForm):
     addr_email = StringField(
         "Votre adresse e-mail",
         render_kw={"required": True},
-        validators=[DataRequired(), Length(1, 64), Email()],
+        validators=[
+            DataRequired(),
+            Length(1, 64),
+            Email(message="Entrer une adresse email valide."),
+        ],
     )
     submit = SubmitField("envoyer le lien de réinitialisation")
 
