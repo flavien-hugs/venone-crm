@@ -107,15 +107,17 @@ def create_transfer_request():
     if trans_amount < 20000:
         return {
             "success": False,
-            "message": "Le montant de retrait doit être supérieur ou égal à 20 000",
+            "message": "Le montant de retrait doit être supérieur ou égal à 20 001",
         }
 
-    transfer = VNTransferRequest()
+    if current_user.vn_balance < trans_amount:
+        return {
+            "success": False,
+            "message": "Vous n'aviez pas assez de fonds disponibles pour le transfert.",
+        }
 
-    transfer.vn_user_id = user
-    transfer.vn_trans_amount = trans_amount
-    transfer.vn_withdrawal_number = withdrawal_number
-
-    transfer.save()
+    transfer_amount = current_user.request_transfer(trans_amount, withdrawal_number)
+    current_user.deduct_payments_received(trans_amount)
+    transfer_amount.save()
 
     return {"success": True, "message": "Demande de transfert soumis avec succès !"}

@@ -86,7 +86,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     if (response.status == 200) {
                         this.isLoading = false;
                         const data = await response.json();
-                        console.log(data);
                         this.transfers = data.transfers;
                         this.user = data.user;
                         this.totalPages = Math.ceil(data.total / this.perPage);
@@ -140,6 +139,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     } else {
                         this.showMessageAlert = true;
                         this.messageAlert = data.message;
+                        setTimeout(() => {
+                            this.showMessageAlert = false;
+                        }, 3000);
                     }
                 } catch (error) {
                     console.log(error);
