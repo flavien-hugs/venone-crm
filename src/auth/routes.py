@@ -44,8 +44,11 @@ def login():
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        addr_email = form.addr_email.data
-        user = VNUser.query.filter_by(vn_addr_email=addr_email.lower()).first()
+        email_or_phone = form.email_or_phone.data
+        user = VNUser.query.filter(
+            (VNUser.vn_addr_email == email_or_phone)
+            | (VNUser.vn_phonenumber_one == email_or_phone)
+        ).first()
         if user and user.vn_activated and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
             next_page = request.args.get("next")
@@ -151,7 +154,8 @@ def password_reset_request():
                 token=token,
             )
             flash(
-                """Nous venons de vous envoyer un e-mail avec un lien pour réinitialiser votre mot de passe !""",
+                """Nous venons de vous envoyer un e-mail avec\
+                    un lien pour réinitialiser votre mot de passe !""",
                 category="info",
             )
             return redirect(url_for("auth_bp.login"))
