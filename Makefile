@@ -31,6 +31,15 @@ upgrade: ## Apply the upgrade to the database
 test: ## Run the unit tests
 	python3 -m unittest discover -s tests
 
+coverage: ## Run the coverage
+	coverage run -m unittest discover
+
+cov-report: ## Generate a code coverage report
+	coverage report -m
+
+cov-html: ## Generate an HTML report
+	coverage html
+
 shell: ## Flask Shell Load
 	$(MANAGE) flask shell
 
