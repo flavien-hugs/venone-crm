@@ -21,12 +21,12 @@ class BaseCase(unittest.TestCase):
         self.user = VNUser(
             vn_gender="Mr",
             vn_fullname="Flavien HUGS",
-            vn_addr_email='test@example.com',
-            vn_phonenumber_one='1234567890',
-            vn_cni_number='CI1234567890',
+            vn_addr_email="test@example.com",
+            vn_phonenumber_one="1234567890",
+            vn_cni_number="CI1234567890",
             vn_country="CI",
         )
-        self.user.set_password('password')
+        self.user.set_password("password")
         self.user.vn_activated = True
         self.user.vn_house_owner = True
 
