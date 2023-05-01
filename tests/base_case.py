@@ -4,6 +4,8 @@ import unittest
 from flask import current_app
 from src import create_venone_app
 from src import db
+from src.auth.models import VNUser
+
 
 sys.path.append("..")
 
@@ -15,6 +17,21 @@ class BaseCase(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         self.client = self.app.test_client()
+
+        self.user = VNUser(
+            vn_gender="Mr",
+            vn_fullname="Flavien HUGS",
+            vn_addr_email="test@example.com",
+            vn_phonenumber_one="1234567890",
+            vn_cni_number="CI1234567890",
+            vn_country="CI",
+        )
+        self.user.set_password("password")
+        self.user.vn_activated = True
+        self.user.vn_house_owner = True
+
+        db.session.add(self.user)
+        db.session.commit()
 
     def tearDown(self):
         db.session.remove()
