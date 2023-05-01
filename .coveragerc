@@ -1,0 +1,7 @@
+[omit]
+include =
+    */tests/*
+    src/celery.py
+    src/constants.py
+    src/utils.py
+    src/venone.py
