@@ -261,7 +261,7 @@ class VNHouse(TimestampMixin):
         today = date.today()
         notice_period = timedelta(days=10)
 
-        if today > self.vn_house_lease_end_date:
+        if today >= self.vn_house_lease_end_date:
             next_month = (
                 self.vn_house_lease_end_date.replace(day=28)
                 + timedelta(days=31)
