@@ -3,9 +3,8 @@ import unittest
 
 from flask import current_app
 from src import create_venone_app
-from src import db
+from src import db, login_manager
 from src.auth.models import VNUser
-
 
 sys.path.append("..")
 
@@ -17,6 +16,7 @@ class BaseCase(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         self.client = self.app.test_client()
+        login_manager.init_app(self.app)
 
         self.user = VNUser(
             vn_gender="Mr",

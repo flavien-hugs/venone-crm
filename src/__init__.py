@@ -194,7 +194,7 @@ def create_venone_app(config_name):
 
 
 def celery_init_app(app):
-    celery_app = Celery(app.name, backend=os.getenv("CELERY_BROKER_URL"))
+    celery_app = Celery(app.name, broker_url=os.getenv("CELERY_BROKER_URL"))
     celery_app.conf.update(app.config)
 
     class ContextTask(Task):
