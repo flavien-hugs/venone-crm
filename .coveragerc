@@ -1,7 +1,9 @@
-[omit]
+[run]
 include =
+    */src/*
+
+omit =
     */tests/*
-    src/celery.py
-    src/constants.py
-    src/utils.py
-    src/venone.py
+    */src/templates/*
+    */src/static/*
+    */src/static/*

@@ -44,11 +44,3 @@ jobs:
 
       - name: Vérifier la fusion
         run: git diff --exit-code --quiet dev
-
-      - name: Créer une demande de fusion
-        uses: peter-evans/create-pull-request@v3
-        with:
-          base: dev
-          head: main
-          title: "Mise à jour de la branche main"
-          body: "Cette demande de fusion met à jour la branche main avec les derniers changements."
