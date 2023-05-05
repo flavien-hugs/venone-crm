@@ -64,7 +64,7 @@ class VNPayment(TimestampMixin):
         return self.vn_payment_id
 
     def __repr__(self):
-        return f"Payment({self.id}, {self.vn_payment_id}, {self.vn_payment_date})"
+        return f"Payment({self.id}, {self.vn_payment_id}, {self.vn_pay_date})"
 
     @classmethod
     def get_payments(cls) -> list:
