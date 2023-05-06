@@ -55,9 +55,12 @@ class VNPayment(TimestampMixin):
             "payment_late_penalty": self.vn_pay_late_penalty,
             "payment_status": self.vn_pay_status,
             "get_payment": self.get_status_payment(),
-            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "check_info_trans": self.check_transaction_trx(),
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y")
         }
+        if self.vn_pay_status:
+            json_payment["check_info_trans"] = self.check_transaction_trx()
+        else:
+            json_payment["check_info_trans"] = "Transaction not verified"
         return json_payment
 
     def __str__(self):
@@ -82,6 +85,7 @@ class VNPayment(TimestampMixin):
 
             if (
                 response_data["code"] == "00"
+                and response_data.get("data") is not None
                 and response_data["data"]["status"] == "ACCEPTED"
             ):
                 payment = VNPayment.query.filter_by(
@@ -91,10 +95,15 @@ class VNPayment(TimestampMixin):
                     payment.vn_pay_status = True
                     payment.vn_cinetpay_data = response_data
                     db.session.commit()
+            else:
+                logger.warning(
+                    f"Transaction {self.vn_transaction_id} not accepted: {response_data}"
+                )
         except Exception as e:
             logger.warning(
                 f"Error verifying transaction with id {self.vn_transaction_id}: {e}"
             )
+            raise e
 
     def get_status_payment(self) -> bool:
         return "payé" if self.vn_pay_status else "impayé"
