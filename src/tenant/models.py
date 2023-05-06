@@ -12,11 +12,6 @@ from src.payment import VNPayment
 
 class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
-    """
-    les propriétaires des maisons
-    Ce modèle représentera les propriétaires des biens locatifs.
-    """
-
     __tablename__ = "houseowner"
 
     vn_owner_id = db.Column(
@@ -139,11 +134,6 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
 
 class VNHouse(TimestampMixin):
-
-    """
-    VNHouse
-    Ce modèle représentera les propriétés locatives et leurs propriétaires associés.
-    """
 
     __tablename__ = "house"
 
@@ -317,11 +307,6 @@ class VNHouse(TimestampMixin):
 
 
 class VNTenant(DefaultUserInfoModel, TimestampMixin):
-
-    """
-    VNTenant
-    Ce modèle représentera les locataires qui occupent les propriétés locatives.
-    """
 
     __tablename__ = "tenant"
 
