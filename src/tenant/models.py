@@ -230,7 +230,7 @@ class VNHouse(TimestampMixin):
 
     def get_owner_id(self):
         owners = VNHouseOwner.query.filter_by(
-            id=self.vn_owner_id, vn_user_id=current_user.id
+            id=self.vn_owner_id, vn_user_id=self.vn_user_id
         )
         return next((own.get_owner_id() for own in owners), None)
 
