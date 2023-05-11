@@ -2,7 +2,7 @@ from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-from src import db
+from src.exts import db
 from src.tenant import VNTenant
 from src.utils import jsonify_response
 
