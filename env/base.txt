@@ -1,6 +1,6 @@
 Flask
 python-dotenv
-flask-migrate
+flask-migrate==4.0.4
 Flask-SQLAlchemy
 uni-slugify
 Flask-Cors
