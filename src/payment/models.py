@@ -4,7 +4,7 @@ from datetime import date
 from cinetpay_sdk.s_d_k import Cinetpay
 from flask import current_app
 from flask_login import current_user
-from src import db
+from src.exts import db
 from src.mixins.models import id_generator
 from src.mixins.models import TimestampMixin
 
@@ -14,12 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class VNPayment(TimestampMixin):
-
-    """
-    VNPayment
-    Ce modèle représentera les paiements individuels
-    des loyers effectués par les locataires.
-    """
 
     __tablename__ = "payment"
 
@@ -55,7 +49,7 @@ class VNPayment(TimestampMixin):
             "payment_late_penalty": self.vn_pay_late_penalty,
             "payment_status": self.vn_pay_status,
             "get_payment": self.get_status_payment(),
-            "created_at": self.vn_created_at.strftime("%d-%m-%Y")
+            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
         }
         if self.vn_pay_status:
             json_payment["check_info_trans"] = self.check_transaction_trx()
