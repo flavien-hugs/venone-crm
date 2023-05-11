@@ -10,10 +10,10 @@ from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-from src import cache
-from src import csrf
 from src.auth.forms.auth_form import ChangePasswordForm
 from src.dashboard.forms import OwnerSettingForm
+from src.exts import cache
+from src.exts import csrf
 from src.mixins.decorators import owner_required
 
 
@@ -23,7 +23,7 @@ csrf.exempt(owner_bp)
 
 @owner_bp.route("/index/", methods=["GET"])
 @login_required
-# @cache.cached(timeout=500)
+@cache.cached(timeout=500)
 def dashboard():
     page_title = "Tableau de board"
     return render_template(

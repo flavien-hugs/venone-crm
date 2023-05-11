@@ -12,10 +12,11 @@ from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import logout_user
-from src import csrf
 from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
 from src.dashboard.services import export_data
+from src.exts import csrf
+from src.exts import cache
 from src.mixins.decorators import agency_required
 
 
@@ -89,6 +90,7 @@ def agency_billing():
 
 @agency_bp.get("/houses/")
 @login_required
+@cache.cached(timeout=500)
 def agency_house_list():
     page_title = "Propriétés"
 
@@ -102,6 +104,7 @@ def agency_house_list():
 @agency_bp.get("/lessors/")
 @login_required
 @agency_required
+@cache.cached(timeout=500)
 def agency_owner_list():
     page_title = "Vos bailleurs"
 
@@ -115,6 +118,7 @@ def agency_owner_list():
 @agency_bp.get("/check-houses/")
 @login_required
 @agency_required
+@cache.cached(timeout=500)
 def check_houses():
     page_title = "Trouver des propriétés dans votre zone"
 
