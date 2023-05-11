@@ -7,57 +7,10 @@ from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import url_for
-from flask_bcrypt import Bcrypt
-from flask_caching import Cache
-from flask_cors import CORS
-from flask_debugtoolbar import DebugToolbarExtension
-from flask_flatpages import FlatPages
-from flask_login import LoginManager
-from flask_mail import Mail
-from flask_marshmallow import Marshmallow
-from flask_migrate import Migrate
-from flask_minify import Minify
-from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import MetaData
+from src import exts
 
 from celery import Celery
 from celery import Task
-
-
-metadata = MetaData(
-    naming_convention={
-        "ix": "ix_%(column_0_label)s",
-        "uq": "uq_%(table_name)s_%(column_0_name)s",
-        "ck": "ck_%(table_name)s_%(constraint_name)s",
-        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-        "pk": "pk_%(table_name)s",
-    }
-)
-
-cors = CORS()
-mail = Mail()
-bcrypt = Bcrypt()
-ma = Marshmallow()
-db = SQLAlchemy(metadata=metadata)
-moment = Moment()
-migrate = Migrate()
-pages = FlatPages()
-csrf = CSRFProtect()
-login_manager = LoginManager()
-cache = Cache(config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
-
-minify = Minify(html=True, js=True, cssless=True, bypass=["owner_bp.*", "agency_bp.*"])
-toolbar = DebugToolbarExtension()
-
-login_manager.login_view = "auth_bp.login"
-login_manager.session_protection = "strong"
-login_manager.login_message_category = "info"
-login_manager.needs_refresh_message_category = "info"
-login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
-login_manager.needs_refresh_message = "Pour protéger votre compte,\
-    veuillez vous réauthentifier pour accéder à cette page."
 
 
 def create_venone_app(config_name):
@@ -69,29 +22,33 @@ def create_venone_app(config_name):
     venone_app.url_map.strict_slashes = False
     venone_app.jinja_env.globals.update(zip=zip)
 
-    mail.init_app(venone_app)
-    bcrypt.init_app(venone_app)
-    moment.init_app(venone_app)
-    pages.init_app(venone_app)
-    csrf.init_app(venone_app)
+    exts.mail.init_app(venone_app)
+    exts.bcrypt.init_app(venone_app)
+    exts.moment.init_app(venone_app)
+    exts.pages.init_app(venone_app)
+    exts.csrf.init_app(venone_app)
 
-    cache.init_app(venone_app)
-    login_manager.init_app(venone_app)
+    exts.cache.init_app(venone_app)
+    exts.login_manager.init_app(venone_app)
 
-    minify.init_app(venone_app)
-    db.init_app(venone_app)
-    migrate.init_app(venone_app, db)
-    ma.init_app(venone_app)
-
-    cors.init_app(venone_app, origins="*", supports_credentials=True)
+    exts.minify.init_app(venone_app)
+    exts.db.init_app(venone_app)
+    exts.migrate.init_app(venone_app, exts.db)
+    exts.ma.init_app(venone_app)
 
     celery_init_app(venone_app)
 
     if venone_app.debug:
         from werkzeug.middleware.profiler import ProfilerMiddleware as prof
+        exts.toolbar.init_app(venone_app)
 
-        # venone_app.wsgi_app = prof(venone_app.wsgi_app)
-        toolbar.init_app(venone_app)
+    exts.cors.init_app(
+        venone_app, origins=[
+            "https://venone.app",
+            "https://www.venone.app",
+            "https://g.venone.app"
+        ]
+    )
 
     with venone_app.app_context():
 
@@ -194,7 +151,11 @@ def create_venone_app(config_name):
 
 
 def celery_init_app(app):
-    celery_app = Celery(app.name, broker_url=os.getenv("CELERY_BROKER_URL"))
+    celery_app = Celery(
+        app.name,
+        broker_url=os.getenv("CELERY_BROKER_URL"),
+        result_backend=os.getenv("CELERY_BROKER_URL")
+    )
     celery_app.conf.update(app.config)
 
     class ContextTask(Task):
