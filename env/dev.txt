@@ -1,4 +1,4 @@
--r ./base.txt
+-r base.txt
 pre-commit
 black
 flake8
