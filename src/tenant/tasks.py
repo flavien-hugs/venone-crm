@@ -1,14 +1,12 @@
 import logging
 from datetime import datetime
-from datetime import timedelta
 
 from src import db
-from src.celery import celery_app
 from src.main.utils import send_sms_reminder
 from src.tenant import VNHouse
 
-from celery import signature
 from celery import shared_task
+from celery import signature
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +45,7 @@ def payment_reminders_for_expired_leases():
 
     expired_houses = VNHouse.query.filter(
         VNHouse.vn_house_is_open == True,
-        VNHouse.vn_house_lease_end_date <= current_date
+        VNHouse.vn_house_lease_end_date <= current_date,
     ).all()
 
     logger.info(f"Found {len(expired_houses)} expired houses.")
@@ -56,7 +54,6 @@ def payment_reminders_for_expired_leases():
         reminder_date = house.vn_house_lease_end_date
         logger.info(f"Reminder date {reminder_date} expired houses.")
         payment_reminder_task = signature(
-            "src.tenant.tasks.payment_reminders",
-            kwargs={"vn_house_id": house.id}
+            "src.tenant.tasks.payment_reminders", kwargs={"vn_house_id": house.id}
         )
         payment_reminder_task.apply_async(eta=reminder_date)
