@@ -30,13 +30,13 @@ pillow = "*"
 cinetpay-sdk = {version = "==0.1.1", index = "testpypi"}
 requests = "*"
 celery = {extras = ["redis"], version = "*"}
-redis = "*"
 flower = "*"
 pyshorteners = "*"
 httpx = "*"
 flask-minify = "*"
 flask-marshmallow = "*"
 flask = {extras = ["async"], version = "*"}
+marshmallow-sqlalchemy = "*"
 
 [dev-packages]
 pre-commit = "*"
