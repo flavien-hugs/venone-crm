@@ -3,7 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from flask_login import current_user
-from src import db
+from src.exts import db
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import id_generator
 from src.mixins.models import TimestampMixin

@@ -2,10 +2,10 @@ import logging as lg
 
 from flask_migrate import Migrate
 from flask_migrate import upgrade
-from src import db
 from src.auth.models import VNPercent
 from src.auth.models import VNRole
 from src.auth.models import VNUser
+from src.exts import db
 from src.payment.models import VNPayment
 from src.payment.models import VNTransferRequest
 from src.tenant.models import VNHouse
@@ -36,7 +36,7 @@ def init_db():
     db.create_all()
     VNRole.insert_roles()
     db.session.commit()
-    lg.warning("Database initialized !")
+    lg.info("Database initialized !")
 
 
 if __name__ == "__main__":

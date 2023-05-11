@@ -6,8 +6,8 @@ from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-from src import db
 from src.auth.models import VNUser
+from src.exts import db
 from src.mixins.decorators import admin_required
 from src.mixins.decorators import agency_required
 from src.mixins.decorators import owner_required

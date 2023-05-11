@@ -9,8 +9,6 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
-from src import db
-from src import login_manager
 from src.auth import utils
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
@@ -19,6 +17,8 @@ from src.auth.forms.auth_form import PasswordResetForm
 from src.auth.forms.auth_form import PasswordResetRequestForm
 from src.auth.forms.owner_form import OwnerHouseSignupForm
 from src.auth.models import VNUser
+from src.exts import db
+from src.exts import login_manager
 from src.mixins.email import send_email
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/")

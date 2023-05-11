@@ -1,0 +1,7 @@
+-r env/base.txt
+pre-commit
+black
+flake8
+isort
+flask-debugtoolbar
+coverage

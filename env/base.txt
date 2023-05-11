@@ -26,3 +26,4 @@ flower
 pyshorteners
 httpx
 flask-marshmallow
+marshmallow-sqlalchemy

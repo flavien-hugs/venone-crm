@@ -5,9 +5,9 @@ from flask import request
 from flask_login import AnonymousUserMixin
 from flask_login import current_user
 from flask_login import UserMixin
-from src import db
-from src import login_manager
 from src.constants import COUNTRY_DEFAULT
+from src.exts import db
+from src.exts import login_manager
 from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import TimestampMixin
 from src.tenant.models import VNHouse
