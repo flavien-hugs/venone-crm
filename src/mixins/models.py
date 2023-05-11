@@ -2,7 +2,7 @@ import secrets
 import uuid
 from datetime import datetime
 
-from src import db
+from src.exts import db
 
 
 def id_generator():
