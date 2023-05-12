@@ -8,7 +8,6 @@ from src.exts import db
 from src.mixins.models import id_generator
 from src.mixins.models import TimestampMixin
 
-
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -42,19 +41,17 @@ class VNPayment(TimestampMixin):
             "payment_id": self.vn_payment_id,
             "trans_id": self.vn_transaction_id,
             "house_rent": self.vn_pay_amount,
-            "house": self.house_payment.to_json(),
+            "house": self.get_house_info(),
             "trans_info": self.vn_cinetpay_data,
-            "amount_penalty": self.calculate_late_penalty(),
+            # "amount_penalty": self.calculate_late_penalty(),
             "payment_date": self.vn_pay_date.strftime("%d-%m-%Y"),
             "payment_late_penalty": self.vn_pay_late_penalty,
             "payment_status": self.vn_pay_status,
             "get_payment": self.get_status_payment(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
+            "check_info_trans": self.check_transaction_trx()
+            or "Transaction not verified",
         }
-        if self.vn_pay_status:
-            json_payment["check_info_trans"] = self.check_transaction_trx()
-        else:
-            json_payment["check_info_trans"] = "Transaction not verified"
         return json_payment
 
     def __str__(self):
@@ -65,39 +62,45 @@ class VNPayment(TimestampMixin):
 
     @classmethod
     def get_payments(cls) -> list:
-        payments = cls.query.filter_by(vn_payee_id=current_user.id)
+        payments = cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=True)
         return payments
+
+    @classmethod
+    def get_payments_by_id(cls, id) -> list:
+        payments = cls.query.filter_by(id=id)
+        return payments
+
+    def get_house_info(self):
+
+        from src.tenant import VNHouse
+
+        houses = VNHouse.query.filter_by(
+            id=self.vn_house_id, vn_user_id=self.vn_payee_id
+        )
+        return next((house.to_json() for house in houses), None)
 
     def check_transaction_trx(self):
         try:
-            app = current_app._get_current_object()
-            SITEID = app.config["CINETPAY_SITE_ID"]
-            APIKEY = app.config["CINETPAY_API_KEY"]
+            current_app_obj = current_app._get_current_object()
+            SITEID = current_app_obj.config["CINETPAY_SITE_ID"]
+            APIKEY = current_app_obj.config["CINETPAY_API_KEY"]
             client = Cinetpay(APIKEY, SITEID)
 
-            response_data = client.TransactionVerfication_trx(self.vn_transaction_id)
-
+            payment = VNPayment.get_payments_by_id(self.id)
+            response_data = client.TransactionVerfication_trx(payment.vn_transaction_id)
             if (
                 response_data["code"] == "00"
                 and response_data.get("data") is not None
                 and response_data["data"]["status"] == "ACCEPTED"
             ):
-                payment = VNPayment.query.filter_by(
-                    vn_transaction_id=self.vn_transaction_id
-                ).first()
                 if payment:
                     payment.vn_pay_status = True
                     payment.vn_cinetpay_data = response_data
                     db.session.commit()
             else:
-                logger.warning(
-                    f"Transaction {self.vn_transaction_id} not accepted: {response_data}"
-                )
+                logger.info(f"Payment {payment} not accepted: {response_data}")
         except Exception as e:
-            logger.warning(
-                f"Error verifying transaction with id {self.vn_transaction_id}: {e}"
-            )
-            raise e
+            logger.warning(f"Error {payment}: {e}")
 
     def get_status_payment(self) -> bool:
         return "payé" if self.vn_pay_status else "impayé"

@@ -40,14 +40,16 @@ def create_venone_app(config_name):
 
     if venone_app.debug:
         from werkzeug.middleware.profiler import ProfilerMiddleware as prof
+
         exts.toolbar.init_app(venone_app)
 
     exts.cors.init_app(
-        venone_app, origins=[
+        venone_app,
+        origins=[
             "https://venone.app",
             "https://www.venone.app",
-            "https://g.venone.app"
-        ]
+            "https://g.venone.app",
+        ],
     )
 
     with venone_app.app_context():
@@ -154,7 +156,7 @@ def celery_init_app(app):
     celery_app = Celery(
         app.name,
         broker_url=os.getenv("CELERY_BROKER_URL"),
-        result_backend=os.getenv("CELERY_BROKER_URL")
+        result_backend=os.getenv("CELERY_BROKER_URL"),
     )
     celery_app.conf.update(app.config)
 

@@ -176,9 +176,7 @@ class VNUser(
             "payments_list": self.get_payments_list(),
             "payments_count": self.get_payments_count(),
             "total_payment_month": "{:,.2f}".format(self.total_payments_month()),
-            "total_payments_received": "{:,.2f}".format(
-                self.get_total_payments_received()
-            ),
+            "total_payments_received": self.get_total_payments_received(),
             "houses_count": self.get_houses_count(),
             "houses_close_count": self.get_houses_close_count(),
             "houses_open_count": self.get_houses_open_count(),

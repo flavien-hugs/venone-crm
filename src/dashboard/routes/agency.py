@@ -15,8 +15,8 @@ from flask_login import logout_user
 from src.auth.models import VNUser
 from src.dashboard.forms import CompanySettingForm
 from src.dashboard.services import export_data
-from src.exts import csrf
 from src.exts import cache
+from src.exts import csrf
 from src.mixins.decorators import agency_required
 
 
