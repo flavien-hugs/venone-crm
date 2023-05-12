@@ -9,7 +9,7 @@
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-if="user.payments_count == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div v-show="payments.length == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
 
                 <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}">
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <div v-else-if="user.payments_count > 0" class="card card-header-actions mx-auto">
+        <div v-show="payments.length > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
                 <span class="fw-700">{{ page_title }}</span>
                 <div>
@@ -57,8 +57,8 @@
                             <tr>
                                 <th scope="col">ID Transaction</th>
                                 <th scope="col">ID Opérateur</th>
-                                <th scope="col">Nom &amp; prénom du locataire</th>
-                                <th scope="col">Loyer (Montant)</th>
+                                <th scope="col">Nom &amp; prénom</th>
+                                <th scope="col">Montant</th>
                                 <th scope="col">Méthode de paiement</th>
                                 <th scope="col">Date de paiement</th>
                                 <th scope="col"></th>
@@ -71,7 +71,7 @@
                                     <td><span class="badge bg-blue-soft text-blue">{ p.trans_info.data.operator_id }</span></td>
                                     <td>{ p.house.tenant_id }</td>
                                     <td>
-                                        <span class="badge bg-blue-soft text-blue ms-2">{ p.house.house_id }</span>{ p.house.house_type } - { p.house_rent} { p.house.devise }
+                                        { p.trans_info.data.amount } { p.trans_info.data.currency }
                                     </td>
                                     <td>{ p.trans_info.data.payment_method }</td>
                                     <td>{ p.trans_info.data.payment_date }</td>
