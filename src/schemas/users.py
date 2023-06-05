@@ -1,16 +1,14 @@
 from src import ma
 
+from src.auth.models import VNUser
 
-class UserSchema(ma.Schema):
+
+class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        fields = ("vn_addr_email", "vn_fullname", "_links")
-
-    _links = ma.Hyperlinks(
-        {
-            "self": ma.URLFor("api.user_detail", values=dict(id="<id>")),
-            "collection": ma.URLFor("api.users_all"),
-        }
-    )
+        model = VNUser
+        include_fk = True
+        load_instance = True
+        include_relationships = True
 
 
 user_schema = UserSchema()
