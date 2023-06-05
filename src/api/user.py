@@ -407,9 +407,9 @@ def login():
     }
 
 
-@api.post("/register/")
+@api.post("/company-register/")
 @jsonify_response
-def register():
+def company_register():
 
     data = request.get_json()
     addr_email = data.get("vn_addr_email", None)
@@ -425,22 +425,21 @@ def register():
 
     fullname = data.get("vn_fullname", None)
     phonenumber_one = data.get("vn_phonenumber_one", None)
-    cni_number = data.get("vn_cni_number", None)
     country = data.get("vn_country", None)
     password = data.get("vn_password", None)
-    is_company = data.get("vn_company", None)
-    is_house_owner = data.get("vn_house_owner", None)
+    agencie_name = data.get("vn_agencie_name", None)
+    business_number = data.get("vn_business_number", None)
 
     new_user = VNUser(
         vn_fullname=fullname,
         vn_addr_email=addr_email.lower(),
         vn_phonenumber_one=phonenumber_one,
-        vn_cni_number=cni_number,
         vn_country=country,
-        vn_house_owner=is_house_owner,
-        vn_company=is_company,
+        vn_agencie_name=agencie_name,
+        vn_business_number=business_number
     )
     new_user.set_password(password)
+    new_user.vn_company = True
     new_user.vn_activated = True
     new_user.save()
     return {
@@ -449,6 +448,45 @@ def register():
         "message": "account successfully created!",
     }
 
+
+@api.post("/owner-register/")
+@jsonify_response
+def owner_register():
+
+    data = request.get_json()
+    addr_email = data.get("vn_addr_email", None)
+
+    if not data.get("addr_email"):
+        return {"message": "The e-mail address cannot be empty."}
+
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", addr_email):
+        return {"message": "The email address is invalid."}
+
+    if VNUser.query.filter_by(vn_addr_email=addr_email).first():
+        return {"message": f"This address email '{addr_email}!r' is taken !"}
+
+    fullname = data.get("vn_fullname", None)
+    phonenumber_one = data.get("vn_phonenumber_one", None)
+    country = data.get("vn_country", None)
+    password = data.get("vn_password", None)
+    cni_number = data.get("vn_cni_number", None)
+
+    new_user = VNUser(
+        vn_fullname=fullname,
+        vn_addr_email=addr_email.lower(),
+        vn_phonenumber_one=phonenumber_one,
+        vn_country=country,
+        cni_number=vn_cni_number
+    )
+    new_user.set_password(password)
+    new_user.vn_house_owner = True
+    new_user.vn_activated = True
+    new_user.save()
+    return {
+        "success": True,
+        "user": user_to_json(new_user),
+        "message": "account successfully created!",
+    }
 
 """
 @api.get("/users-all/")
