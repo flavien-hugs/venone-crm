@@ -41,7 +41,7 @@ class VNPayment(TimestampMixin):
             "payment_id": self.vn_payment_id,
             "trans_id": self.vn_transaction_id,
             "house_rent": self.vn_pay_amount,
-            "house": self.get_house_info(),
+            "house": self.get_payment_house_info(),
             "trans_info": self.vn_cinetpay_data,
             # "amount_penalty": self.calculate_late_penalty(),
             "payment_date": self.vn_pay_date.strftime("%d-%m-%Y"),
@@ -49,58 +49,75 @@ class VNPayment(TimestampMixin):
             "payment_status": self.vn_pay_status,
             "get_payment": self.get_status_payment(),
             "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "check_info_trans": self.check_transaction_trx()
-            or "Transaction not verified",
+            # "check_info_trans": self.check_transaction_trx()
         }
         return json_payment
 
     def __str__(self):
-        return self.vn_payment_id
+        return self.vn_transaction_id
 
     def __repr__(self):
-        return f"Payment({self.id}, {self.vn_payment_id}, {self.vn_pay_date})"
+        return f"Payment({self.vn_transaction_id}, {self.vn_payment_id}, {self.vn_pay_date})"
 
     @classmethod
-    def get_payments(cls) -> list:
-        payments = cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=True)
-        return payments
-
-    @classmethod
-    def get_payments_by_id(cls, id) -> list:
-        payments = cls.query.filter_by(id=id)
-        return payments
-
-    def get_house_info(self):
-
+    def get_payment_house_info(cls):
         from src.tenant import VNHouse
+        house = VNHouse.query.filter_by(id=cls.vn_house_id, vn_user_id=cls.vn_payee_id).first()
+        return house.to_json() if house is not None else None
 
-        houses = VNHouse.query.filter_by(
-            id=self.vn_house_id, vn_user_id=self.vn_payee_id
-        )
-        return next((house.to_json() for house in houses), None)
+    @classmethod
+    def get_payments(cls):
+        return cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=True)
 
-    def check_transaction_trx(self):
+    @classmethod
+    def find_by_transaction_id(cls, vn_transaction_id):
+        return cls.query.filter_by(vn_transaction_id=vn_transaction_id).first()
+
+    @classmethod
+    def check_transaction_trx(cls):
         try:
             current_app_obj = current_app._get_current_object()
             SITEID = current_app_obj.config["CINETPAY_SITE_ID"]
             APIKEY = current_app_obj.config["CINETPAY_API_KEY"]
             client = Cinetpay(APIKEY, SITEID)
 
-            payment = VNPayment.get_payments_by_id(self.id)
-            response_data = client.TransactionVerfication_trx(payment.vn_transaction_id)
-            if (
-                response_data["code"] == "00"
-                and response_data.get("data") is not None
-                and response_data["data"]["status"] == "ACCEPTED"
-            ):
-                if payment:
-                    payment.vn_pay_status = True
-                    payment.vn_cinetpay_data = response_data
-                    db.session.commit()
-            else:
-                logger.info(f"Payment {payment} not accepted: {response_data}")
+            payments = cls.get_payments()
+
+            for payment in payments:
+                payment_id = cls.find_by_transaction_id(payment)
+                response_data = client.TransactionVerfication_trx(payment_id)
+                logger.info("response data: %s", response_data)
+
+                if isinstance(response_data, dict):
+                    if (
+                        response_data["code"] == "00"
+                        and response_data["data"]["status"] == "ACCEPTED"
+                    ):
+                        payment.vn_pay_status = True
+                        payment.vn_cinetpay_data = response_data
+                        db.session.commit()
+                    elif (
+                        response_data["code"] == "662"
+                        and response_data["message"] == "WAITING_CUSTOMER_PAYMENT"
+                        and response_data["data"]["status"] == "PENDING"
+                    ):
+                        payment.vn_pay_status = False
+                        payment.vn_cinetpay_data = response_data
+                        db.session.commit()
+                    else:
+                        logger.warning(
+                            "Invalid response data for transaction ID %s: %s",
+                            payment.id,
+                            response_data,
+                        )
+                else:
+                    logger.warning(
+                        "Invalid response data type for transaction ID %s: %s",
+                        payment.id,
+                        type(response_data),
+                    )
         except Exception as e:
-            logger.warning(f"Error {payment}: {e}")
+            logger.warning("Error processing transaction: %s", e)
 
     def get_status_payment(self) -> bool:
         return "payé" if self.vn_pay_status else "impayé"
