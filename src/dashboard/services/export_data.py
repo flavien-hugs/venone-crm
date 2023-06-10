@@ -42,7 +42,7 @@ def generate_owner_csv(data, headers):
                 row.vn_addr_email,
                 row.vn_cni_number,
                 row.vn_profession,
-                row.houses.count(),
+                row.get_tenants_count(),
                 row.vn_created_at,
             ]
         )
@@ -89,7 +89,7 @@ def generate_payments_csv(data, headers):
             [
                 row.vn_transaction_id,
                 cinetpay_data.get("operator_id", ""),
-                row.tenant_payment.vn_fullname,
+                row.tenant.vn_fullname,
                 row.vn_pay_amount,
                 cinetpay_data.get("payment_method", ""),
                 cinetpay_data.get("payment_date", ""),
