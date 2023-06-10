@@ -4,7 +4,7 @@ from src.venone import venone_app
 from celery.schedules import crontab
 
 celery_app = celery_init_app(venone_app)
-celery_app.autodiscover_tasks(["src.tenant.tasks", "src.payments.tasks"])
+celery_app.autodiscover_tasks(["src.tenant.tasks", "src.payment.tasks"])
 
 celery_app.conf.beat_schedule = {
     "payment_reminders_for_expired_leases": {
@@ -12,7 +12,7 @@ celery_app.conf.beat_schedule = {
         "schedule": crontab(minute="*/60"),
     },
     "check_transaction_trx": {
-        "task": "src.payments.tasks.check_transaction_trx",
+        "task": "src.payment.tasks.check_transaction_trx",
         "schedule": crontab(minute="*/60"),
     },
 }
