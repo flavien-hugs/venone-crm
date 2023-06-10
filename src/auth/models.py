@@ -144,52 +144,6 @@ class VNUser(
     def __repr__(self):
         return f"VNUser({self.id}, {self.vn_fullname})"
 
-    def to_json(self):
-        json_user = {
-            "user_id": self.uuid,
-            "fullname": self.vn_fullname,
-            "addr_email": self.vn_addr_email,
-            "profession": self.vn_profession,
-            "parent_name": self.vn_parent_name,
-            "phonenumber_one": self.vn_phonenumber_one,
-            "phonenumber_two": self.vn_phonenumber_two,
-            "cni_number": self.vn_cni_number,
-            "location": self.vn_location,
-            "country": self.vn_country,
-            "agencie_name": self.vn_agencie_name,
-            "business_number": self.vn_business_number,
-            "devise": self.vn_device,
-            "find_us": self.vn_find_us,
-            "ip_address": self.vn_ip_address,
-            "is_company": self.vn_company,
-            "is_owner": self.vn_house_owner,
-            "is_admin": self.is_administrator(),
-            "is_activated": self.vn_activated,
-            "last_seen": self.vn_last_seen,
-            "owner_percent": self.get_owner_percent(),
-            "amount_apply_percent": self.amount_apply_percent(),
-            "company_percent": self.get_company_percent(),
-            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-            "total_house_receive": "{:,.2f}".format(self.total_houses_percent()),
-            "total_house_amount": "{:,.2f}".format(self.total_houses_amount()),
-            "total_house_percent": "{:,.2f}".format(self.get_amount_received()),
-            "payments_list": self.get_payments_list(),
-            "payments_count": self.get_payments_count(),
-            "total_payment_month": "{:,.2f}".format(self.total_payments_month()),
-            "total_payments_received": self.get_total_payments_received(),
-            "houses_count": self.get_houses_count(),
-            "houses_close_count": self.get_houses_close_count(),
-            "houses_open_count": self.get_houses_open_count(),
-            "houses_list": self.get_houses(),
-            "tenants_list": self.get_tenants(),
-            "tenants_count": self.get_tenants_count(),
-            "owners_list": self.get_houseowners_list(),
-            "owners_count": self.get_houseowners_count(),
-            "transfers_list": self.get_transfers_list(),
-            "transfers_count": self.get_transfers_count(),
-        }
-        return json_user
-
     def set_password(self, password):
         self.vn_password = generate_password_hash(password)
 
@@ -202,35 +156,15 @@ class VNUser(
     def get_company_percent(self) -> float:
         return getattr(self.percent, "vn_company_percent", 6)
 
-    def get_payments_list(self) -> list:
-        payments_list = self.payments.filter_by(vn_payee_id=self.id).all()
-        return [p.to_json() for p in payments_list]
-
     def get_payments_count(self) -> int:
         payments_count = self.payments.filter_by(
             vn_payee_id=self.id, vn_pay_status=True
         ).count()
         return payments_count
 
-    def get_transfers_list(self) -> list:
-        transfers_list = self.transfers.filter_by(vn_user_id=self.id).all()
-        return [t.to_json() for t in transfers_list]
-
-    def get_transfers_count(self) -> int:
-        transfers_count = self.transfers.filter_by(vn_user_id=self.id).count()
-        return transfers_count
-
-    def get_houseowners_list(self) -> list:
-        owners_list = self.houseowners.filter_by(vn_user_id=self.id).all()
-        return [o.to_json() for o in owners_list]
-
     def get_houseowners_count(self):
         houseowners_count = self.houseowners.filter_by(vn_user_id=self.id).count()
         return houseowners_count
-
-    def get_houses(self):
-        houses_list = self.houses.filter_by(vn_user_id=self.id).all()
-        return [h.to_json() for h in houses_list]
 
     def get_houses_count(self):
         houses_count = self.houses.filter_by(vn_user_id=self.id).count()
@@ -247,10 +181,6 @@ class VNUser(
             vn_house_is_open=False, vn_user_id=self.id
         ).count()
         return houses_open_count
-
-    def get_tenants(self):
-        tenants_list = self.tenants.filter_by(vn_user_id=self.id).all()
-        return [t.to_json() for t in tenants_list]
 
     def get_tenants_count(self):
         tenants_count = self.tenants.filter_by(vn_user_id=self.id).count()

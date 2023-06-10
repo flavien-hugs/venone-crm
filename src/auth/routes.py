@@ -45,10 +45,7 @@ def login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
         email_or_phone = form.email_or_phone.data
-        user = VNUser.query.filter(
-            (VNUser.vn_addr_email == email_or_phone)
-            | (VNUser.vn_phonenumber_one == email_or_phone)
-        ).first()
+        user = VNUser.find_by_email_and_phone(email_or_phone)
         if user and user.vn_activated and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
             next_page = request.args.get("next")
@@ -143,7 +140,7 @@ def password_reset_request():
     form = PasswordResetRequestForm(request.form)
     if form.validate_on_submit():
         email = form.addr_email.data.lower()
-        user = VNUser.query.filter_by(vn_addr_email=email).first()
+        user = VNUser.find_by_email(email)
         if user:
             token = utils.generate_confirm_token(email)
             send_email(
@@ -182,7 +179,7 @@ def password_reset(token):
         )
         return redirect(url_for("auth_bp.login"))
 
-    user = VNUser.query.filter_by(vn_addr_email=email).first()
+    user = VNUser.find_by_email(email)
     if not user:
         flash(
             "Le lien de réinitialisation de mot de passe est invalide ou expiré.",
