@@ -1,12 +1,11 @@
 import logging
 
-from src.exts import db
-from celery import shared_task
-from celery import signature
-
-from flask import current_app
-from .models import VNPayment
 from cinetpay_sdk.s_d_k import Cinetpay
+from flask import current_app
+from src.exts import db
+
+from .models import VNPayment
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +18,10 @@ def check_transaction_trx():
         APIKEY = current_app_obj.config["CINETPAY_API_KEY"]
         client = Cinetpay(APIKEY, SITEID)
 
-        payments = VNPayment.get_payments()
+        payments = VNPayment.unpaids()
 
         for payment in payments:
-            payment_id = VNPayment.find_by_transaction_id(payment)
-            response_data = client.TransactionVerfication_trx(payment_id)
+            response_data = client.TransactionVerfication_trx(payment.vn_transaction_id)
             logger.info("response data: %s", response_data)
 
             if isinstance(response_data, dict):
@@ -43,8 +41,16 @@ def check_transaction_trx():
                     payment.vn_cinetpay_data = response_data
                     db.session.commit()
                 else:
-                    logger.warning("Invalid response data for transaction ID %s: %s", payment.id, response_data)
+                    logger.warning(
+                        "Invalid response data for transaction ID %s: %s",
+                        payment.id,
+                        response_data,
+                    )
             else:
-                logger.warning("Invalid response data type for transaction ID %s: %s", payment.id, type(response_data))
+                logger.warning(
+                    "Invalid response data type for transaction ID %s: %s",
+                    payment.id,
+                    type(response_data),
+                )
     except Exception as e:
         logger.warning("Error processing transaction: %s", e)
