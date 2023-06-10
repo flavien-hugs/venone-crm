@@ -42,12 +42,13 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     houses_open_count = fields.Method("get_houses_open_count")
     tenants_count = fields.Method("get_tenants_count")
     owners_count = fields.Method("get_houseowners_count")
+    transfers_count = fields.Method("get_transfers_count")
 
     houses = fields.Method("get_houses")
     tenants = fields.Method("get_tenants")
     houseowners = fields.Method("get_owners")
     payments = fields.Method("get_payments")
-    transfers = fields.Nested(transfers_schema)
+    transfers = fields.Method("get_transfers")
 
     def is_admin(self, obj):
         return obj.is_administrator()
@@ -88,6 +89,15 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
     def get_payments_count(self, obj):
         return obj.get_payments_count()
+    
+    def get_payments(self, obj):
+        return payments_schema.dump(obj.get_payments_list())
+
+    def get_transfers(self, obj):
+        return transfers_schema.dump(obj.get_transfers_list())
+
+    def get_transfers_count(self, obj):
+        return obj.get_transfers_count()
 
     def get_houses(self, obj):
         return houses_schema.dump(obj.get_houses_list())
@@ -113,8 +123,6 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     def get_houseowners_count(self, obj):
         return obj.get_houseowners_count()
 
-    def get_payments(self, obj):
-        return payments_schema.dump(obj.get_payments_list())
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
