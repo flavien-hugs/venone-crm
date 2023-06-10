@@ -172,6 +172,14 @@ class VNUser(
         houseowners_count = self.get_houseowners_list().count()
         return houseowners_count
 
+    def get_transfers_list(self) -> list:
+        transfers = self.transfers.filter_by(vn_user_id=self.id)
+        return transfers
+
+    def get_transfers_count(self) -> int:
+        transfers_count = self.get_transfers_list().count()
+        return transfers_count
+
     def get_houses_list(self) -> list:
         houses= self.houses.filter_by(vn_user_id=self.id)
         return houses
