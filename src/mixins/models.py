@@ -37,6 +37,7 @@ class CRUDMixin(object):
     def update(self, data):
         for attr, value in data.items():
             setattr(self, attr, value)
+        return self.save()
 
     def save(self, commit=True):
         db.session.add(self)
@@ -62,6 +63,10 @@ class TimestampMixin(CRUDMixin, db.Model):
     vn_created_at = db.Column(db.DateTime, default=datetime.utcnow())
     vn_updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow())
 
+    @classmethod
+    def find_by_uuid(cls, uuid):
+        return cls.query.filter_by(uuid=uuid).first()
+
 
 class DefaultUserInfoModel(db.Model):
 
@@ -77,3 +82,17 @@ class DefaultUserInfoModel(db.Model):
     vn_cni_number = db.Column(db.String(80), nullable=True)
     vn_location = db.Column(db.String(180), nullable=True)
     vn_activated = db.Column(db.Boolean, default=True)
+
+    @classmethod
+    def all(cls):
+        return cls.query.all()
+
+    @classmethod
+    def find_by_email(cls, email):
+        return cls.query.filter_by(vn_addr_email=email).first()
+
+    @classmethod
+    def find_by_email_and_phone(cls, obj):
+        return cls.query.filter(
+            (cls.vn_addr_email == obj) | (cls.vn_phonenumber_one == obj)
+        ).first()
