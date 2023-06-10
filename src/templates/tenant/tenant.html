@@ -7,7 +7,7 @@
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-if="user.tenants_count == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div v-show="user.tenants_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center py-2">
 
                 <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}">
@@ -16,19 +16,19 @@
                     Vous n'avez aucun locataire enregistré en ce moment.
                 </h4>
 
-                <button v-if="user.is_owner" @click="createOwnerTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                <button v-show="user.vn_house_owner" @click="createOwnerTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
                     <i class="me-2" data-feather="user-plus"></i>
-                    Enregistrer un locataire
+                    Ajouter un locataire
                 </button>
 
-                <button v-if="user.is_company" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                <button v-show="user.vn_company" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
                     <i class="me-2" data-feather="user-plus"></i>
-                    Enregistrer un locataire
+                    Ajouter un locataire
                 </button>
             </div>
         </div>
 
-        <div v-if="isLoading" class="preloader">
+        <div v-show="isLoading" class="preloader">
             <div class="preloader-body">
                 <p>Chargement en cours...</p>
                 <div class="cssload-container">
@@ -37,18 +37,18 @@
             </div>
         </div>
 
-        <div v-else-if="user.tenants_count > 0" class="card card-header-actions mx-auto">
+        <div v-show="user.tenants_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
-                <span class="fw-700">{ user.tenants_count } locataires</span>
+                <span class="fw-700">Vos locataires ({ user.tenants_count })</span>
                 <div>
-                    <button v-if="user.is_company" @click.prevent="createCompanyTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
+                    <button v-show="user.vn_company" @click.prevent="createCompanyTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
                         <i class="me-2" data-feather="user-plus"></i>
-                        Enregistrer un locataire
+                        Ajouter un locataire
                     </button>
 
-                    <button v-if="user.is_owner" @click.prevent="createOwnerTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
+                    <button v-show="user.vn_house_owner" @click.prevent="createOwnerTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
                         <i class="me-2" data-feather="user-plus"></i>
-                        Enregistrer un locataire
+                        Ajouter un locataire
                     </button>
 
                     <button @click.prevent="downloadTenantCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
@@ -59,7 +59,8 @@
             </div>
 
             <div class="card-body">
-                <div class="input-group input-group-joined input-group-solid shadow-none">
+
+                {#<div class="input-group input-group-joined input-group-solid shadow-none">
                     <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
                     <input
                         type="text"
@@ -67,16 +68,17 @@
                         v-model="searchQuery"
                         class="form-control shadow-none ps-0"
                     >
-                </div>
+                </div>#}
 
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="small">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th v-if="user.is_company" scope="col">ID Propriétaire</th>
+                                <th v-show="user.vn_company" scope="col">ID Propriétaire</th>
                                 <th scope="col">Nom &amp; prénoms / téléphone</th>
-                                <th scope="col">Loyer du mois en cours</th>
+                                <th scope="col">Loyer à payer</th>
+                                <th scope="col">Date prochain loyer</th>
                                 <th scope="col">Date d'ajout</th>
                                 <th>Actions</th>
                             </tr>
@@ -97,7 +99,7 @@
         </div>
 
         <!-- modal company add tenant -->
-        <div v-if="user.is_company" class="modal fade" data-bs-backdrop="static" id="createTenantModal">
+        <div v-show="user.vn_company" class="modal fade" data-bs-backdrop="static" id="createTenantModal">
             <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -142,142 +144,15 @@
 
                         <div class="tab-content">
                             <div :class="{ active: currentStep === 1 }"class="tab-pane fade show">
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-6">
-                                        <label for="fullname" class="form-label small">Nom &amp; prénoms</label>
-                                        <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="ownerData.fullname">
-                                    </div>
-
-                                    <div class="col-6">
-                                        <label for="card_number" class="form-label small">N° Carte Nationale d'Identité/Attestion/Passport</label>
-                                        <input placeholder="N° Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model.trim="ownerData.card_number">
-                                    </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label for="percent" class="form-label">Pourcentage (&#37;)</label>
-                                        <input placeholder="Entrer votre pourcentage sur les loyers de ce propriétaire" class="form-control" id="percent" v-model.num="ownerData.percent">
-                                    </div>
-                                </div>
-
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-6">
-                                        <label for="phonenumber_one" class="form-label small">Numéro de téléphone I</label>
-                                        <input placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="ownerData.phonenumber_one" placeholder="01-5157-1393">
-                                    </div>
-
-                                    <div class="col-6">
-                                        <label for="phonenumber_two" class="form-label small">Numéro de téléphone II</label>
-                                        <input placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="ownerData.phonenumber_two">
-                                    </div>
-                                </div>
-
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-6">
-                                        <label for="profession" class="form-label small">Profession</label>
-                                        <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="ownerData.profession">
-                                    </div>
-
-                                    <div class="col-6">
-                                        <label for="addr_email" class="form-label small">Adresse e-mail</label>
-                                        <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model.trim="ownerData.addr_email">
-                                    </div>
-                                </div>
-
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-6">
-                                        <label for="location" class="form-label small">Lieu d'habitation</label>
-                                        <input placeholder="Lieu d'habitation" type="text" class="form-control" id="location" v-model="ownerData.location">
-                                    </div>
-
-                                    <div class="col-6">
-                                        <label for="parent_name" class="form-label small">Nom d'un parent</label>
-                                        <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="ownerData.parent_name">
-                                    </div>
-                                </div>
+                                {% include "tenant/fields/field_owner.html" %}
                             </div>
 
                             <div :class="{ active: currentStep === 2 }"class="tab-pane fade show">
-                                <div class="row gx-3 mb-4">
-                                    <div class="col-3">
-                                        <label for="house_type" class="form-label small">Type de propriétés</label>
-                                        <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
-                                    </div>
-
-                                    <div class="col-3">
-                                        <label for="house_rent" class="form-label small">Loyer/mois</label>
-                                        <input @input="filterNumber(houseData.house_rent)" placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
-                                    </div>
-
-                                    <div class="col-3">
-                                        <label for="house_number_room" class="form-label small">Nombre de pièces</label>
-                                        <input @input="filterNumber(houseData.house_number_room)" placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
-                                    </div>
-
-                                    <div class="col-3">
-                                        <label for="house_address" class="form-label small">Situation géographique</label>
-                                        <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
-                                    </div>
-                                </div>
-
-                                <div class="row gx-3 mb-4">
-                                    <div class="col-3">
-                                        <input @input="filterNumber(houseData.house_month)" placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
-                                    </div>
-
-                                    <div class="col-3">
-                                        <input @input="filterNumber(houseData.house_guaranty)" placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
-                                    </div>
-
-                                    <div class="col-3">
-                                        <input v-bind:placeholder="houseData.house_lease_start_date" type="date" class="form-control" id="house_lease_start_date" v-model="houseData.house_lease_start_date">
-                                        <span class="text-muted small">Date de location</span>
-                                    </div>
-                                </div>
+                                {% include "tenant/fields/field_house.html" %}
                             </div>
 
                             <div :class="{ active: currentStep === 3 }" class="tab-pane fade show">
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-6">
-                                        <label for="fullname" class="form-label small">Nom &amp; prénoms</label>
-                                        <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
-                                    </div>
-
-                                    <div class="col-6 mb-3">
-                                        <label for="card_number" class="form-label small">N° Carte Nationale d'Identité/Attestion/Passport</label>
-                                        <input placeholder="N° Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
-                                    </div>
-                                </div>
-
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-6">
-                                        <label for="phonenumber_one" class="form-label small">Numéro de téléphone I</label>
-                                        <input placeholder="Numéro de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
-                                    </div>
-
-                                    <div class="col-6">
-                                        <label for="phonenumber_two" class="form-label small">Numéro de téléphone II</label>
-                                        <input placeholder="Numéro de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
-                                    </div>
-                                </div>
-
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-4">
-                                        <label for="profession" class="form-label small">Profession</label>
-                                        <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="tenantData.profession">
-                                    </div>
-
-                                    <div class="col-4">
-                                        <label for="addr_email" class="form-label small">Adresse e-mail</label>
-                                        <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model="tenantData.addr_email">
-                                    </div>
-
-                                    <div class="col-4">
-                                        <label for="parent_name" class="form-label small">Nom d'un parent</label>
-                                        <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
-                                    </div>
-                                </div>
+                                {% include "tenant/fields/field_tenant.html" %}
                             </div>
                         </div>
                     </div>
@@ -296,7 +171,7 @@
         </div>
 
         <!-- modal owner add tenant -->
-        <div v-if="user.is_owner" class="modal fade" data-bs-backdrop="static" id="addOwnerTenantModal">
+        <div v-show="user.vn_house_owner" class="modal fade" data-bs-backdrop="static" id="addOwnerTenantModal">
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <form>
@@ -334,87 +209,11 @@
 
                             <div class="tab-content">
                                 <div :class="{ active: currentStep === 1 }"class="tab-pane fade show">
-                                    <div class="row gx-3 mb-3">
-                                        <div class="col-6">
-                                            <label for="fullname" class="form-label small">Nom &amp; prénoms</label>
-                                            <input placeholder="Nom &amp; prénoms" type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
-                                        </div>
-
-                                        <div class="col-6 mb-3">
-                                            <label for="card_number" class="form-label small">N° de Carte Nationale d'Identité/Attestion/Passport</label>
-                                            <input placeholder="N° de Carte Nationale d'Identité/Attestion/Passport" type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
-                                        </div>
-                                    </div>
-
-                                    <div class="row gx-3 mb-3">
-                                        <div class="col-6">
-                                            <label for="phonenumber_one" class="form-label small">N° de téléphone I</label>
-                                            <input placeholder="N° de téléphone I" type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
-                                        </div>
-
-                                        <div class="col-6">
-                                            <label for="phonenumber_two" class="form-label small">N° de téléphone II</label>
-                                            <input placeholder="N° de téléphone II" type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
-                                        </div>
-                                    </div>
-
-                                    <div class="row gx-3 mb-3">
-                                        <div class="col-4">
-                                            <label for="profession" class="form-label small">Profession</label>
-                                            <input placeholder="Profession" type="text" class="form-control" id="profession" v-model="tenantData.profession">
-                                        </div>
-
-                                        <div class="col-4">
-                                            <label for="addr_email" class="form-label small">Adresse e-mail</label>
-                                            <input placeholder="Adresse e-mail" type="text" class="form-control" id="addr_email" v-model="tenantData.addr_email">
-                                        </div>
-
-                                        <div class="col-4">
-                                            <label for="parent_name" class="form-label small">Nom d'un parent</label>
-                                            <input placeholder="Nom d'un parent" type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
-                                        </div>
-                                    </div>
+                                    {% include "tenant/fields/field_tenant.html" %}
                                 </div>
 
                                 <div :class="{ active: currentStep === 2 }" class="tab-pane fade show">
-                                    <div class="row gx-3 mb-4">
-                                        <div class="col-3">
-                                            <label for="house_type" class="form-label small">Type de propriétés</label>
-                                            <input placeholder="Type de propriétés" type="text" class="form-control" id="house_type" v-model="houseData.house_type">
-                                        </div>
-
-                                        <div class="col-3">
-                                            <label for="house_rent" class="form-label small">Loyer/mois</label>
-                                            <input placeholder="Loyer/mois" class="form-control" id="house_rent" v-model="houseData.house_rent">
-                                        </div>
-
-                                        <div class="col-3">
-                                            <label for="house_number_room" class="form-label small">Nombre de pièces</label>
-                                            <input placeholder="Nombre de pièces" class="form-control" id="house_number_room" v-model="houseData.house_number_room">
-                                        </div>
-
-                                        <div class="col-3">
-                                            <label for="house_address" class="form-label small">Situation géographique</label>
-                                            <input placeholder="Situation géographique" class="form-control" id="house_address" v-model="houseData.house_address">
-                                        </div>
-                                    </div>
-
-                                    <div class="row gx-3 mb-4">
-                                        <div class="col-3">
-                                            <label for="house_month" class="form-label small">Nombre de mois de caution</label>
-                                            <input placeholder="Nombre de mois de caution" class="form-control" id="house_month" v-model="houseData.house_month">
-                                        </div>
-
-                                        <div class="col-3">
-                                            <label for="house_guaranty" class="form-label small">Caution</label>
-                                            <input placeholder="Caution" type="text" class="form-control" id="house_guaranty" v-model="houseData.house_guaranty">
-                                        </div>
-
-                                        <div class="col-3">
-                                            <label for="house_lease_start_date" class="form-label small">Date de location</label>
-                                            <input v-bind:placeholder="houseData.house_lease_start_date" type="date" class="form-control" id="house_lease_start_date" v-model="houseData.house_lease_start_date">
-                                        </div>
-                                    </div>
+                                    {% include "tenant/fields/field_house.html" %}
                                 </div>
                             </div>
                         </div>

@@ -1,27 +1,25 @@
-<template v-for="tn in filteredTenants" v-bind:key="tn.tenant_uuid">
-	<tr v-if='tn.user_uuid'>
+<template v-for="tn in filteredTenants" v-bind:key="tn.uuid">
+	<tr v-if='tn.uuid'>
 		<td scope="row">
 			<span
-				class="badge bg-blue-soft text-blue">
-				{ tn.tenant_id }
+				class="badge bg-purple text-white">
+				#{ tn.vn_tenant_id }
 			</span>
 		</td>
-		<td v-if="user.is_company" scope="row">
-			<span
-				class="badge bg-purple-soft text-purple">
-				{ tn.owner }
+		<td v-show="user.vn_company" scope="row">
+			<span v-show="tn.owner" class="badge bg-red text-white">
+				#{ tn.owner }
 			</span>
-			<span v-if="!tn.owner">
-				@
-			</span>
+			<span v-if="!tn.owner">&ndash;</span>
 		</td>
-		<td>{ tn.fullname } ({ tn.phonenumber_one })</td>
-		<td>
-			<span class="badge bg-red-soft text-red ms-2">{ tn.house.house_id }</span>
-			{ tn.house.house_type } &smid; { tn.house.house_rent.toLocaleString() } { tn.devise }
+		<td scope="row">{ tn.vn_fullname } ({ tn.vn_phonenumber_one })</td>
+		<td scope="row">
+			<span class="badge bg-blue text-white ms-2">#{ tn.house.vn_house_id }</span>
+			<span> &ndash; { tn.house.vn_house_type } ({ tn.house.vn_house_rent.toLocaleString() } { user.vn_device })</span>
 		</td>
-		<td>{ tn.created_at.toLocaleString() }</td>
-		<td>
+		<td scope="row">{ tn.house.vn_house_lease_end_date } <span> <br> (dans { tn.house.remaining_days } jours)</span></td>
+		<td scope="row">{ tn.vn_created_at }</td>
+		<td scope="row">
 			<button title="Télécharger le contrat de ce locataire" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
 				<i class="fa fa-download me-2"></i>
             </button>
@@ -30,7 +28,7 @@
 				<i class="text-secondary fa fa-edit"></i>
 			</button>
 
-			<button title="Supprimer ce locataire" @click.prevent="deleteTenantConfirm(tn.tenant_uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
+			<button title="Supprimer ce locataire" @click.prevent="deleteTenantConfirm(tn.uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
 				<i class="text-danger fa fa-trash"></i>
 			</button>
 		</td>
@@ -44,48 +42,12 @@
 			<form>
 				<div class="modal-header">
 					<h4 class="modal-title">
-						Mise à jour locataire : { tenantData.tenant_id } - { tenantData.fullname }
+						Mise à jour locataire : #{ tenantData.vn_tenant_id } - { tenantData.vn_fullname }
 					</h4>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 				</div>
 				<div class="modal-body">
-					<div class="row gx-3 mb-3">
-						<div class="col-6">
-							<label for="fullname" class="form-label">Nom &amp; prénoms</label>
-							<input type="text" class="form-control" id="fullname" v-model="tenantData.fullname">
-						</div>
-
-						<div class="col-6">
-							<label for="card_number" class="form-label">N° CNI/Attestion/Passport</label>
-							<input type="text" class="form-control" id="card_number" v-model="tenantData.card_number">
-						</div>
-					</div>
-
-					<div class="row gx-3 mb-3">
-						<div class="col-4">
-							<label for="phonenumber_one" class="form-label">Téléphone I</label>
-							<input type="tel" class="form-control" id="phonenumber_one" v-model="tenantData.phonenumber_one">
-						</div>
-						<div class="col-4">
-							<label for="phonenumber_two" class="form-label">Téléphone II</label>
-							<input type="tel" class="form-control" id="phonenumber_two" v-model="tenantData.phonenumber_two">
-						</div>
-
-						<div class="col-4">
-							<label for="addr_email" class="form-label">Addresse e-mail</label>
-							<input type="email" class="form-control" id="addr_email" v-model="tenantData.addr_email">
-						</div>
-					</div>
-
-					<div class="mb-3">
-						<label for="parent_name" class="form-label">Nom du parent</label>
-						<input type="text" class="form-control" id="parent_name" v-model="tenantData.parent_name">
-					</div>
-
-					<div class="row gx-3 mb-3">
-						<label for="profession" class="form-label">Profession</label>
-						<input type="text" class="form-control" id="profession" v-model="tenantData.profession">
-					</div>
+					{% include "tenant/fields/field_tenant.html" %}
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>

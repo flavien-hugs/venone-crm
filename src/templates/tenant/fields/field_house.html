@@ -1,0 +1,21 @@
+{% from "tenant/fields/macros.html" import input_field with context %}
+
+<div class="row gx-3 mb-4">
+    {{ input_field('vn_house_type', model='houseData.vn_house_type', label='Type de propriété', placeholder='Ex: Villa', required='True') }}
+
+    {{ input_field('vn_house_rent', type="number", model='houseData.vn_house_rent', label='Loyer/mois', placeholder='Ex: 50000', required='True') }}
+
+    {{ input_field('vn_house_number_room', type="number", model='houseData.vn_house_number_room', label='Nombre de pièces', placeholder='Ex: 3', required='True') }}
+</div>
+
+<div class="row gx-3 mb-4">
+    {{ input_field('vn_house_month', type="number", model='houseData.vn_house_month', label='Nombre de mois de caution',  placeholder='Ex: 2', required='True') }}
+
+    {{ input_field('vn_house_guaranty', type="number", model='houseData.vn_house_guaranty', label='Caution', placeholder='Ex: 150000', required='True') }}
+
+    {{ input_field('vn_house_address', model='houseData.vn_house_address', label='Situation géographique', placeholder='Ex: Abidjan, Cocody', required='True') }}
+</div>
+
+<div class="row gx-1 mb-4">
+    {{ input_field('vn_house_lease_start_date', model='houseData.vn_house_lease_start_date', label='Date de mise en location', type="date", placeholder='houseData.vn_house_lease_start_date', required='False') }}
+</div>

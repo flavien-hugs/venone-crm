@@ -1,0 +1,21 @@
+{% from "tenant/fields/macros.html" import input_field with context %}
+
+<div class="row gx-3 mb-4">
+    {{ input_field('vn_fullname', model='tenantData.vn_fullname', label='Nom & prénoms', placeholder='Ex: Flavien HUGS', required='True') }}
+
+    {{ input_field('vn_cni_number', model='tenantData.vn_cni_number', label="N° de CNI/Attestion/Passport", placeholder='CI010203040506', required='True') }}
+
+    {{ input_field('vn_phonenumber_one', model='tenantData.vn_phonenumber_one', label='N° de téléphone I', placeholder='Ex: 2250101010101', required='True') }}
+</div>
+
+<div class="row gx-3 mb-4">
+    {{ input_field('vn_phonenumber_two', model='tenantData.vn_phonenumber_two', label='N° de téléphone II',  placeholder='Ex: 2250101010101', required='False') }}
+
+    {{ input_field('vn_profession', model='tenantData.vn_profession', label='Profession', placeholder='Profession', required='False') }}
+
+    {{ input_field('vn_addr_email', type='email', model='tenantData.vn_addr_email', label='Adresse e-mail', placeholder='Ex: unsta@example.com', required='False') }}
+</div>
+
+<div class="row gx-1 mb-4">
+    {{ input_field('vn_parent_name', model='tenantData.vn_parent_name', label="Nom d'un parent", placeholder='Ex: Flavien HUGS', required='False') }}
+</div>

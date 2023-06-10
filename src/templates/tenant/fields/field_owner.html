@@ -1,0 +1,27 @@
+{% from "tenant/fields/macros.html" import input_field with context %}
+
+<div class="row gx-3 mb-4">
+    {{ input_field('vn_fullname', model='ownerData.vn_fullname', label='Nom & prénoms', placeholder='Ex: Flavien HUGS', required='True') }}
+
+    {{ input_field('vn_cni_number', model='ownerData.vn_cni_number', label="N° de CNI/Attestion/Passport", placeholder='CI010203040506', required='True') }}
+
+    {{ input_field('vn_phonenumber_one', model='ownerData.vn_phonenumber_one', label='N° de téléphone I', placeholder='Ex: 2250101010101', required='True') }}
+</div>
+
+<div class="row mb-4">
+    {{ input_field('vn_owner_percent', type='number', model='ownerData.vn_owner_percent', label='Pourcentage sur les loyers (%)', placeholder='Ex: 5', required='True') }}
+</div>
+
+<div class="row gx-3 mb-4">
+    {{ input_field('vn_addr_email', type='email', model='ownerData.vn_addr_email', label='Adresse e-mail', placeholder='Ex: unsta@example.com', required='False') }}
+
+    {{ input_field('vn_phonenumber_two', model='ownerData.vn_phonenumber_two', label='N° de téléphone II',  placeholder='Ex: 2250101010101', required='False') }}
+
+    {{ input_field('vn_profession', model='ownerData.vn_profession', label='Profession', placeholder='Ex: Enseignant', required='False') }}
+</div>
+
+<div class="row gx-3 mb-4">
+    {{ input_field('vn_location', model='ownerData.vn_location', label="Lieu d'habitation", placeholder="Abidjan, Cocody", required='False') }}
+
+    {{ input_field('vn_parent_name', model='ownerData.vn_parent_name', label="Nom d'un parent", placeholder='Ex: Flavien HUGS', required='False') }}
+</div>
