@@ -9,6 +9,7 @@ from flask_login import current_user
 from flask_login import login_required
 from src.auth.models import VNUser
 from src.exts import db
+from src.exts import cache
 from src.mixins.decorators import admin_required
 from src.mixins.decorators import agency_required
 from src.mixins.decorators import owner_required
@@ -41,6 +42,7 @@ def get_user():
 @login_required
 @admin_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_all_users():
 
     page = request.args.get("page", 1, type=int)
@@ -77,6 +79,7 @@ def get_all_users():
 @login_required
 @admin_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_all_companies():
 
     page = request.args.get("page", 1, type=int)
@@ -112,6 +115,7 @@ def get_all_companies():
 @login_required
 @admin_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_all_lessors():
 
     page = request.args.get("page", 1, type=int)

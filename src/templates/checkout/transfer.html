@@ -3,13 +3,12 @@
 {% block dashboard_content %}
     <section id="requestTransferTable">
 
-        <!-- Alert message -->
         <message-component
             :show-message-alert="showMessageAlert"
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-if="isLoading" class="preloader">
+        <div v-show="isLoading" class="preloader">
             <div class="preloader-body">
                 <p>Chargement en cours...</p>
                 <div class="cssload-container">
@@ -18,7 +17,7 @@
             </div>
         </div>
 
-        <div v-if="user.houses_count > 0" class="row g-2 border-bottom mb-5 mb-sm-2">
+        <div v-show="user.houses_count > 0" class="row g-2 border-bottom mb-5 mb-sm-2">
             <div class="col-xl-4 mb-4">
                 <div class="card border-start-lg border-start-primary h-100">
                     <div class="card-body">

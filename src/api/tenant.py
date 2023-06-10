@@ -6,6 +6,7 @@ from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src.exts import db
+from src.exts import cache
 from src.schemas import houses
 from src.schemas import users
 from src.tenant import VNTenant
@@ -24,6 +25,7 @@ def abort_if_tenant_doesnt_exist(uuid: str):
 @api.get("/tenants/")
 @login_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_all_tenants():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
@@ -76,6 +78,7 @@ def get_all_tenants():
 @api.get("/tenants/<string:uuid>/")
 @login_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_tenant(uuid: str) -> dict:
     tenant = abort_if_tenant_doesnt_exist(uuid)
     return {"tenant": houses.tenant_schema.dump(tenant)}

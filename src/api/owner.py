@@ -8,6 +8,7 @@ from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src.exts import db
+from src.exts import cache
 from src.schemas import owners
 from src.schemas import users
 from src.tenant import VNHouse
@@ -28,6 +29,7 @@ def abort_if_owner_doesnt_exist(uuid: str):
 @api.get("/owners/")
 @login_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_all_houseowners():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
@@ -61,6 +63,7 @@ def get_all_houseowners():
 @api.get("/owners/<string:uuid>/")
 @login_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_houseowner(uuid: str) -> dict:
     owner = abort_if_owner_doesnt_exist(uuid)
     return {"owner": owners.owner_schema.dump(owner)}

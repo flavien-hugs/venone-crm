@@ -9,6 +9,7 @@ from flask_login import current_user
 from flask_login import login_required
 from src.auth.models import VNUser
 from src.exts import db
+from src.exts import cache
 from src.schemas import houses
 from src.schemas import users
 from src.tenant import VNHouse
@@ -29,6 +30,7 @@ def abort_if_house_doesnt_exist(uuid: str):
 @api.get("/houses/")
 @login_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_all_houses():
 
     page = request.args.get("page", 1, type=int)
@@ -104,6 +106,7 @@ def houses_register():
 @api.get("/houses/<string:uuid>/")
 @login_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_house(uuid: str) -> dict:
 
     house = abort_if_house_doesnt_exist(uuid)
@@ -178,6 +181,7 @@ def delete_house(uuid: str) -> dict:
 @api.get("/check-houses-country/")
 @login_required
 @jsonify_response
+@cache.cached(timeout=500)
 def get_houses_country():
 
     page = request.args.get("page", 1, type=int)
@@ -206,6 +210,7 @@ def get_houses_country():
 
 @api.get("/available-houses/")
 @jsonify_response
+@cache.cached(timeout=500)
 def get_houses_listing():
 
     page = request.args.get("page", 1, type=int)
@@ -219,6 +224,7 @@ def get_houses_listing():
 
 @api.get("/available-houses/<string:uuid>/")
 @jsonify_response
+@cache.cached(timeout=500)
 def get_house_info(uuid: str) -> dict:
     house = VNHouse.get_available_houses(uuid)
     house = abort_if_house_doesnt_exist(house)
