@@ -156,34 +156,48 @@ class VNUser(
     def get_company_percent(self) -> float:
         return getattr(self.percent, "vn_company_percent", 6)
 
+    def get_payments_list(self) -> list:
+        payments = self.payments.filter_by(vn_payee_id=self.id, vn_pay_status=True)
+        return payments
+
     def get_payments_count(self) -> int:
-        payments_count = self.payments.filter_by(
-            vn_payee_id=self.id, vn_pay_status=True
-        ).count()
+        payments_count = self.get_payments_list().count()
         return payments_count
 
-    def get_houseowners_count(self):
-        houseowners_count = self.houseowners.filter_by(vn_user_id=self.id).count()
+    def get_houseowners_list(self) -> list:
+        houseowners = self.houseowners.filter_by(vn_user_id=self.id)
+        return houseowners
+
+    def get_houseowners_count(self) -> int:
+        houseowners_count = self.get_houseowners_list().count()
         return houseowners_count
 
-    def get_houses_count(self):
-        houses_count = self.houses.filter_by(vn_user_id=self.id).count()
+    def get_houses_list(self) -> list:
+        houses= self.houses.filter_by(vn_user_id=self.id)
+        return houses
+
+    def get_houses_count(self) -> int:
+        houses_count = self.get_houses_list().count()
         return houses_count
 
-    def get_houses_close_count(self):
+    def get_houses_close_count(self) -> int:
         houses_close_count = self.houses.filter_by(
             vn_house_is_open=True, vn_user_id=self.id
         ).count()
         return houses_close_count
 
-    def get_houses_open_count(self):
+    def get_houses_open_count(self) -> int:
         houses_open_count = self.houses.filter_by(
             vn_house_is_open=False, vn_user_id=self.id
         ).count()
         return houses_open_count
 
-    def get_tenants_count(self):
-        tenants_count = self.tenants.filter_by(vn_user_id=self.id).count()
+    def get_tenants_list(self) -> list:
+        tenants= self.tenants.filter_by(vn_user_id=self.id)
+        return tenants
+
+    def get_tenants_count(self) -> int:
+        tenants_count = self.get_tenants_list().count()
         return tenants_count
 
     def can(self, perm):

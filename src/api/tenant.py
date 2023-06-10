@@ -25,7 +25,6 @@ def abort_if_tenant_doesnt_exist(uuid: str):
 @api.get("/tenants/")
 @login_required
 @jsonify_response
-@cache.cached(timeout=500)
 def get_all_tenants():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
