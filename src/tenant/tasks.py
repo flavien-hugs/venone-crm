@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from src import db
+from src.exts import db
 from src.main.utils import send_sms_reminder
 from src.tenant import VNHouse
 

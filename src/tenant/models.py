@@ -1,3 +1,4 @@
+import locale
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -8,6 +9,10 @@ from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import id_generator
 from src.mixins.models import TimestampMixin
 from src.payment import VNPayment
+
+
+loc = locale.getlocale()
+locale.setlocale(locale.LC_ALL, loc)
 
 
 class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
@@ -21,78 +26,6 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
     vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="cascade"))
     vn_owner_percent = db.Column(db.Float, default=0, nullable=True)
 
-    houses = db.relationship(
-        "VNHouse",
-        lazy="dynamic",
-        backref="owner_houses",
-        order_by="desc(VNHouse.vn_created_at)",
-    )
-    tenants = db.relationship(
-        "VNTenant",
-        lazy="dynamic",
-        backref="owner_tenants",
-        order_by="desc(VNTenant.vn_created_at)",
-    )
-    payments = db.relationship(
-        "VNPayment",
-        lazy="dynamic",
-        backref="owner_payment",
-        order_by="desc(VNPayment.vn_pay_date)",
-    )
-
-    def to_json(self):
-        json_owner = {
-            "owner_uuid": self.uuid,
-            "user_uuid": current_user.uuid,
-            "owner_id": self.get_owner_id(),
-            "gender": self.vn_gender,
-            "fullname": self.vn_fullname,
-            "addr_email": self.vn_addr_email,
-            "profession": self.vn_profession,
-            "parent_name": self.vn_parent_name,
-            "card_number": self.vn_cni_number,
-            "location": self.vn_location,
-            "percent": self.vn_owner_percent,
-            "phonenumber_one": self.vn_phonenumber_one,
-            "phonenumber_two": self.vn_phonenumber_two,
-            "devise": current_user.vn_device,
-            "amount_repaid": self.get_amount_repaid(),
-            "amount": "{:,.2f}".format(self.get_owner_property_values()),
-            "total_percent": "{:,.2f}".format(self.total_houses_amount()),
-            "houses": [h.vn_house_id for h in self.houses],
-            "tenants": [t.vn_tenant_id for t in self.tenants],
-            "houses_list": [h.to_json() for h in self.houses],
-            "tenants_list": [t.to_json() for t in self.tenants],
-            "number_houses": self.houses.count(),
-            "number_tenants": self.tenants.count(),
-            "number_payments": self.payments.count(),
-            "is_activated": self.vn_activated,
-            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-        }
-        return json_owner
-
-    @staticmethod
-    def from_json(json_owner):
-        fullname = json_owner.get("fullname")
-        addr_email = json_owner.get("addr_email")
-        profession = json_owner.get("addr_email")
-        parent_name = json_owner.get("parent_name")
-        card_number = json_owner.get("card_number")
-        location = json_owner.get("location")
-        phonenumber_one = json_owner.get("phonenumber_one")
-        phonenumber_two = json_owner.get("phonenumber_two")
-
-        return VNHouseOwner(
-            fullname=fullname,
-            addr_email=addr_email,
-            profession=profession,
-            parent_name=parent_name,
-            card_number=card_number,
-            location=location,
-            phonenumber_one=phonenumber_one,
-            phonenumber_two=phonenumber_two,
-        )
-
     def __str__(self):
         return f"{self.vn_fullname} - {self.vn_fullname} - {self.vn_phonenumber_one}"
 
@@ -102,35 +35,44 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
     def get_owner_id(self):
         return f"#{self.vn_owner_id}"
 
-    @staticmethod
-    def get_houseowner_name(houseowner) -> str:
-        return houseowner.vn_fullname
-
-    def get_owner_available(self) -> bool:
-        return "Compte actif" if self.vn_activated else "Compte inactif"
-
-    @classmethod
-    def get_owner(cls, owner_uuid) -> dict:
-        query = cls.query.filter_by(vn_user_id=current_user.id, uuid=owner_uuid)
-        return query.first()
+    def get_owner_houses(self):
+        houses = VNHouse.query.filter(
+            VNHouse.vn_house_is_open == True,
+            VNHouse.vn_user_id == current_user.id,
+            VNHouse.vn_owner_id == self.id,
+        ).all()
+        return houses
 
     def get_owner_property_values(self):
-        user_houses = self.houses.filter_by(
-            vn_house_is_open=True, vn_user_id=current_user.id
-        ).all()
-        total_house_value = sum(house.vn_house_rent for house in user_houses)
+        houses = self.get_owner_houses()
+        total_house_value = sum(house.vn_house_rent for house in houses)
         return total_house_value
 
     def total_houses_amount(self):
-        user_houses = self.houses.filter_by(
-            vn_house_is_open=True, vn_user_id=current_user.id
-        ).all()
-        total = sum(house.get_house_rent_with_percent() for house in user_houses)
+        houses = self.get_owner_houses()
+        total = sum(house.get_house_rent_with_percent() for house in houses)
         return total
 
     def get_amount_repaid(self):
-        total = self.get_owner_property_values() - self.total_houses_amount()
-        return "{:,.2f}".format(total)
+        return self.get_owner_property_values() - self.total_houses_amount()
+
+    def get_houses_count(self):
+        return len(self.get_owner_houses())
+
+    def get_owner_tenants(self):
+        tenants = VNTenant.query.filter(
+            VNTenant.vn_user_id == current_user.id, VNTenant.vn_owner_id == self.id
+        ).all()
+        return tenants
+
+    def get_tenants_count(self):
+        return len(self.get_owner_tenants())
+
+    def get_owner_payments(self):
+        payments = VNPayment.query.filter(
+            VNPayment.vn_payee_id == current_user.id, VNPayment.vn_owner_id == self.id
+        ).all()
+        return payments
 
 
 class VNHouse(TimestampMixin):
@@ -157,39 +99,11 @@ class VNHouse(TimestampMixin):
 
     vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     vn_owner_id = db.Column(db.Integer, db.ForeignKey("houseowner.id"))
-
-    tenants = db.relationship(
-        "VNTenant",
-        backref="house_tenant",
-        order_by="desc(VNTenant.vn_created_at)",
+    owner = db.relationship(
+        "VNHouseOwner",
+        backref="owner_houses",
+        order_by="desc(VNHouse.vn_created_at)",
     )
-    payments = db.relationship(
-        "VNPayment", backref="house_payment", order_by="desc(VNPayment.vn_pay_date)"
-    )
-
-    def to_json(self):
-        json_house = {
-            "house_uuid": self.uuid,
-            "owner_id": self.get_owner_id(),
-            "tenant_id": self.get_current_tenant(),
-            "user_uuid": current_user.uuid,
-            "devise": current_user.vn_device,
-            "house_id": self.get_house_id(),
-            "house_type": self.vn_house_type,
-            "house_rent": self.vn_house_rent,
-            "house_month": self.vn_house_month,
-            "house_guaranty": self.vn_house_guaranty,
-            "house_number_room": self.vn_house_number_room,
-            "house_address": self.vn_house_address,
-            "house_is_open": self.vn_house_is_open,
-            "house_status": self.get_house_open(),
-            "house_percent": self.get_house_rent_with_percent(),
-            "house_lease_start_date": self.vn_house_lease_start_date.strftime(
-                "%d-%m-%Y"
-            ),
-            "house_lease_end_date": self.vn_house_lease_end_date.strftime("%d-%m-%Y"),
-        }
-        return json_house
 
     def __str__(self) -> str:
         return f"{self.vn_house_id} - {self.vn_house_type} - {self.vn_house_rent}"
@@ -197,54 +111,63 @@ class VNHouse(TimestampMixin):
     def __repr__(self):
         return f"VNHouse({self.id}, {self.vn_house_type})"
 
+    def get_remaining_days(self):
+        lease_end_date = self.vn_house_lease_end_date
+        current_date = datetime.utcnow().date()
+        remaining_days = (lease_end_date - current_date).days
+        return remaining_days
+
     def house_disable(self):
         self.vn_house_is_open = False
         db.session.add(self)
         db.session.commit()
 
-    def get_house_open(self) -> bool:
+    def get_house_open(self):
         return "indisponible" if self.vn_house_is_open else "disponible"
 
     def get_house_id(self) -> str:
         return f"#{self.vn_house_id}"
 
+    @staticmethod
+    def get_available_houses(cls, uuid):
+        return cls.query.filter_by(vn_house_id=uuid, vn_house_is_open=False).first()
+
     @classmethod
     def get_houses_list(cls) -> list:
-        houses = cls.query.filter_by(vn_user_id=current_user.id)
-        return houses
+        return cls.query.filter_by(vn_user_id=cls.vn_user_id).order_by(
+            cls.vn_created_at.desc()
+        )
 
     @classmethod
-    def get_house(cls, house_uuid) -> dict:
-        house = cls.query.filter_by(uuid=house_uuid, vn_user_id=current_user.id)
-        return house.first()
+    def get_house_object(cls, uuid) -> dict:
+        return cls.query.filter_by(uuid=uuid, vn_user_id=current_user.id).first()
 
-    def get_owner_id(self):
-        owners = VNHouseOwner.query.filter_by(
-            id=self.vn_owner_id, vn_user_id=self.vn_user_id
-        )
-        return next((own.get_owner_id() for own in owners), None)
+    def get_house_owner(self):
+        house_owner = self.owner
+        return house_owner.vn_owner_id if house_owner is not None else None
 
     def get_current_tenant(self):
-        tenant = self.tenants[0] if len(self.tenants) > 0 else None
+        tenant = self.house_tenants[0] if self.house_tenants else None
         return tenant.vn_fullname if tenant is not None else None
 
     def get_current_tenant_id(self):
-        tenant = self.tenants[0] if len(self.tenants) > 0 else None
+        tenant = self.house_tenants[0] if self.house_tenants else None
         return tenant.id if tenant is not None else None
 
     def get_tenant_phone_number(self):
-        tenant = self.tenants[0] if len(self.tenants) > 0 else None
+        tenant = self.house_tenants[0] if self.house_tenants else None
         return tenant.vn_phonenumber_one if tenant is not None else None
 
     def get_house_rent_with_percent(self):
         if (
-            self.owner_houses
-            and self.owner_houses.vn_owner_percent is not None
-            and self.owner_houses.vn_owner_percent != 0
+            self.owner
+            and self.owner.vn_owner_percent is not None
+            and self.owner.vn_owner_percent != 0
         ):
-            percent = self.owner_houses.vn_owner_percent / 100
-            result = self.vn_house_rent * percent
-            return result
+            percent = self.owner.vn_owner_percent / 100
+            if percent != 0:
+                result = self.vn_house_rent * percent
+                return result
         return 0
 
     def update_lease_end_date(self):
@@ -319,38 +242,21 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     vn_birthdate = db.Column(db.Date, nullable=True)
 
     vn_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    vn_house_id = db.Column(db.Integer, db.ForeignKey("house.id"))
-    vn_owner_id = db.Column(db.Integer, db.ForeignKey("houseowner.id"))
 
-    payments = db.relationship(
-        "VNPayment",
-        lazy="dynamic",
-        backref="tenant_payment",
-        order_by="desc(VNPayment.vn_pay_date)",
+    vn_house_id = db.Column(db.Integer, db.ForeignKey("house.id"))
+    house = db.relationship(
+        "VNHouse",
+        uselist=False,
+        backref="house_tenants",
+        order_by="desc(VNTenant.vn_created_at)",
     )
 
-    def to_json(self):
-        json_tenant = {
-            "user_uuid": current_user.uuid,
-            "devise": current_user.vn_device,
-            "tenant_uuid": self.uuid,
-            "owner": self.get_owner_id(),
-            "tenant_id": self.get_tenant_id(),
-            "house": self.house_tenant.to_json(),
-            "gender": self.vn_gender,
-            "fullname": self.vn_fullname,
-            "addr_email": self.vn_addr_email,
-            "profession": self.vn_profession,
-            "parent_name": self.vn_parent_name,
-            "card_number": self.vn_cni_number,
-            "location": self.vn_location,
-            "phonenumber_one": self.vn_phonenumber_one,
-            "phonenumber_two": self.vn_phonenumber_two,
-            "activated": self.vn_activated,
-            "payments": self.list_payments(),
-            "created_at": self.vn_created_at.strftime("%d-%m-%Y"),
-        }
-        return json_tenant
+    vn_owner_id = db.Column(db.Integer, db.ForeignKey("houseowner.id"))
+    owner = db.relationship(
+        "VNHouseOwner",
+        backref="owner_tenants",
+        order_by="desc(VNTenant.vn_created_at)",
+    )
 
     def __str__(self):
         return f"{self.id} {self.vn_fullname}"
@@ -358,32 +264,14 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     def __repr__(self):
         return f"VNTenant({self.id}, {self.vn_tenant_id})"
 
-    def get_owner_id(self):
-        owners = VNHouseOwner.query.filter_by(
-            id=self.vn_owner_id, vn_user_id=current_user.id
-        )
-        return next((own.get_owner_id() for own in owners), None)
-
     def get_tenant_id(self) -> str:
         return f"#{self.vn_tenant_id}"
 
-    @staticmethod
-    def get_tenant_name(tenant) -> str:
-        return tenant.vn_fullname
+    def get_tenant_owner(self):
+        tenant_owner = self.owner
+        return tenant_owner.vn_owner_id if tenant_owner is not None else None
 
     @classmethod
     def get_tenants_list(cls) -> list:
         tenants = cls.query.filter_by(vn_user_id=current_user.id)
         return tenants
-
-    def list_payments(self):
-        payments = self.payments.all()
-        payments_json = [payment.to_json() for payment in payments]
-        return payments_json
-
-    @classmethod
-    def get_tenant(cls, tenant_uuid) -> dict:
-        tenant = cls.query.filter_by(
-            uuid=tenant_uuid, vn_user_id=current_user.id
-        ).first()
-        return tenant
