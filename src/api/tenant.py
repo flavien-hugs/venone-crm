@@ -1,12 +1,24 @@
+from http import HTTPStatus
+
+from flask import abort
 from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src.exts import db
+from src.schemas import houses
+from src.schemas import users
 from src.tenant import VNTenant
 from src.utils import jsonify_response
 
 from . import api
+
+
+def abort_if_tenant_doesnt_exist(uuid: str):
+    tenant = VNTenant.find_by_uuid(uuid)
+    if not tenant:
+        abort(HTTPStatus.NOT_FOUND, f"Could not find user with ID {uuid}")
+    return tenant
 
 
 @api.get("/tenants/")
@@ -38,7 +50,6 @@ def get_all_tenants():
     )
 
     pagination = tenants_query.paginate(page=page, per_page=per_page, error_out=False)
-    tenants = pagination.items
 
     prev = (
         url_for("api.get_all_tenants", page=page - 1, _external=True)
@@ -52,79 +63,61 @@ def get_all_tenants():
     )
 
     return {
-        "tenants": [tenant.to_json() for tenant in tenants],
+        "tenants": [houses.tenant_schema.dump(t) for t in pagination.items],
+        "user": users.user_schema.dump(current_user),
         "prev": prev,
         "next": next,
         "page": page,
         "per_page": per_page,
         "total": pagination.total,
-        "user": current_user.to_json(),
     }
 
 
-@api.delete("/tenants/<string:tenant_uuid>/delete/")
+@api.get("/tenants/<string:uuid>/")
 @login_required
 @jsonify_response
-def delete_tenant(tenant_uuid):
-    tenant = VNTenant.get_tenant(tenant_uuid)
+def get_tenant(uuid: str) -> dict:
+    tenant = abort_if_tenant_doesnt_exist(uuid)
+    return {"tenant": houses.tenant_schema.dump(tenant)}
 
-    if tenant is not None:
-        tenant.house_tenant.house_disable()
-        tenant.remove()
-        return {
-            "success": True,
-            "message": f"Locataire #{tenant.vn_tenant_id} a été supprimé avec succès !",
-        }
 
+@api.delete("/tenants/<string:uuid>/")
+@login_required
+@jsonify_response
+def delete_tenant(uuid: str) -> dict:
+    tenant = abort_if_tenant_doesnt_exist(uuid)
+    tenant.house.house_disable()
+    tenant.remove()
     return {
-        "success": False,
-        "message": "Oups ! L'élément n'a pas été trouvé.",
+        "success": True,
+        "message": f"Locataire #{tenant.vn_tenant_id} a été supprimé avec succès !",
     }
 
 
-@api.put("/tenants/<string:tenant_uuid>/update/")
+@api.patch("/tenants/<string:uuid>/")
 @login_required
 @jsonify_response
-def update_tenant(tenant_uuid):
-    tenant = VNTenant.get_tenant(tenant_uuid)
+def update_tenant(uuid: str) -> dict:
+    tenant = abort_if_tenant_doesnt_exist(uuid)
 
-    if not tenant:
-        return {"message": "tenant not found"}
+    update_tenant_data = request.json.get("update_tenant_data")
 
-    data = request.json
-
-    fullname = data.get("fullname")
-    addr_email = data.get("addr_email")
-    card_number = data.get("card_number")
-    profession = data.get("profession")
-    parent_name = data.get("parent_name")
-    phonenumber_one = data.get("phonenumber_one")
-    phonenumber_two = data.get("phonenumber_two")
-
-    tenant.vn_fullname = fullname
-    tenant.vn_addr_email = addr_email
-    tenant.vn_cni_number = card_number
-    tenant.vn_profession = profession
-    tenant.vn_parent_name = parent_name
-    tenant.vn_phonenumber_one = phonenumber_one
-    tenant.vn_phonenumber_two = phonenumber_two
-
+    fields = [
+        "vn_fullname",
+        "vn_addr_email",
+        "vn_cni_number",
+        "vn_location",
+        "vn_profession",
+        "vn_parent_name",
+        "vn_phonenumber_one",
+        "vn_phonenumber_two",
+    ]
+    for field in fields:
+        if field in update_tenant_data:
+            setattr(tenant, field, update_tenant_data[field])
     tenant.save()
 
     return {
         "success": True,
         "message": f"Locataire #{tenant.vn_tenant_id} mise à jour avec succès !",
     }
-
-
-@api.get("/tenants/<string:tenant_uuid>/")
-@login_required
-@jsonify_response
-def get_tenant(tenant_uuid):
-    tenant = VNTenant.get_tenant(tenant_uuid)
-    if not tenant:
-        return {
-            "message": "Oups ! L'élément n'a pas été trouvé !",
-        }
-
-    return {"tenant": tenant.to_json()}
