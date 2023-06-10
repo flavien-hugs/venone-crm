@@ -10,7 +10,7 @@ checkout_bp = Blueprint("checkout_bp", __name__, url_prefix="/dashboard/")
 
 @checkout_bp.get("/payments/")
 @login_required
-@cache.cached(timeout=500)
+# @cache.cached(timeout=500)
 def checkout():
     page_title = "Liste des paiements de loyers"
     return render_template(
