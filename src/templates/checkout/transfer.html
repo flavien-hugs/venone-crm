@@ -8,7 +8,7 @@
             :message-alert="messageAlert">
         </message-component>
 
-        <div v-show="isLoading" class="preloader">
+        <div v-if="isLoading" class="preloader">
             <div class="preloader-body">
                 <p>Chargement en cours...</p>
                 <div class="cssload-container">
@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        <div v-show="user.transfers.length == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div v-show="user.transfers_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center">
                 <img loading="lazy" class="img-account-profile mb-4" src="{{ url_for('static', filename="img/element/credit_card.svg")}}">
 
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <div v-show="user.transfers.length > 0" class="card card-header-actions mx-auto">
+        <div v-show="user.transfers_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
                 <span class="fw-700">{{ page_title }}</span>
                 <div>
@@ -98,7 +98,7 @@
             </div>
 
             <div class="card-body">
-                <div class="input-group input-group-joined input-group-solid shadow-none">
+                {#<div class="input-group input-group-joined input-group-solid shadow-none">
                     <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
                     <input
                         type="text"
@@ -106,7 +106,7 @@
                         v-model="searchQuery"
                         class="form-control shadow-none ps-0"
                     >
-                </div>
+                </div>#}
 
                 <div class="table-responsive">
                     <table class="table table-hover">
