@@ -8,11 +8,11 @@
     <section id="dashboardApp">
         <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row mb-4">
             <div class="me-4 mb-3 mb-sm-0">
-                <h1 class="mb-0">{{ page_title | e}}</h1>
+                <h1 class="mb-0">{{ page_title | e }}</h1>
                 <div class="small">
                     <span class="fw-500 text-muted">
                         {{ moment().format('dddd') }} {{ moment().format('Do MMMM YYYY') }}
-                    </span> &smid; { user.country }
+                    </span> &smid; { user.vn_country }
                 </div>
             </div>
         </div>
@@ -44,20 +44,7 @@
         </div>
 
         <div class="row">
-            <div v-if="user.is_company" class="col-xl-4 mb-4">
-                <div class="card card-header-actions h-auto">
-                    <div class="card-header text-muted">
-                        Nombre de bailleurs par mois
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-area">
-                            <canvas id="ownerChart" width="100%" height="30"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div :class="{ 'col-xl-6': user.is_owner, 'col-xl-4': user.is_company }" class="mb-4">
+            <div :class="{ 'col-xl-6': user.vn_house_owner, 'col-xl-4': user.vn_company }" class="mb-4">
                 <div class="card card-header-actions h-auto">
                     <div class="card-header text-muted">
                         Nombre de locataires par mois
@@ -70,7 +57,20 @@
                 </div>
             </div>
 
-            <div :class="{ 'col-xl-6': user.is_owner, 'col-xl-4': user.is_company }" class="mb-4">
+            <div v-show="user.vn_company" class="col-xl-4 mb-4">
+                <div class="card card-header-actions h-auto">
+                    <div class="card-header text-muted">
+                        Nombre de bailleurs par mois
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="ownerChart" width="100%" height="30"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div :class="{ 'col-xl-6': user.vn_house_owner, 'col-xl-4': user.vn_company }" class="mb-4">
                 <div class="card card-header-actions h-auto">
                     <div class="card-header text-muted">
                         Disponibilté de vos propriétés

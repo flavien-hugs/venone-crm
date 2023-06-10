@@ -4,40 +4,41 @@ import messageComponent from './components/messageComponent.js';
 window.addEventListener('DOMContentLoaded', event => {
 
     const OWNER_DATA = {
-        owner_uuid: '',
-        gender: '',
-        fullname: '',
-        addr_email: '',
-        card_number: '',
-        location: '',
-        percent: '',
-        profession: '',
-        parent_name: '',
-        phonenumber_one: '',
-        phonenumber_two: '',
+        uuid: '',
+        vn_owner_id: '',
+        vn_fullname: '',
+        vn_addr_email: '',
+        vn_cni_number: '',
+        vn_location: '',
+        vn_profession: '',
+        vn_parent_name: '',
+        vn_phonenumber_one: '',
+        vn_phonenumber_two: '',
+        vn_owner_percent: '',
     };
 
     const HOUSE_DATA = {
-        house_uuid: '',
-        house_type: '',
-        house_rent: '',
-        house_guaranty: '',
-        house_month: '',
-        house_number_room: '',
-        house_address: '',
-        house_lease_start_date: new Date().toISOString().substring(0, 10),
+        uuid: '',
+        vn_house_type: '',
+        vn_house_rent: '',
+        vn_house_guaranty: '',
+        vn_house_month: '',
+        vn_house_number_room: '',
+        vn_house_address: '',
+        vn_house_lease_start_date: new Date().toISOString().substring(0, 10),
     };
 
     const TENANT_DATA = {
-        tenant_uuid: '',
-        fullname: '',
-        addr_email: '',
-        card_number: '',
-        profession: '',
-        parent_name: '',
-        location: '',
-        phonenumber_one: '',
-        phonenumber_two: '',
+        uuid: '',
+        vn_tenant_id: '',
+        vn_fullname: '',
+        vn_addr_email: '',
+        vn_cni_number: '',
+        vn_location: '',
+        vn_profession: '',
+        vn_parent_name: '',
+        vn_phonenumber_one: '',
+        vn_phonenumber_two: '',
     };
 
     var app = Vue.createApp({
@@ -74,8 +75,8 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         watch: {
-            "ownerData.percent": function (f) {
-                this.ownerData.percent = this.filterNumber(f);
+            'houseData.vn_house_month': function () {
+                this.houseData.vn_house_guaranty = this.calculateGuaranty();
             },
         },
 
@@ -84,8 +85,16 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         methods: {
-            filterNumber(e) {
-                return ("" + e).replace(/[^0-9]/g, "");
+
+            calculateGuaranty() {
+                const hrent = parseFloat(this.houseData.vn_house_rent);
+                const hmonth = parseInt(this.houseData.vn_house_month);
+
+                if (!isNaN(hrent) && !isNaN(hmonth)) {
+                    return hrent * hmonth;
+                } else {
+                    return null;
+                }
             },
 
             nextStep() {
@@ -112,7 +121,7 @@ window.addEventListener('DOMContentLoaded', event => {
                         },
                     });
 
-                    if (response.status == 200) {
+                    if (response.ok) {
                         const data = await response.json();
                         this.user = data.user;
                         this.owners = data.houseowners;
@@ -127,15 +136,15 @@ window.addEventListener('DOMContentLoaded', event => {
                 }
             },
 
-            async getOwner(ownerUUID) {
+            async getOwner(uuid) {
                 try {
-                    const ownerURL = `/api/owners/${ownerUUID}/`;
+                    const ownerURL = `/api/owners/${uuid}/`;
                     const response = await fetch(ownerURL, {
                         method: "GET",
                         headers: { "Content-type": "application/json" },
                     });
 
-                    if (response.status == 200) {
+                    if (response.ok) {
                         const data = await response.json();
                         this.owner = data.owner;
                         const modal = new bootstrap.Modal(
@@ -158,18 +167,18 @@ window.addEventListener('DOMContentLoaded', event => {
                 modal.show();
             },
 
-            deleteOwnerConfirm(ownerUUID) {
-                this.ownerUUID = ownerUUID;
+            deleteOwnerConfirm(uuid) {
+                this.uuid = uuid;
                 const modal = new bootstrap.Modal(
                     document.getElementById("deleteModal")
                 );
                 modal.show();
             },
 
-            createOwnerTenantConfirm(ownerUUID) {
-                this.ownerUUID = ownerUUID;
-                this.houseData = { ...ownerUUID } ?? {};
-                this.tenantData = { ...ownerUUID } ?? {};
+            createOwnerTenantConfirm(uuid) {
+                this.uuid = uuid;
+                this.houseData = { ...uuid } ?? {};
+                this.tenantData = { ...uuid } ?? {};
                 const modal = new bootstrap.Modal(
                     document.getElementById("addOwnerTenantModal")
                 );
@@ -178,7 +187,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onCreateOwnerTenant() {
                 try {
-                    const registerURL = `/api/owners/${this.ownerUUID}/create_tenant/`;
+                    const registerURL = `/api/owners/${this.uuid}/create-tenant/`;
                     const response = await fetch(registerURL, {
                         method: "POST",
                         headers: {
@@ -190,21 +199,21 @@ window.addEventListener('DOMContentLoaded', event => {
                         }),
                     });
 
-                    const data = await response.json();
+                    const { success, message } = await response.json();
 
-                    if (data.success) {
+                    if (success) {
                         await this.getOwners();
                         this.tenantData = { ...TENANT_DATA };
                         this.houseData = { ...HOUSE_DATA };
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
 
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                     }
                 } catch (error) {
                     console.error(error);
@@ -222,54 +231,50 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onUpdateOwner() {
                 try {
-                    const updateURL = `/api/owners/${this.ownerData.owner_uuid}/update/`;
+                    const updateURL = `/api/owners/${this.ownerData.uuid}/`;
 
                     if (
-                        this.ownerData.percent === "" ||
-                        isNaN(this.ownerData.percent) ||
-                        this.ownerData.percent < 0 ||
-                        this.ownerData.percent > 100
+                        this.ownerData.vn_owner_percent === "" ||
+                        Number.isNaN(parseFloat(this.ownerData.vn_owner_percent)) ||
+                        this.ownerData.vn_owner_percent < 0 ||
+                        this.ownerData.vn_owner_percent > 100
                     ) {
                         this.showMessageAlert = true;
-                        this.messageAlert =
-                            "Valeur de pourcentage invalide. Le pourcentage doit être un nombre entre 0 et 100.";
+                        this.messageAlert = "La valeur du pourcentage est invalide. Le pourcentage doit être un nombre entre 0 et 100.";
                         return;
                     }
 
-                    this.ownerData.percent = parseFloat(this.ownerData.percent);
+                    this.ownerData.vn_owner_percent = parseFloat(this.ownerData.vn_owner_percent);
 
                     const response = await fetch(updateURL, {
-                        method: "PUT",
+                        method: "PATCH",
                         headers: { "Content-type": "application/json" },
                         body: JSON.stringify(this.ownerData),
                     });
 
-                    const data = await response.json();
+                    const { success, message } = await response.json();
 
-                    if (data.success) {
-                        const index = this.owners.findIndex(
-                            (owner) =>
-                                owner.owner_uuid === this.ownerData.owner_uuid
-                        );
-                        this.owners.splice(index, 1, this.ownerData);
+                    if (success) {
+                        const ownerUUID = this.ownerData.uuid;
+                        const ownerIndex = this.owners.findIndex((owner) => owner.uuid === ownerUUID);
+                        this.owners.splice(ownerIndex, 1, this.ownerData);
                         this.ownerData = { ...OWNER_DATA };
                         await this.getOwners();
 
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                     }
                 } catch (error) {
                     this.showMessageAlert = true;
-                    this.messageAlert =
-                        "Une erreur est survenue lors de la mise à du compte propriétaire.";
+                    this.messageAlert = "Une erreur est survenue lors de la mise à jour du compte propriétaire.";
                 } finally {
-                    this.ownerData.owner_uuid = null;
+                    this.ownerData.uuid = null;
                     const modal = bootstrap.Modal.getInstance(
                         document.getElementById("editModal")
                     );
@@ -279,7 +284,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onDeleteOwner() {
                 try {
-                    const deleteURL = `/api/owners/${this.ownerUUID}/delete/`;
+                    const deleteURL = `/api/owners/${this.uuid}/`;
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {
@@ -291,7 +296,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
                     if (data.success) {
                         this.owners = this.owners.filter(
-                            (owner) => owner.owner_uuid !== this.ownerUUID
+                            (owner) => owner.owner_uuid !== this.uuid
                         );
                         await this.getOwners();
                         this.showMessageAlert = true;
@@ -309,7 +314,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     this.messageAlert =
                         "Une erreur est survenue lors de la suppresion de ce propriétaire.";
                 } finally {
-                    this.ownerUUID = null;
+                    this.uuid = null;
                     const modal = bootstrap.Modal.getInstance(
                         document.getElementById("deleteModal")
                     );

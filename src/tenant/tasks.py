@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from src import db
+from src.exts import db
 from src.main.utils import send_sms_reminder
 from src.tenant import VNHouse
 
@@ -32,10 +32,11 @@ def payment_reminders(vn_house_id):
 
     if house.vn_house_is_open:
         logger.info(f"House status: {house.vn_house_is_open}")
-        for tenant in house.tenants:
-            send_sms_reminder(house, tenant)
-            if house.vn_house_lease_end_date <= current_date:
-                house.update_lease_end_date()
+        tenant = house.house_tenants[0] if house.house_tenants else None
+        send_sms_reminder(house, tenant)
+        if house.vn_house_lease_end_date <= current_date:
+            house.update_lease_end_date()
+            
         db.session.commit()
 
 

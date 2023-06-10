@@ -27,7 +27,7 @@ var app = Vue.createApp({
 
     async mounted() {
         await this.getUser();
-        if (this.user.is_company) {
+        if (this.user.vn_company) {
             await this.getOwnerData();
         }
         await this.getTenantData();
@@ -77,9 +77,7 @@ var app = Vue.createApp({
                     const data = await response.json();
                     const values = data.map((d) => d.count);
 
-                    const ctx = document
-                        .getElementById("ownerChart")
-                        .getContext("2d");
+                    const ctx = document.getElementById("ownerChart").getContext("2d");
                     const chart = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -88,8 +86,7 @@ var app = Vue.createApp({
                                 {
                                     data: values,
                                     backgroundColor: "rgba(0, 97, 242, 1)",
-                                    hoverBackgroundColor:
-                                        "rgba(0, 97, 242, 0.9)",
+                                    hoverBackgroundColor: "rgba(0, 97, 242, 0.9)",
                                     borderColor: "#4e73df",
                                     borderWidth: 1,
                                     maxBarThickness: 25,

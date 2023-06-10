@@ -2,43 +2,43 @@ import paginateComponent from './components/paginateComponent.js';
 import messageComponent from './components/messageComponent.js';
 
 window.addEventListener('DOMContentLoaded', event => {
+
     const OWNER_DATA = {
-        owner_uuid: '',
-        fullname: '',
-        addr_email: '',
-        percent: '',
-        card_number: '',
-        profession: '',
-        location: '',
-        parent_name: '',
-        parent_name: '',
-        phonenumber_one: '',
-        phonenumber_two: ''
+        uuid: '',
+        vn_owner_id: '',
+        vn_fullname: '',
+        vn_addr_email: '',
+        vn_cni_number: '',
+        vn_location: '',
+        vn_profession: '',
+        vn_parent_name: '',
+        vn_phonenumber_one: '',
+        vn_phonenumber_two: '',
+        vn_owner_percent: '',
     };
 
     const HOUSE_DATA = {
-        house_uuid: '',
-        house_type: '',
-        house_rent: '',
-        house_guaranty: '',
-        house_month: '',
-        house_location: '',
-        house_number_room: '',
-        house_address: '',
-        house_lease_start_date: new Date().toISOString().substring(0, 10),
+        uuid: '',
+        vn_house_type: '',
+        vn_house_rent: '',
+        vn_house_guaranty: '',
+        vn_house_month: '',
+        vn_house_number_room: '',
+        vn_house_address: '',
+        vn_house_lease_start_date: new Date().toISOString().substring(0, 10),
     };
 
     const TENANT_DATA = {
-        tenant_uuid: '',
-        fullname: '',
-        addr_email: '',
-        card_number: '',
-        profession: '',
-        location: '',
-        parent_name: '',
-        parent_name: '',
-        phonenumber_one: '',
-        phonenumber_two: ''
+        uuid: '',
+        vn_tenant_id: '',
+        vn_fullname: '',
+        vn_addr_email: '',
+        vn_cni_number: '',
+        vn_location: '',
+        vn_profession: '',
+        vn_parent_name: '',
+        vn_phonenumber_one: '',
+        vn_phonenumber_two: '',
     };
 
     var app = Vue.createApp({
@@ -76,20 +76,8 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         watch: {
-            'houseData.house_rent': function (f){
-                this.houseData.house_rent = this.filterNumber(f);
-            },
-            'houseData.house_number_room': function (f){
-                this.houseData.house_number_room = this.filterNumber(f);
-            },
-            'houseData.vn_house_month': function (f){
-                this.houseData.vn_house_month = this.filterNumber(f);
-            },
-            'houseData.house_month': function (f){
-                this.houseData.house_month = this.filterNumber(f);
-            },
-            'houseData.house_guaranty': function (f){
-                this.houseData.house_guaranty = this.filterNumber(f);
+            'houseData.vn_house_month': function () {
+                this.houseData.vn_house_guaranty = this.calculateGuaranty();
             },
 
             searchQuery: function() {
@@ -110,11 +98,11 @@ window.addEventListener('DOMContentLoaded', event => {
                 const searchRegex = new RegExp(this.searchQuery, 'i');
 
                     return this.tenants.filter(tenant => {
-                        const fullnameMatch = searchRegex.test(tenant.fullname);
-                        const addrEmailMatch = searchRegex.test(tenant.addr_email);
-                        const phonenumberOneMatch = searchRegex.test(tenant.phonenumber_one);
-                        const phonenumberTwoMatch = searchRegex.test(tenant.phonenumber_two);
-                        const cardNumberMatch = searchRegex.test(tenant.card_number);
+                        const fullnameMatch = searchRegex.test(tenant.vn_fullname);
+                        const addrEmailMatch = searchRegex.test(tenant.vn_addr_email);
+                        const phonenumberOneMatch = searchRegex.test(tenant.vn_phonenumber_one);
+                        const phonenumberTwoMatch = searchRegex.test(tenant.vn_phonenumber_two);
+                        const cardNumberMatch = searchRegex.test(tenant.vn_cni_number);
 
                     return (
                         fullnameMatch ||
@@ -136,19 +124,19 @@ window.addEventListener('DOMContentLoaded', event => {
                 this.currentStep--;
             },
 
-            filterNumber(e) {
-                return  ("" + e).replace(/[^0-9]/g, '');
-            },
-
             downloadTenantCSV() {
                 window.location.href = `/dashboard/export-tenants-data`;
             },
 
-            formatPhoneNumber(n) {
-                return ("" + n)
-                    .replace(/\D/g, "")
-                    .substring(0, 15)
-                    .replace(/(\d{2})(\d{4})(\d{4})/g, "$1-$2-$3");
+            calculateGuaranty() {
+                const hrent = parseFloat(this.houseData.vn_house_rent);
+                const hmonth = parseInt(this.houseData.vn_house_month);
+
+                if (!isNaN(hrent) && !isNaN(hmonth)) {
+                    return hrent * hmonth;
+                } else {
+                    return null;
+                }
             },
 
             async getTenants() {
@@ -243,17 +231,17 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onUpdateTenant() {
                 try {
-                    const updateURL = `/api/tenants/${this.tenantData.tenant_uuid}/update/`;
+                    const updateURL = `/api/tenants/${this.tenantData.uuid}/`;
                     const response = await fetch(updateURL, {
-                        method: "PUT",
+                        method: "PATCH",
                         headers: {'Content-type': 'application/json'},
-                        body: JSON.stringify(this.tenantData),
+                        body: JSON.stringify({update_tenant_data: this.tenantData}),
                     });
 
                     const data = await response.json();
 
                     if (data.success) {
-                        const index = this.tenants.findIndex(tenant => tenant.tenant_uuid === this.tenantData.tenant_uuid);
+                        const index = this.tenants.findIndex(tenant => tenant.uuid === this.tenantData.uuid);
                         this.tenants.splice(index, 1, this.tenantData);
                         this.tenantData = { ...TENANT_DATA };
                         this.getTenants();
@@ -272,7 +260,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     this.showMessageAlert = true;
                     this.messageAlert = "Une erreur est survenue lors de la mise à jour de ce locataire";
                 } finally {
-                    this.tenantData.tenant_uuid = null;
+                    this.tenantData.uuid = null;
                     const modal = bootstrap.Modal.getInstance(document.getElementById('updateTenantConfirm'));
                     modal.hide();
                 }
@@ -283,18 +271,17 @@ window.addEventListener('DOMContentLoaded', event => {
                     const registerURL = `/api/companies/tenant-register/`;
 
                     if (
-                        this.ownerData.percent === "" ||
-                        isNaN(this.ownerData.percent) ||
-                        this.ownerData.percent < 0 ||
-                        this.ownerData.percent > 100
+                        this.ownerData.vn_owner_percent === "" ||
+                        Number.isNaN(parseFloat(this.ownerData.vn_owner_percent)) ||
+                        this.ownerData.vn_owner_percent < 0 ||
+                        this.ownerData.vn_owner_percent > 100
                     ) {
                         this.showMessageAlert = true;
-                        this.messageAlert =
-                            "Valeur de pourcentage invalide. Le pourcentage doit être un nombre entre 0 et 100.";
+                        this.messageAlert = "La valeur du pourcentage est invalide. Le pourcentage doit être un nombre entre 0 et 100.";
                         return;
                     }
 
-                    this.ownerData.percent = parseFloat(this.ownerData.percent);
+                    this.ownerData.vn_owner_percent = parseFloat(this.ownerData.vn_owner_percent);
 
                     const response = await fetch(registerURL, {
                         method: "POST",
@@ -308,20 +295,21 @@ window.addEventListener('DOMContentLoaded', event => {
                         }),
                     });
 
-                    const data = await response.json();
-                    if (data.success) {
+                    const { success, message } = await response.json();
+
+                    if (success) {
                         await this.getTenants();
                         this.ownerData = { ...OWNER_DATA };
                         this.houseData = { ...HOUSE_DATA };
                         this.tenantData = { ...TENANT_DATA };
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                     }
                 } catch (error) {
                     console.log(error);
@@ -335,7 +323,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onDeleteTenant() {
                 try {
-                    const deleteURL = `/api/tenants/${this.deleteTenantUUID}/delete/`;
+                    const deleteURL = `/api/tenants/${this.deleteTenantUUID}/`;
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {
@@ -343,19 +331,19 @@ window.addEventListener('DOMContentLoaded', event => {
                         }
                     });
 
-                    const data = await response.json();
+                    const { success, message } = await response.json();
 
-                    if (data.success) {
-                        this.tenants = this.tenants.filter(tenant => tenant.tenant_uuid !== this.deleteTenantUUID);
+                    if (success) {
+                        this.tenants = this.tenants.filter(tenant => tenant.uuid !== this.deleteTenantUUID);
                         await this.getTenants();
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                     }
                 } catch (error) {
                     console.log(error);

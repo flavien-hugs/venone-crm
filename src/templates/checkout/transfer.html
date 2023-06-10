@@ -3,7 +3,6 @@
 {% block dashboard_content %}
     <section id="requestTransferTable">
 
-        <!-- Alert message -->
         <message-component
             :show-message-alert="showMessageAlert"
             :message-alert="messageAlert">
@@ -18,7 +17,7 @@
             </div>
         </div>
 
-        <div v-if="user.houses_count > 0" class="row g-2 border-bottom mb-5 mb-sm-2">
+        <div v-show="user.houses_count > 0" class="row g-2 border-bottom mb-5 mb-sm-2">
             <div class="col-xl-4 mb-4">
                 <div class="card border-start-lg border-start-primary h-100">
                     <div class="card-body">
@@ -27,7 +26,7 @@
                                 <div class="small fw-bold text-primary mb-2 text-uppercase">
                                     solde
                                 </div>
-                                <div class="h1 fw-700">{ user.total_payments_received } { user.devise }</div>
+                                <div class="h1 fw-700">{ user.total_payments_received } { user.vn_device }</div>
                             </div>
                             <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                         </div>
@@ -41,7 +40,7 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
                                 <div class="small fw-bold text-primary mb-2 text-uppercase">Total loyers à collecter</div>
-                                <div class="h1 fw-700">{ user.total_house_amount } { user.devise }</div>
+                                <div class="h1 fw-700">{ user.total_house_amount } { user.vn_device }</div>
                             </div>
                             <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                         </div>
@@ -55,7 +54,7 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
                                 <div class="small fw-bold text-primary mb-2 text-uppercase">gains sur loyers à collectés</div>
-                                <div class="h1 fw-700">{ user.total_house_percent } { user.devise }</div>
+                                <div class="h1 fw-700">{ user.total_house_percent } { user.vn_device }</div>
                             </div>
                             <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                         </div>
@@ -64,7 +63,7 @@
             </div>
         </div>
 
-        <div v-if="user.transfers_count == 0" class="card card-body shadow-none bg-transparent border-0">
+        <div v-show="user.transfers_count == 0" class="card card-body shadow-none bg-transparent border-0">
             <div class="text-center">
                 <img loading="lazy" class="img-account-profile mb-4" src="{{ url_for('static', filename="img/element/credit_card.svg")}}">
 
@@ -78,12 +77,12 @@
                 </button>
 
                 <p v-show="user.total_payments_received < 20000" class="text-success small">
-                    Il vous est actuellement impossible de demander un transfert car le solde de votre compte est inférieur à 20 000 { user.devise }.
+                    Il vous est actuellement impossible de demander un transfert car le solde de votre compte est inférieur à 20 000 { user.vn_device }.
                 </p>
             </div>
         </div>
 
-        <div v-else-if="user.transfers_count > 0" class="card card-header-actions mx-auto">
+        <div v-show="user.transfers_count > 0" class="card card-header-actions mx-auto">
             <div class="card-header">
                 <span class="fw-700">{{ page_title }}</span>
                 <div>
@@ -99,7 +98,7 @@
             </div>
 
             <div class="card-body">
-                <div class="input-group input-group-joined input-group-solid shadow-none">
+                {#<div class="input-group input-group-joined input-group-solid shadow-none">
                     <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
                     <input
                         type="text"
@@ -107,13 +106,13 @@
                         v-model="searchQuery"
                         class="form-control shadow-none ps-0"
                     >
-                </div>
+                </div>#}
 
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="small">
                             <tr>
-                                <th scope="col">ID Transfert</th>
+                                <th scope="col">ID</th>
                                 <th scope="col">Numero de retrait</th>
                                 <th scope="col">Montant</th>
                                 <th scope="col">Date de retrait</th>
@@ -121,12 +120,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-for="ts in transfers" v-bind:key="ts.transfer_uuid">
+                            <template v-for="ts in transfers" v-bind:key="ts.uuid">
                                 <tr>
-                                    <td><span class="badge bg-primary-soft text-primary">#{ ts.transfer_id }</span></td>
-                                    <td>{ ts.withdrawal_number }</td>
-                                    <td>{ ts.amount } { user.devise }</td>
-                                    <td>{ ts.created_at }</td>
+                                    <td><span class="badge bg-primary-soft text-primary">#{ ts.vn_transfer_id }</span></td>
+                                    <td>{ ts.vn_withdrawal_number }</td>
+                                    <td>{ ts.vn_trans_amount } { user.devise }</td>
+                                    <td>{ ts.vn_created_at }</td>
                                     <td>
                                         <span :class="{ 'bg-red-soft text-red': !ts.status, 'bg-blue-soft text-blue': ts.status }" class="badge text-uppercase fw-500 p-2 rounded-0">
                                             <i :class="{ 'fa-spinner': !ts.status, 'fa-check': ts.status }" class="fa me-1"></i>

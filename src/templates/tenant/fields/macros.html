@@ -1,0 +1,6 @@
+{% macro input_field(id, label='', model='', type='text', placeholder='', required='') -%}
+	<div class="col-4">
+		<label for="{{ id }}" class="form-label small">{{ label }}</label>
+		<input class="form-control" type="{{ type }}" v-model="{{ model }}" placeholder="{{ placeholder }}" required="{{ required }}">
+	</div>
+{%- endmacro %}

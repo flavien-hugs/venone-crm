@@ -74,7 +74,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
             async getTransfers() {
                 try {
                     this.isLoading = true;
-                    const transferRequestURL = `/api/transfers-request/?page=${this.currentPage}`;
+                    const transferRequestURL = `/api/transfers/?page=${this.currentPage}`;
 
                     const response = await fetch(transferRequestURL, {
                         method: "GET",
@@ -110,7 +110,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
             async onCreateTransferRequest() {
                 try {
-                    const createRequestURL = `/api/transfers-request/create/`;
+                    const createRequestURL = `/api/transfers/`;
 
                     this.transferData.trans_amount = parseFloat(
                         this.transferData.trans_amount

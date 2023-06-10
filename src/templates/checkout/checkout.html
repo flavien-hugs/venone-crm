@@ -41,46 +41,51 @@
             </div>
 
             <div class="card-body">
-                <div class="input-group input-group-joined input-group-solid shadow-none">
+                {#<div class="input-group input-group-joined input-group-solid shadow-none">
                     <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
                     <input
                         type="text"
-                        placeholder="Rechercher un locataire ..."
+                        placeholder="Rechercher un paiement ..."
                         v-model="searchQuery"
                         class="form-control shadow-none ps-0"
                     >
-                </div>
+                </div>#}
 
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="small">
                             <tr>
+                                <th scope="col">ID</th>
                                 <th scope="col">ID Transaction</th>
-                                <th scope="col">ID Opérateur</th>
                                 <th scope="col">Nom &amp; prénom</th>
-                                <th scope="col">Montant</th>
+                                <th scope="col">ID Opérateur</th>
+                                <th scope="col">Montant ({ user.vn_device })</th>
                                 <th scope="col">Méthode de paiement</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Date de paiement</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            <template v-for="p in payments" v-bind:key="p.payment_uuid">
-                                <tr v-if="p.payment_status">
-                                    <td><span class="badge bg-red-soft text-red">{ p.trans_id }</span></td>
-                                    <td><span class="badge bg-blue-soft text-blue">{ p.trans_info.data.operator_id }</span></td>
-                                    <td>{ p.house.tenant_id }</td>
+                            <template v-for="p in payments" v-bind:key="p.uuid">
+                                <tr>
+                                    <td><span class="badge bg-secondary text-white">#{ p.vn_payment_id }</span></td>
+                                    <td><span class="badge bg-red text-white">{ p.vn_transaction_id }</span></td>
+                                    <td>{ p.house.tenant }</td>
                                     <td>
-                                        { p.trans_info.data.amount } { p.trans_info.data.currency }
+                                        <span class="badge bg-blue text-white">{ p.vn_cinetpay_data.data.operator_id }</span>
                                     </td>
-                                    <td>{ p.trans_info.data.payment_method }</td>
-                                    <td>{ p.trans_info.data.payment_date }</td>
+                                    <td>{ p.vn_cinetpay_data.data.amount }{ p.vn_cinetpay_data.data.currency }</td>
+                                    <td>{ p.vn_cinetpay_data.data.payment_method }</td>
+                                    <td><span :class="{'bg-red': p.vn_pay_status, 'bg-green': !p.vn_pay_status}" class="badge text-white text-uppercase">{ p.payment_status }</span></td>
+                                    <td>{ p.vn_cinetpay_data.data.payment_date }</td>
                                     <td>
-                                        <button v-if="p.payment_status" title="Télécharger la facture du paiement" type="button" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+                                        <button v-show="!p.payment_status" title="Afficher la facture du paiement" type="button" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
                                             <i class="text-secondary fa fa-eye"></i>
                                         </button>
 
-                                        <button v-if="p.payment_status" title="Télécharger la facture du paiement" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
+                                        <button v-show="!p.payment_status" title="Télécharger la facture du paiement" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
                                             <i class="text-green fa fa-download"></i>
                                         </button>
                                     </td>

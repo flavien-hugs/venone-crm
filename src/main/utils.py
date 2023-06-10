@@ -73,4 +73,7 @@ def send_sms_reminder(house, tenant):
         &type=sms&from={SMS_SENDER_ID}&to={phone_number}&text={message}"
 
         requests.request("POST", reqUrl)
-        lg.info(f"SMS reminder sent to {phone_number} for house {house.vn_house_id}")
+        if reqUrl is not None and not reqUrl.startswith(("http://", "https://")):
+            lg.info(
+                f"SMS reminder sent to {phone_number} for house {house.vn_house_id}"
+            )

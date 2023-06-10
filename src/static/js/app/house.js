@@ -2,28 +2,29 @@ import paginateComponent from './components/paginateComponent.js';
 import messageComponent from './components/messageComponent.js';
 
 window.addEventListener('DOMContentLoaded', event => {
-
     const HOUSE_DATA = {
-        house_uuid: '',
-        house_type: '',
-        house_rent: '',
-        house_guaranty: '',
-        house_month: '',
-        house_address: '',
-        house_number_room: '',
-        lease_start_date: new Date().toISOString().substring(0, 10),
-    }
+        uuid: '',
+        vn_house_id: '',
+        vn_house_type: '',
+        vn_house_rent: '',
+        vn_house_guaranty: '',
+        vn_house_month: '',
+        vn_house_number_room: '',
+        vn_house_address: '',
+        vn_house_lease_start_date: new Date().toISOString().substring(0, 10),
+    };
 
     const TENANT_DATA = {
-        tenant_uuid: '',
-        fullname: '',
-        addr_email: '',
-        card_number: '',
-        profession: '',
-        parent_name: '',
-        location: '',
-        phonenumber_one: '',
-        phonenumber_two: '',
+        uuid: '',
+        vn_tenant_id: '',
+        vn_fullname: '',
+        vn_addr_email: '',
+        vn_cni_number: '',
+        vn_location: '',
+        vn_profession: '',
+        vn_parent_name: '',
+        vn_phonenumber_one: '',
+        vn_phonenumber_two: '',
     };
 
     var app = Vue.createApp({
@@ -46,7 +47,6 @@ window.addEventListener('DOMContentLoaded', event => {
                 isLoading: false,
                 messageAlert: "",
                 showMessageAlert: false,
-                deleteHouseUUID: null,
                 houseData: { ...HOUSE_DATA },
                 tenantData: { ...TENANT_DATA },
             };
@@ -58,20 +58,8 @@ window.addEventListener('DOMContentLoaded', event => {
         },
 
         watch: {
-            'houseData.house_rent': function (f){
-                this.houseData.house_rent = this.filterNumber(f);
-            },
-            'houseData.house_number_room': function (f){
-                this.houseData.house_number_room = this.filterNumber(f);
-            },
-            'houseData.vn_house_month': function (f){
-                this.houseData.vn_house_month = this.filterNumber(f);
-            },
-            'houseData.house_month': function (f){
-                this.houseData.house_month = this.filterNumber(f);
-            },
-            'houseData.house_guaranty': function (f){
-                this.houseData.house_guaranty = this.filterNumber(f);
+            'houseData.vn_house_month': function () {
+                this.houseData.vn_house_guaranty = this.calculateGuaranty();
             },
         },
 
@@ -85,10 +73,6 @@ window.addEventListener('DOMContentLoaded', event => {
                 window.location.href = `/dashboard/export-houses-data`;
             },
 
-            filterNumber(e) {
-                return  ("" + e).replace(/[^0-9]/g, '');
-            },
-
             nextStep() {
                 this.currentStep++;
             },
@@ -98,12 +82,13 @@ window.addEventListener('DOMContentLoaded', event => {
             },
 
             calculateGuaranty() {
-                const hrent = parseInt(this.houseData.house_rent);
-                const hmonth = parseInt(this.houseData.house_month);
-                if (!isNaN(hrent) && !isNaN(hmonth))
-                    return (this.houseData.house_guaranty = hrent * hmonth);
-                else {
-                    return;
+                const hrent = parseFloat(this.houseData.vn_house_rent);
+                const hmonth = parseInt(this.houseData.vn_house_month);
+
+                if (!isNaN(hrent) && !isNaN(hmonth)) {
+                    return hrent * hmonth;
+                } else {
+                    return null;
                 }
             },
 
@@ -148,10 +133,10 @@ window.addEventListener('DOMContentLoaded', event => {
                 modal.show();
             },
 
-            assignHouseToTenantConfirm(houseUuid) {
-                this.houseUUID = houseUuid;
-                this.houseData = { ...houseUuid };
-                this.tenantData = { ...houseUuid };
+            assignHouseToTenantConfirm(houseUUID) {
+                this.houseUUID = houseUUID;
+                this.houseData = { ...houseUUID };
+                this.tenantData = { ...houseUUID };
                 const modal = new bootstrap.Modal(
                     document.getElementById("assignHouseToTenantModal")
                 );
@@ -159,7 +144,7 @@ window.addEventListener('DOMContentLoaded', event => {
             },
 
             deleteHouseConfirm(houseUUID) {
-                this.deleteHouseUUID = houseUUID;
+                this.houseUUID = houseUUID;
                 const modal = new bootstrap.Modal(
                     document.getElementById("deleteHouseModal")
                 );
@@ -168,14 +153,14 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onCreateHouse() {
                 try {
-                    const houseRegisterURL = `/api/house-register/`;
+                    const houseRegisterURL = `/api/houses/`;
                     const response = await fetch(houseRegisterURL, {
                         method: "POST",
                         headers: {
                             'Content-type': 'application/json'
                         },
                         body: JSON.stringify({
-                            house_data: this.houseData,
+                            create_house_data: this.houseData,
                         }),
                     });
 
@@ -198,7 +183,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     this.showMessageAlert = true;
                     this.messageAlert = "Une erreur est survenue lors de l'enregistrement.";
                 } finally {
-                    this.houseData.house_uuid = null;
+                    this.houseData.uuid = null;
                     const modal = bootstrap.Modal.getInstance(document.getElementById('createHouseModal'));
                     modal.hide();
                 }
@@ -206,31 +191,32 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onUpdateHouse() {
                 try {
-                    const updateURL = `/api/houses/${this.houseData.house_uuid}/update/`;
-                    console.log(updateURL)
+                    const updateURL = `/api/houses/${this.houseData.uuid}/`;
                     const response = await fetch(updateURL, {
-                        method: "PUT",
+                        method: "PATCH",
                         headers: { "Content-type": "application/json" },
                         body: JSON.stringify(this.houseData),
                     });
 
-                    if (response.status == 200) {
-                        const data = await response.json();
+                    const { success, message } = await response.json();
 
-                        const index = this.houses.findIndex(
-                            (house) => house.house_uuid === this.houseData.house_uuid
+                    if (success) {
+                        const houseUUID = this.houseData.uuid;
+                        const houseIndex = this.houses.findIndex(
+                            (house) => house.uuid === houseUUID
                         );
-                        this.houses.splice(index, 1, this.houseData);
+                        this.houses.splice(houseIndex, 1, this.houseData);
                         this.houseData = { ...HOUSE_DATA };
                         await this.getHouses();
 
                         this.showMessageAlert = true;
-                        this.messageAlert = 'Location mise à jour avec succès !';
+                        this.messageAlert = message;
                         setTimeout(() => {
                             this.showMessageAlert = false;
+                            this.messageAlert = message;
                         }, 3000);
                     } else {
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                     }
                 } catch (error) {
                     console.error("FETCH ERROR:", error);
@@ -238,7 +224,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     this.messageAlert =
                         "Une erreur est survenue lors de la mise à jour de cette propriété";
                 } finally {
-                    this.houseData.house_uuid = null;
+                    this.houseData.uuid = null;
                     const modal = bootstrap.Modal.getInstance(
                         document.getElementById("updateHouseConfirm")
                     );
@@ -248,7 +234,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onDeleteHouse() {
                 try {
-                    const deleteURL = `/api/houses/${this.deleteHouseUUID}/delete/`;
+                    const deleteURL = `/api/houses/${this.houseUUID}/`;
                     const response = await fetch(deleteURL, {
                         method: "DELETE",
                         headers: {
@@ -260,7 +246,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
                     if (data.success) {
                         this.houses = this.houses.filter(
-                            (house) => house.house_uuid !== this.deleteHouseUUID
+                            (house) => house.uuid !== this.houseUUID
                         );
                         await this.getHouses();
 
@@ -279,7 +265,7 @@ window.addEventListener('DOMContentLoaded', event => {
                     this.messageAlert =
                         "Une erreur est survenue lors de la suppression de cette propriété";
                 } finally {
-                    this.deleteHouseUUID = null;
+                    this.houseUUID = null;
                     const modal = bootstrap.Modal.getInstance(
                         document.getElementById("deleteHouseModal")
                     );
@@ -289,7 +275,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
             async onAssignHouseToTenant() {
                 try {
-                    const assignURL = `/api/houses/${this.houseData.house_uuid}/house-assign-tenant/`;
+                    const assignURL = `/api/houses/${this.houseData.uuid}/house-assign-tenant/`;
                     const response = await fetch(assignURL, {
                         method: "PATCH",
                         headers: {
