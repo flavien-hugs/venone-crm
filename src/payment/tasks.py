@@ -43,13 +43,13 @@ def check_transaction_trx():
                 else:
                     logger.warning(
                         "Invalid response data for transaction ID %s: %s",
-                        payment.id,
+                        payment.vn_transaction_id,
                         response_data,
                     )
             else:
                 logger.warning(
                     "Invalid response data type for transaction ID %s: %s",
-                    payment.id,
+                    payment.vn_transaction_id,
                     type(response_data),
                 )
     except Exception as e:
