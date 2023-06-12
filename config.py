@@ -34,7 +34,6 @@ def get_db() -> Generator:
 
 
 class Config:
-
     DEBUG = False
     TESTING = False
     DEVELOPMENT = False
@@ -121,7 +120,6 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-
     DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
 
