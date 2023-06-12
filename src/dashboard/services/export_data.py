@@ -17,7 +17,7 @@ def generate_tenant_csv(data, headers):
                 row.vn_addr_email,
                 row.vn_cni_number,
                 row.vn_profession,
-                row.house_tenant.vn_house_rent,
+                row.house.vn_house_rent,
                 row.vn_created_at,
             ]
         )
@@ -58,7 +58,7 @@ def generate_house_csv(data, headers):
         writer.writerow(
             [
                 row.vn_house_id,
-                row.owner_houses,
+                row.owner.vn_fullname,
                 row.vn_house_type,
                 row.vn_house_rent,
                 row.vn_house_guaranty,

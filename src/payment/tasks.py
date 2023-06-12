@@ -26,11 +26,10 @@ def check_transaction_trx():
             response_data = client.TransactionVerfication_trx(payment.vn_transaction_id)
             logger.info("response data: %s", response_data)
 
-            if response_data:
+            if isinstance(response_data, dict):
                 try:
-                    response_json = json.loads(response_data)
-                    code = response_json.get("code")
-                    status = response_json.get("data", {}).get("status")
+                    code = response_data.get("code")
+                    status = response_data.get("data", {}).get("status")
 
                     if code == "00" and status == "ACCEPTED":
                         payment.vn_pay_status = True
