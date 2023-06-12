@@ -11,7 +11,6 @@ from wtforms.validators import ValidationError
 
 
 class AgencieSignupForm(FormMixin, FlaskForm):
-
     gender = SelectField("Genre", choices=GENDER, coerce=str)
     fullname = StringField(
         "Nom du gestionnaire",

@@ -32,7 +32,6 @@ def agency_setting():
     form = CompanySettingForm()
 
     if request.method == "POST" and form.validate_on_submit():
-
         current_user.vn_gender = form.gender.data
         current_user.vn_fullname = form.fullname.data
         current_user.vn_phonenumber_two = form.phonenumber_two.data
@@ -90,7 +89,7 @@ def agency_billing():
 
 @agency_bp.get("/houses/")
 @login_required
-@cache.cached(timeout=500)
+# @cache.cached(timeout=500)
 def agency_house_list():
     page_title = "Propriétés"
 
@@ -104,7 +103,7 @@ def agency_house_list():
 @agency_bp.get("/lessors/")
 @login_required
 @agency_required
-@cache.cached(timeout=500)
+# @cache.cached(timeout=500)
 def agency_owner_list():
     page_title = "Vos bailleurs"
 
@@ -118,7 +117,7 @@ def agency_owner_list():
 @agency_bp.get("/check-houses/")
 @login_required
 @agency_required
-@cache.cached(timeout=500)
+# @cache.cached(timeout=500)
 def check_houses():
     page_title = "Trouver des propriétés dans votre zone"
 
@@ -148,7 +147,6 @@ def delete_account():
 @agency_bp.get("/export-tenants-data/")
 @login_required
 def export_tenants_csv():
-
     headers = [
         "ID",
         "Nom & Prénoms",
@@ -178,7 +176,6 @@ def export_tenants_csv():
 @agency_bp.get("/export-owners-data/")
 @login_required
 def export_owners_csv():
-
     headers = [
         "ID",
         "Nom & Prénoms",
@@ -208,7 +205,6 @@ def export_owners_csv():
 @agency_bp.get("/export-houses-data/")
 @login_required
 def export_houses_csv():
-
     headers = [
         "ID",
         "Propriétaire",
@@ -240,7 +236,6 @@ def export_houses_csv():
 @agency_bp.get("/export-payments-data/")
 @login_required
 def export_payments_csv():
-
     headers = [
         "ID Transaction",
         "ID Opérateur",

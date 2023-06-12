@@ -9,7 +9,6 @@ from wtforms.validators import InputRequired
 
 
 class OwnerHouseSignupForm(FormMixin, FlaskForm):
-
     gender = SelectField("Genre", choices=GENDER, coerce=str)
     fullname = StringField(
         "Nom et prénom",

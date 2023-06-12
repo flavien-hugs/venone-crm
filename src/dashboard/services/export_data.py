@@ -3,7 +3,6 @@ import io
 
 
 def generate_tenant_csv(data, headers):
-
     output = io.StringIO()
     writer = csv.writer(output)
 
@@ -27,7 +26,6 @@ def generate_tenant_csv(data, headers):
 
 
 def generate_owner_csv(data, headers):
-
     output = io.StringIO()
     writer = csv.writer(output)
 
@@ -51,7 +49,6 @@ def generate_owner_csv(data, headers):
 
 
 def generate_house_csv(data, headers):
-
     output = io.StringIO()
     writer = csv.writer(output)
 
@@ -77,7 +74,6 @@ def generate_house_csv(data, headers):
 
 
 def generate_payments_csv(data, headers):
-
     output = io.StringIO()
     writer = csv.writer(output)
 

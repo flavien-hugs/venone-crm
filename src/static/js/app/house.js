@@ -40,7 +40,6 @@ window.addEventListener('DOMContentLoaded', event => {
                 houses: [],
                 houseUUID: null,
 
-                perPage: 10,
                 currentPage: 1,
                 currentStep: 1,
                 totalPages: 1,
@@ -109,7 +108,7 @@ window.addEventListener('DOMContentLoaded', event => {
                         const data = await response.json();
                         this.houses = data.houses;
                         this.user = data.user;
-                        this.totalPages = Math.ceil(data.total / this.perPage);
+                        this.totalPages = Math.ceil(data.total / data.per_page);
                         this.currentPage = data.page;
                     } else {
                         this.isLoading = false;

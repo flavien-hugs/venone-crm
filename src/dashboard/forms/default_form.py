@@ -9,7 +9,6 @@ from wtforms.validators import Optional
 
 
 class DefaultForm:
-
     gender = SelectField(
         label="Genre",
         choices=GENDER,

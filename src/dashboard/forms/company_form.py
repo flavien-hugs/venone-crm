@@ -8,7 +8,6 @@ from wtforms.validators import ValidationError
 
 
 class CompanySettingForm(DefaultForm, FlaskForm):
-
     fullname = StringField(
         label="Nom du gestionnaire",
         render_kw={"required": True},

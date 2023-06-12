@@ -53,7 +53,6 @@ window.addEventListener('DOMContentLoaded', event => {
 
                 owners: [],
                 owner: [],
-                perPage: 20,
                 currentStep: 1,
                 currentPage: 1,
                 totalPages: 1,
@@ -124,8 +123,8 @@ window.addEventListener('DOMContentLoaded', event => {
                     if (response.ok) {
                         const data = await response.json();
                         this.user = data.user;
-                        this.owners = data.houseowners;
-                        this.totalPages = Math.ceil(data.total / this.perPage);
+                        this.owners = data.owners;
+                        this.totalPages = Math.ceil(data.total / data.per_page);
                         this.isLoading = false;
                     } else {
                         throw new Error("NETWORK RESPONSE ERROR");

@@ -10,7 +10,6 @@ def id_generator():
 
 
 class CRUDMixin(object):
-
     __table_args__ = {"extend_existing": True}
 
     id = db.Column(
@@ -56,7 +55,6 @@ class CRUDMixin(object):
 
 
 class TimestampMixin(CRUDMixin, db.Model):
-
     __abstract__ = True
 
     uuid = db.Column(db.String(40), index=True, default=lambda: str(uuid.uuid4()))
@@ -69,7 +67,6 @@ class TimestampMixin(CRUDMixin, db.Model):
 
 
 class DefaultUserInfoModel(db.Model):
-
     __abstract__ = True
 
     vn_gender = db.Column(db.String(10), nullable=True)

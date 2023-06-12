@@ -157,7 +157,7 @@ window.addEventListener('DOMContentLoaded', event => {
                         const data = await response.json();
                         this.tenants = data.tenants;
                         this.user = data.user;
-                        this.totalPages = Math.ceil(data.total / this.perPage);
+                        this.totalPages = Math.ceil(data.total / data.per_page);
                         this.currentPage = data.page;
                     } else {
                         this.isLoading = false;

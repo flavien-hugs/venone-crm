@@ -7,8 +7,8 @@ from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-from src.exts import db
 from src.exts import cache
+from src.exts import db
 from src.schemas import owners
 from src.schemas import users
 from src.tenant import VNHouse
@@ -29,34 +29,34 @@ def abort_if_owner_doesnt_exist(uuid: str):
 @api.get("/owners/")
 @login_required
 @jsonify_response
-@cache.cached(timeout=500)
-def get_all_houseowners():
+def get_all_owners():
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = current_user.houseowners.paginate(
-        page=page, per_page=per_page, error_out=False
+    query = VNHouseOwner.get_owners_list()
+    owners_items = db.paginate(
+        query, page=page, per_page=per_page, max_per_page=20, error_out=True, count=True
     )
+    owner_ids = owners_items.items
 
-    owners_items = pagination.items
     prev = (
-        url_for("api.get_all_houseowners", page=page - 1, _external=True)
-        if pagination.has_prev
+        url_for("api.get_all_owners", page=page - 1, _external=True)
+        if owners_items.has_prev
         else None
     )
     next = (
-        url_for("api.get_all_houseowners", page=page + 1, _external=True)
-        if pagination.has_next
+        url_for("api.get_all_owners", page=page + 1, _external=True)
+        if owners_items.has_next
         else None
     )
     return {
-        "houseowners": owners.owners_schema.dump(owners_items),
+        "owners": owners.owners_schema.dump(owner_ids),
         "user": users.user_schema.dump(current_user),
         "prev": prev,
         "next": next,
         "page": page,
         "per_page": per_page,
-        "total": pagination.total,
+        "total": owners_items.total,
     }
 
 

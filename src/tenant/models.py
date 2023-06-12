@@ -16,7 +16,6 @@ locale.setlocale(locale.LC_ALL, loc)
 
 
 class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
-
     __tablename__ = "houseowner"
 
     vn_owner_id = db.Column(
@@ -34,6 +33,14 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
     def get_owner_id(self):
         return f"#{self.vn_owner_id}"
+
+    @classmethod
+    def get_owners_list(cls):
+        return (
+            db.select(cls)
+            .where(cls.vn_user_id == current_user.id)
+            .order_by(cls.vn_created_at.desc())
+        )
 
     def get_owner_houses(self):
         houses = VNHouse.query.filter(
@@ -76,7 +83,6 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
 
 class VNHouse(TimestampMixin):
-
     __tablename__ = "house"
 
     vn_house_id = db.Column(
@@ -108,7 +114,7 @@ class VNHouse(TimestampMixin):
     def __str__(self) -> str:
         return f"{self.vn_house_id} - {self.vn_house_type} - {self.vn_house_rent}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"VNHouse({self.id}, {self.vn_house_type})"
 
     def get_remaining_days(self):
@@ -134,8 +140,10 @@ class VNHouse(TimestampMixin):
 
     @classmethod
     def get_houses_list(cls) -> list:
-        return cls.query.filter_by(vn_user_id=cls.vn_user_id).order_by(
-            cls.vn_created_at.desc()
+        return (
+            db.select(cls)
+            .where(cls.vn_user_id == current_user.id)
+            .order_by(cls.vn_created_at.desc())
         )
 
     @classmethod
@@ -203,7 +211,6 @@ class VNHouse(TimestampMixin):
             db.session.commit()
 
     def is_rent_paid(self, tenant_id: int) -> bool:
-
         """
         Check if rent for the current month has been paid for a specific tenant
         """
@@ -230,7 +237,6 @@ class VNHouse(TimestampMixin):
 
 
 class VNTenant(DefaultUserInfoModel, TimestampMixin):
-
     __tablename__ = "tenant"
 
     vn_tenant_id = db.Column(
@@ -261,7 +267,7 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     def __str__(self):
         return f"{self.id} {self.vn_fullname}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"VNTenant({self.id}, {self.vn_tenant_id})"
 
     def get_tenant_id(self) -> str:
