@@ -23,7 +23,7 @@ csrf.exempt(owner_bp)
 
 @owner_bp.route("/index/", methods=["GET"])
 @login_required
-@cache.cached(timeout=500)
+# @cache.cached(timeout=500)
 def dashboard():
     page_title = "Tableau de board"
     return render_template(

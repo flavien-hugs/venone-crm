@@ -52,3 +52,8 @@ def get_country_code():
     except (httpx.RequestError, ValueError) as error:
         logger.debug(f"Unable to obtain the country code: {error})")
         return None
+
+
+def formatted_number(obj):
+    number = "{:,.0f}".format(obj)
+    return number.replace(",", " ")

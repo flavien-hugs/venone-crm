@@ -1,18 +1,13 @@
-import locale
-
 from marshmallow import fields
 from src.auth.models import VNUser
 from src.exts import ma
+from src.utils import formatted_number
 
 from .houses import houses_schema
 from .houses import payments_schema
 from .houses import tenants_schema
 from .houses import transfers_schema
 from .owners import owners_schema
-
-
-loc = locale.getlocale()
-locale.setlocale(locale.LC_ALL, loc)
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
@@ -63,29 +58,19 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         return obj.get_company_percent()
 
     def total_houses_percent(self, obj):
-        return locale.format_string(
-            "%.0f", obj.total_houses_percent(), grouping=True, monetary=True
-        )
+        return formatted_number(obj.total_houses_percent())
 
     def total_houses_amount(self, obj):
-        return locale.format_string(
-            "%.0f", obj.total_houses_amount(), grouping=True, monetary=True
-        )
+        return formatted_number(obj.total_houses_amount())
 
     def get_total_payments_received(self, obj):
-        return locale.format_string(
-            "%.0f", obj.get_total_payments_received(), grouping=True, monetary=True
-        )
+        return obj.get_total_payments_received()
 
     def get_amount_received(self, obj):
-        return locale.format_string(
-            "%.0f", obj.get_amount_received(), grouping=True, monetary=True
-        )
+        return formatted_number(obj.get_amount_received())
 
     def total_payments_month(self, obj):
-        return locale.format_string(
-            "%.0f", obj.total_payments_month(), grouping=True, monetary=True
-        )
+        return formatted_number(obj.total_payments_month())
 
     def get_payments_count(self, obj):
         return obj.get_payments_count()
