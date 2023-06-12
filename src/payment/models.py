@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class VNPayment(TimestampMixin):
-
     __tablename__ = "payment"
 
     vn_payment_id = db.Column(
@@ -48,16 +47,20 @@ class VNPayment(TimestampMixin):
     def __str__(self):
         return self.vn_transaction_id
 
-    def __repr__(self):
-        return f"Payment({self.vn_transaction_id}, {self.vn_payment_id}, {self.vn_pay_date})"
+    def __repr__(self) -> str:
+        return f"Payment(id={self.id!r}, fullname={self.vn_transaction_id!r}, {self.vn_pay_date})"
 
     @classmethod
     def paids(cls):
         return cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=True)
 
     @classmethod
+    def payments(cls):
+        return db.select(cls).order_by(cls.vn_created_at.desc())
+
+    @classmethod
     def unpaids(cls):
-        return cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=False)
+        return cls.query.filter_by(vn_pay_status=False)
 
     @classmethod
     def find_by_transaction_id(cls, transaction_id):
@@ -79,7 +82,6 @@ class VNPayment(TimestampMixin):
 
 
 class VNTransferRequest(TimestampMixin):
-
     __tablename__ = "transfer_request"
 
     vn_transfer_id = db.Column(
