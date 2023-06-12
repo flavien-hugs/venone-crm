@@ -8,8 +8,8 @@ from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src.auth.models import VNUser
-from src.exts import db
 from src.exts import cache
+from src.exts import db
 from src.mixins.decorators import admin_required
 from src.mixins.decorators import agency_required
 from src.mixins.decorators import owner_required
@@ -44,7 +44,6 @@ def get_user():
 @jsonify_response
 @cache.cached(timeout=500)
 def get_all_users():
-
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
@@ -81,7 +80,6 @@ def get_all_users():
 @jsonify_response
 @cache.cached(timeout=500)
 def get_all_companies():
-
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
@@ -117,7 +115,6 @@ def get_all_companies():
 @jsonify_response
 @cache.cached(timeout=500)
 def get_all_lessors():
-
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
 
@@ -152,7 +149,6 @@ def get_all_lessors():
 @owner_required
 @jsonify_response
 def owner_register_tenant():
-
     if not current_user:
         return {
             "message": "Oups ! L'élément n'a pas été trouvé !",
@@ -226,7 +222,6 @@ def owner_register_tenant():
 @agency_required
 @jsonify_response
 def company_register_tenant():
-
     user = abort_if_user_doesnt_exist(current_user.uuid)
 
     owner_data = request.json.get("owner_data")
@@ -321,7 +316,6 @@ def company_register_tenant():
 @api.post("/login/")
 @jsonify_response
 def login():
-
     data = request.get_json()
     email_or_phone = data.get("email_or_phone", None)
     passowrd = data.get("vn_password", None)

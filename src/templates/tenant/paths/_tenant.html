@@ -15,7 +15,7 @@
 		<td scope="row">{ tn.vn_fullname } ({ tn.vn_phonenumber_one })</td>
 		<td scope="row">
 			<span class="badge bg-blue text-white ms-2">#{ tn.house.vn_house_id }</span>
-			<span> &ndash; { tn.house.vn_house_type } ({ tn.house.vn_house_rent.toLocaleString() } { user.vn_device })</span>
+			<span> &ndash; ({ tn.house.vn_house_rent.toLocaleString() } { user.vn_device })</span>
 		</td>
 		<td scope="row">{ tn.house.vn_house_lease_end_date } <span> <br> (dans { tn.house.remaining_days } jours)</span></td>
 		<td scope="row">{ tn.vn_created_at }</td>

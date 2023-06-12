@@ -21,31 +21,27 @@ def check_transaction_trx():
         payments = VNPayment.unpaids()
 
         for payment in payments:
+            logger.info("payment transaction ID: %s", payment.vn_transaction_id)
             response_data = client.TransactionVerfication_trx(payment.vn_transaction_id)
             logger.info("response data: %s", response_data)
 
             if isinstance(response_data, dict):
-                if (
-                    response_data["code"] == "00"
-                    and response_data["data"]["status"] == "ACCEPTED"
-                ):
+                code = response_data.get("code")
+                status = response_data.get("data", {}).get("status")
+
+                if code == "00" and status == "ACCEPTED":
                     payment.vn_pay_status = True
-                    payment.vn_cinetpay_data = response_data
-                    db.session.commit()
-                elif (
-                    response_data["code"] == "662"
-                    and response_data["message"] == "WAITING_CUSTOMER_PAYMENT"
-                    and response_data["data"]["status"] == "PENDING"
-                ):
+                elif code == "662" and status == "PENDING":
                     payment.vn_pay_status = False
-                    payment.vn_cinetpay_data = response_data
-                    db.session.commit()
                 else:
                     logger.warning(
                         "Invalid response data for transaction ID %s: %s",
                         payment.vn_transaction_id,
                         response_data,
                     )
+
+                payment.vn_cinetpay_data = response_data
+                db.session.commit()
             else:
                 logger.warning(
                     "Invalid response data type for transaction ID %s: %s",
@@ -53,4 +49,4 @@ def check_transaction_trx():
                     type(response_data),
                 )
     except Exception as e:
-        logger.warning("Error processing transaction: %s", e)
+        logger.exception("Error processing transaction: %s", e)

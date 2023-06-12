@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def payment_reminders(vn_house_id):
-
     current_date = datetime.utcnow().date()
 
     house = VNHouse.query.get(vn_house_id)
@@ -36,7 +35,7 @@ def payment_reminders(vn_house_id):
         send_sms_reminder(house, tenant)
         if house.vn_house_lease_end_date <= current_date:
             house.update_lease_end_date()
-            
+
         db.session.commit()
 
 

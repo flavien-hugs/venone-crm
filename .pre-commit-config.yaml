@@ -8,13 +8,16 @@ repos:
     - id: fix-byte-order-marker
     - id: check-yaml
     - id: end-of-file-fixer
+    - id: check-ast
+    - id: check-json
+    - id: check-merge-conflict
+    - id: check-symlinks
+    - id: debug-statements
+    - id: mixed-line-ending
+    - id: requirements-txt-fixer
+    - id: check-added-large-files
+    - id: detect-private-key
     - id: trailing-whitespace
-      name: Trim trailing whitespace
-      description: This hook trims trailing whitespace
-      entry: trailing-whitespace-fixer
-      language: python
-      types:
-        - "text"
 
 # isort
 - repo: https://github.com/asottile/seed-isort-config
@@ -24,7 +27,7 @@ repos:
 
 # black
 - repo: https://github.com/ambv/black
-  rev: 22.10.0
+  rev: 23.3.0
   hooks:
     - id: black
       args:
@@ -44,14 +47,14 @@ repos:
 
 # flake8
 - repo: https://github.com/PyCQA/flake8
-  rev: 3.8.3
+  rev: 6.0.0
   hooks:
     - id: flake8
       additional_dependencies:
         - flake8-bugbear
         - flake8-implicit-str-concat
       args:
-        - "--max-line-length=88"
+        - "--max-line-length=170"
         - "--max-complexity=18"
         - "--select=B,C,E,F,W,T4,B9"
         - "--ignore=E203,E266,E501,W503"

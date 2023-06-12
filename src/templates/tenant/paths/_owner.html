@@ -1,4 +1,4 @@
-<template v-for="own in user.houseowners" :key="own.uuid">
+<template v-for="own in owners" :key="own.uuid">
 	<tr v-show='own.uuid'>
 		<td scope="row">
 			<span class="badge bg-red text-white">#{ own.vn_owner_id }</span>

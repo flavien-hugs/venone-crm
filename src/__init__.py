@@ -14,7 +14,6 @@ from celery import Task
 
 
 def create_venone_app(config_name):
-
     venone_app = Flask(__name__)
     venone_app.config.from_object(config[config_name])
     config[config_name].init_app(venone_app)
@@ -53,7 +52,6 @@ def create_venone_app(config_name):
     )
 
     with venone_app.app_context():
-
         from src.auth import auth_bp
         from src.dashboard.routes import owner_bp, agency_bp, admin_bp, checkout_bp
         from src.api import api

@@ -10,7 +10,6 @@ from src.tenant import VNHouse
 
 
 def run_process_payment(house):
-
     app = current_app._get_current_object()
     SITEID = app.config["CINETPAY_SITE_ID"]
     APIKEY = app.config["CINETPAY_API_KEY"]
@@ -40,7 +39,9 @@ def run_process_payment(house):
             VNHouse.process_payment_data(house, transaction_id)
             return response["data"]["payment_url"]
         else:
-            lg.warning(f"Error processing payment for house {house.vn_house_id}: {response['message']}")
+            lg.warning(
+                f"Error processing payment for house {house.vn_house_id}: {response['message']}"
+            )
             return None
     except Exception as e:
         lg.warning(f"Error processing payment for house {house.vn_house_id}: {e}")
@@ -48,7 +49,6 @@ def run_process_payment(house):
 
 
 def send_sms_reminder(house, tenant):
-
     """Send an SMS reminder to the tenant to pay rent"""
 
     current_date = datetime.utcnow().date()
@@ -61,7 +61,9 @@ def send_sms_reminder(house, tenant):
 
     house_payment_url = run_process_payment(house)
     if house_payment_url is None:
-        lg.warning(f"Payment URL is None for house {house.vn_house_id}. SMS reminder not sent.")
+        lg.warning(
+            f"Payment URL is None for house {house.vn_house_id}. SMS reminder not sent."
+        )
         return
 
     s = pyshorteners.Shortener()
@@ -82,7 +84,9 @@ def send_sms_reminder(house, tenant):
         try:
             requests.request("POST", reqUrl)
             if reqUrl is not None and not reqUrl.startswith(("http://", "https://")):
-                lg.info(f"SMS reminder sent to {phone_number} for house {house.vn_house_id}")
+                lg.info(
+                    f"SMS reminder sent to {phone_number} for house {house.vn_house_id}"
+                )
             else:
                 lg.warning(f"Failed to send SMS reminder for house {house.vn_house_id}")
         except Exception as e:

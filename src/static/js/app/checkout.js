@@ -14,7 +14,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 user: [],
                 payments: [],
 
-                perPage: 10,
                 currentPage: 1,
                 totalPages: 1,
                 isLoading: false,
@@ -57,7 +56,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         const data = await response.json();
                         this.payments = data.payments;
                         this.user = data.user;
-                        this.totalPages = Math.ceil(data.total / this.perPage);
+                        this.totalPages = Math.ceil(data.total / data.per_page);
                         this.currentPage = data.page;
                     } else {
                         this.isLoading = false;

@@ -23,7 +23,6 @@ class Permission:
 
 
 class VNRole(db.Model):
-
     __tablename__ = "roles"
 
     id = db.Column(db.Integer, index=True, primary_key=True)
@@ -74,7 +73,6 @@ class VNRole(db.Model):
 
 
 class VNAgencieInfoModelMixin(db.Model):
-
     __abstract__ = True
 
     vn_agencie_name = db.Column(db.String(80), unique=True, nullable=True)
@@ -84,7 +82,6 @@ class VNAgencieInfoModelMixin(db.Model):
 class VNUser(
     UserMixin, DefaultUserInfoModel, VNAgencieInfoModelMixin, TimestampMixin, db.Model
 ):
-
     __tablename__ = "user"
 
     vn_country = db.Column(db.String(80), default=COUNTRY_DEFAULT, nullable=False)
@@ -141,8 +138,8 @@ class VNUser(
     def __str__(self):
         return self.vn_fullname or self.vn_agencie_name
 
-    def __repr__(self):
-        return f"VNUser({self.id}, {self.vn_fullname})"
+    def __repr__(self) -> str:
+        return f"VNUser(id={self.id!r}, fullname={self.vn_fullname!r})"
 
     def set_password(self, password):
         self.vn_password = generate_password_hash(password)
@@ -181,7 +178,7 @@ class VNUser(
         return transfers_count
 
     def get_houses_list(self) -> list:
-        houses= self.houses.filter_by(vn_user_id=self.id)
+        houses = self.houses.filter_by(vn_user_id=self.id)
         return houses
 
     def get_houses_count(self) -> int:
@@ -201,7 +198,7 @@ class VNUser(
         return houses_open_count
 
     def get_tenants_list(self) -> list:
-        tenants= self.tenants.filter_by(vn_user_id=self.id)
+        tenants = self.tenants.filter_by(vn_user_id=self.id)
         return tenants
 
     def get_tenants_count(self) -> int:
@@ -224,17 +221,17 @@ class VNUser(
         db.session.add(self)
 
     @classmethod
-    def get_users_list(cls):
+    def get_users_list(cls) -> list:
         users = cls.query.filter_by(vn_activated=True)
         return users
 
     @classmethod
-    def get_companies_list(cls):
+    def get_companies_list(cls) -> list:
         companies = cls.query.filter_by(vn_company=True)
         return companies
 
     @classmethod
-    def get_lessors_list(cls):
+    def get_lessors_list(cls) -> list:
         lessors = cls.query.filter_by(vn_house_owner=True)
         return lessors
 
@@ -251,7 +248,7 @@ class VNUser(
         return pagination, user_houses
 
     @classmethod
-    def get_user_logged(cls):
+    def get_user_logged(cls) -> dict:
         user = cls.query.filter_by(id=current_user.id, vn_activated=True).first()
         return user
 
@@ -263,7 +260,6 @@ class VNUser(
         return total
 
     def total_houses_percent(self):
-
         if self.vn_house_owner:
             user_houses = self.houses.filter_by(
                 vn_user_id=self.id, vn_house_is_open=True
@@ -374,7 +370,6 @@ class VNUser(
     def request_transfer(
         self, amount, withdrawal_number, withdrawal_method=None, cinetpay_data=None
     ):
-
         from src.payment import VNTransferRequest
 
         transfer = VNTransferRequest(
@@ -431,7 +426,6 @@ class VNUser(
         return total_payments or 0
 
     def total_payments_month(self):
-
         from src.payment import VNPayment
         from src.tenant import VNHouse, VNHouseOwner, VNTenant
 
@@ -496,7 +490,6 @@ class VNUser(
 
     @staticmethod
     def create_admin():
-
         """
         Create the admin user.
         """
@@ -524,7 +517,6 @@ class VNUser(
 
 
 class VNPercent(TimestampMixin):
-
     __tablename__ = "percent"
 
     vn_user_id = db.Column(

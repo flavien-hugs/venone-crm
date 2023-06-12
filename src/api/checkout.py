@@ -2,6 +2,7 @@ from flask import request
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
+from src.exts import db
 from src.payment import VNPayment
 from src.payment import VNTransferRequest
 from src.schemas import houses
@@ -15,34 +16,34 @@ from . import api
 @login_required
 @jsonify_response
 def get_all_payments():
-
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = VNPayment.paids().paginate(
-        page=page, per_page=per_page, error_out=False
+    query = VNPayment.paids()
+    payments_items = db.paginate(
+        query, page=page, per_page=per_page, max_per_page=20, error_out=True, count=True
     )
+    payments_ids = payments_items.items
+
     prev = (
         url_for("api.get_all_payments", page=page - 1, _external=True)
-        if pagination.has_prev
+        if payments_items.has_prev
         else None
     )
     next = (
         url_for("api.get_all_payments", page=page + 1, _external=True)
-        if pagination.has_next
+        if payments_items.has_next
         else None
     )
 
     return {
-        "payments": [
-            houses.payment_schema.dump(payment) for payment in pagination.items
-        ],
+        "payments": [houses.payment_schema.dump(payment) for payment in payments_ids],
         "user": users.user_schema.dump(current_user),
         "prev": prev,
         "next": next,
         "page": page,
         "per_page": per_page,
-        "total": pagination.total,
+        "total": payments_items.total,
     }
 
 
@@ -50,7 +51,6 @@ def get_all_payments():
 @login_required
 @jsonify_response
 def get_transfers():
-
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
@@ -85,7 +85,6 @@ def get_transfers():
 @login_required
 @jsonify_response
 def create_transfer_request():
-
     user = current_user.id
 
     if not user:

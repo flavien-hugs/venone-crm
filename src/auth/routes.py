@@ -38,7 +38,6 @@ def before_request():
 
 @auth_bp.route("/login/", methods=["GET", "POST"])
 def login():
-
     if current_user.is_authenticated:
         return redirect(url_for("owner_bp.dashboard"))
 
@@ -71,7 +70,6 @@ def login():
 
 @auth_bp.route("/owner/signup/", methods=["GET", "POST"])
 def registerowner_page():
-
     if current_user.is_authenticated and current_user.vn_activated:
         flash("Vous êtes déjà inscrit(e).", category="info")
         return redirect(url_for("owner_bp.dashboard"))
@@ -103,7 +101,6 @@ def registerowner_page():
 
 @auth_bp.route("/company/signup/", methods=["GET", "POST"])
 def agencieregister_page():
-
     if current_user.is_authenticated and current_user.vn_activated:
         flash("Vous êtes déjà inscrit(e).", category="info")
         return redirect(url_for("owner_bp.dashboard"))
@@ -136,7 +133,6 @@ def agencieregister_page():
 
 @auth_bp.route("/reset-password/", methods=["GET", "POST"])
 def password_reset_request():
-
     form = PasswordResetRequestForm(request.form)
     if form.validate_on_submit():
         email = form.addr_email.data.lower()

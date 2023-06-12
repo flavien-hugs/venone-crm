@@ -89,7 +89,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
     def get_payments_count(self, obj):
         return obj.get_payments_count()
-    
+
     def get_payments(self, obj):
         return payments_schema.dump(obj.get_payments_list())
 

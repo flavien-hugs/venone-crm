@@ -39,7 +39,6 @@ def owner_setting():
     form = OwnerSettingForm(request.form)
 
     if request.method == "POST" and form.validate_on_submit():
-
         current_user.vn_gender = form.gender.data
         current_user.vn_fullname = form.fullname.data
         current_user.vn_phonenumber_two = form.phonenumber_two.data
@@ -55,7 +54,6 @@ def owner_setting():
         flash("Votre compte a été mise à jour avec succès.", "success")
         return redirect(url_for("owner_bp.owner_setting"))
     elif request.method == "GET":
-
         form.gender.data = current_user.vn_gender
         form.fullname.data = current_user.vn_fullname
         form.phonenumber_two.data = current_user.vn_phonenumber_two

@@ -8,8 +8,8 @@ from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
 from src.auth.models import VNUser
-from src.exts import db
 from src.exts import cache
+from src.exts import db
 from src.schemas import houses
 from src.schemas import users
 from src.tenant import VNHouse
@@ -30,36 +30,35 @@ def abort_if_house_doesnt_exist(uuid: str):
 @api.get("/houses/")
 @login_required
 @jsonify_response
-@cache.cached(timeout=500)
 def get_all_houses():
-
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 10, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
 
-    pagination = VNHouse.get_houses_list().paginate(
-        page=page, per_page=per_page, error_out=False
+    query = VNHouse.get_houses_list()
+    houses_items = db.paginate(
+        query, page=page, per_page=per_page, max_per_page=20, error_out=True, count=True
     )
-    houses_items = pagination.items
+    house_ids = houses_items.items
 
     prev = (
         url_for("api.get_all_houses", page=page - 1, _external=True)
-        if pagination.has_prev
+        if houses_items.has_prev
         else None
     )
     next = (
         url_for("api.get_all_houses", page=page + 1, _external=True)
-        if pagination.has_next
+        if houses_items.has_next
         else None
     )
 
     return {
-        "houses": houses.houses_schema.dump(houses_items),
+        "houses": houses.houses_schema.dump(house_ids),
         "user": users.user_schema.dump(current_user),
         "prev": prev,
         "next": next,
         "page": page,
         "per_page": per_page,
-        "total": pagination.total,
+        "total": houses_items.total,
     }
 
 
@@ -67,7 +66,6 @@ def get_all_houses():
 @login_required
 @jsonify_response
 def houses_register():
-
     create_house_data = request.json.get("create_house_data")
 
     fields = [
@@ -108,7 +106,6 @@ def houses_register():
 @jsonify_response
 @cache.cached(timeout=500)
 def get_house(uuid: str) -> dict:
-
     house = abort_if_house_doesnt_exist(uuid)
 
     if not house:
@@ -183,7 +180,6 @@ def delete_house(uuid: str) -> dict:
 @jsonify_response
 @cache.cached(timeout=500)
 def get_houses_country():
-
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 12, type=int)
     pagination, houses_all = VNUser.get_houses_by_country(page, per_page)
@@ -212,7 +208,6 @@ def get_houses_country():
 @jsonify_response
 @cache.cached(timeout=500)
 def get_houses_listing():
-
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
     houses = VNHouse.get_houses_list()
@@ -235,7 +230,6 @@ def get_house_info(uuid: str) -> dict:
 @login_required
 @jsonify_response
 def house_assign_tenant(uuid: str) -> dict:
-
     house = abort_if_house_doesnt_exist(uuid)
 
     house_data = request.json.get("house_data")
