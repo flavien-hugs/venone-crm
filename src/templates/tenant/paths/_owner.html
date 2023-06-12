@@ -6,17 +6,9 @@
 		<td>{ own.vn_fullname } ({own.vn_phonenumber_one})</td>
 		<td>{ own.amount.toLocaleString() } { own.devise }</td>
 		<td>{ own.amount_repaid } { own.devise }</td>
-		<td>
-			<span v-for="h in own.owner_houses" class="badge bg-blue text-white me-1" v-show="own.number_houses > 0">
-			#{ h.vn_house_id }</span>
-			({ own.number_houses })
-		</td>
-		<td>
-			<span v-for="t in own.owner_tenants" class="badge bg-purple text-white me-1" v-show="own.number_tenants > 0">
-			#{ t.vn_tenant_id }</span>
-			({ own.number_tenants })
-		</td>
-		<td>{ own.vn_created_at.toLocaleString() }</td>
+		<td>{ own.number_houses }</td>
+		<td>{ own.number_tenants }</td>
+		<td>{ own.vn_created_at }</td>
 		<td>
 			<button @click.prevent="getOwner(own.uuid)"  title="Détail information propriétaire" type="button" class="btn btn-datatable btn-icon me-2">
 				<i class="text-secondary fa fa-eye"></i>
@@ -169,7 +161,7 @@
 								<template v-for="tenant in owner.owner_tenants" :key="tenant.uuid">
 									<div class="d-flex align-items-center justify-content-between px-4">
 										<div class="d-flex align-items-center">
-											<i class="fa fa-home fa-1x text-muted"></i>
+											<i class="fa fa-user fa-1x text-muted"></i>
 	                                        <div class="ms-4">
 	                                            <div class="text-xs text-secondary">
 	                                            	#{ tenant.vn_tenant_id } &smid; { tenant.vn_fullname } ({ tenant.vn_phonenumber_one }) &smid; Loyer: { tenant.house.vn_house_rent } { tenant.house.devise }/mois

@@ -38,7 +38,7 @@ def check_transaction_trx():
                         payment.vn_pay_status = False
                     else:
                         logger.warning(
-                         "Invalid response data for transaction ID %s: %s",
+                            "Invalid response data for transaction ID %s: %s",
                             payment.vn_transaction_id,
                             response_data,
                         )
@@ -49,8 +49,12 @@ def check_transaction_trx():
                     logger.warning(
                         "Error decoding JSON response for transaction ID %s: %s",
                         payment.vn_transaction_id,
-                        response_data)
+                        response_data,
+                    )
             else:
-                logger.warning("Empty response data for transaction ID %s", payment.vn_transaction_id)
+                logger.warning(
+                    "Empty response data for transaction ID %s",
+                    payment.vn_transaction_id,
+                )
     except Exception as e:
         logger.exception("Error processing transaction: %s", e)

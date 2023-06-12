@@ -1,7 +1,7 @@
 from marshmallow import fields
 from src.exts import ma
-from src.utils import formatted_number
 from src.tenant.models import VNHouseOwner
+from src.utils import formatted_number
 
 from .houses import houses_schema
 from .houses import payments_schema
