@@ -32,10 +32,9 @@ def abort_if_user_doesnt_exist(uuid: str):
 @api.get("/users/")
 @login_required
 def get_user():
-    user = current_user.get_user_logged()
-    if not user:
-        return {"message": "Oups ! L'élément n'a pas été trouvé."}
-    return {"user": users.user_schema.dump(user)}
+    user = abort_if_user_doesnt_exist(current_user.uuid)
+    if user.vn_activated:
+        return {"user": users.user_schema.dump(user)}
 
 
 @api.get("/customers/")

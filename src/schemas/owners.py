@@ -1,5 +1,3 @@
-import locale
-
 from marshmallow import fields
 from src.exts import ma
 from src.tenant.models import VNHouseOwner
@@ -7,10 +5,6 @@ from src.tenant.models import VNHouseOwner
 from .houses import houses_schema
 from .houses import payments_schema
 from .houses import tenants_schema
-
-
-loc = locale.getlocale()
-locale.setlocale(locale.LC_ALL, loc)
 
 
 class VNHouseOwnerSchema(ma.SQLAlchemyAutoSchema):
@@ -46,19 +40,16 @@ class VNHouseOwnerSchema(ma.SQLAlchemyAutoSchema):
         return obj.house_owner.vn_device
 
     def get_amount_repaid(self, obj):
-        return locale.format_string(
-            "%.0f", obj.get_amount_repaid(), grouping=True, monetary=True
-        )
+        formatted_number = "{:,.0f}".format(obj.get_amount_repaid())
+        return formatted_number.replace(",", " ")
 
     def get_owner_property_values(self, obj):
-        return locale.format_string(
-            "%.0f", obj.get_owner_property_values(), grouping=True, monetary=True
-        )
+        formatted_number = "{:,.0f}".format(obj.get_owner_property_values())
+        return formatted_number.replace(",", " ")
 
     def get_total_houses_amount(self, obj):
-        return locale.format_string(
-            "%.0f", obj.total_houses_amount(), grouping=True, monetary=True
-        )
+        formatted_number = "{:,.0f}".format(obj.total_houses_amount())
+        return formatted_number.replace(",", " ")
 
     def houses_count(self, obj):
         return obj.get_houses_count()
