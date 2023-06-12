@@ -1,5 +1,6 @@
 from marshmallow import fields
 from src.exts import ma
+from src.utils import formatted_number
 from src.tenant.models import VNHouseOwner
 
 from .houses import houses_schema
@@ -40,16 +41,13 @@ class VNHouseOwnerSchema(ma.SQLAlchemyAutoSchema):
         return obj.house_owner.vn_device
 
     def get_amount_repaid(self, obj):
-        formatted_number = "{:,.0f}".format(obj.get_amount_repaid())
-        return formatted_number.replace(",", " ")
+        return formatted_number(obj.get_amount_repaid())
 
     def get_owner_property_values(self, obj):
-        formatted_number = "{:,.0f}".format(obj.get_owner_property_values())
-        return formatted_number.replace(",", " ")
+        return formatted_number(obj.get_owner_property_values())
 
     def get_total_houses_amount(self, obj):
-        formatted_number = "{:,.0f}".format(obj.total_houses_amount())
-        return formatted_number.replace(",", " ")
+        return formatted_number(obj.total_houses_amount())
 
     def houses_count(self, obj):
         return obj.get_houses_count()
