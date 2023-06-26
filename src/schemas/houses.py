@@ -55,10 +55,14 @@ class VNTenantSchema(ma.SQLAlchemyAutoSchema):
 
     owner = fields.Method("get_tenant_owner")
     house = fields.Nested(house_schema)
+    payment_history = fields.Method("get_payments_histories")
     vn_created_at = fields.DateTime(format="%d %B %Y")
 
     def get_tenant_owner(self, obj):
         return obj.get_tenant_owner()
+
+    def get_payments_histories(self, obj):
+        return [n.vn_cinetpay_data for n in obj.get_payment_history()]
 
 
 tenant_schema = VNTenantSchema()

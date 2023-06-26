@@ -168,6 +168,29 @@ window.addEventListener('DOMContentLoaded', event => {
                 }
             },
 
+            async getTenant(uuid) {
+                try {
+                    const tenantURL = `/api/tenants/${uuid}/`;
+                    const response = await fetch(tenantURL, {
+                        method: "GET",
+                        headers: { "Content-type": "application/json" },
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.tenant = data.tenant;
+                        const modal = new bootstrap.Modal(
+                            document.getElementById("detailTenantModal")
+                        );
+                        modal.show();
+                    } else {
+                        throw new Error("NETWORK RESPONSE ERROR");
+                    }
+                } catch (error) {
+                    console.error("FETCH ERROR:", error);
+                }
+            },
+
             createOwnerTenant() {
                 const modal = new bootstrap.Modal(document.getElementById('addOwnerTenantModal'));
                 modal.show();

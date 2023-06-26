@@ -281,3 +281,9 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
     def get_tenants_list(cls) -> list:
         tenants = cls.query.filter_by(vn_user_id=current_user.id)
         return tenants
+
+    def get_payment_history(self) -> list:
+        payments = VNPayment.query\
+            .filter_by(vn_tenant_id=self.id, vn_pay_status=True)\
+            .order_by(VNPayment.vn_pay_date.desc()).all()
+        return payments

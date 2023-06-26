@@ -20,7 +20,11 @@
 		<td scope="row">{ tn.house.vn_house_lease_end_date } <span> <br> (dans { tn.house.remaining_days } jours)</span></td>
 		<td scope="row">{ tn.vn_created_at }</td>
 		<td scope="row">
-			<button title="Télécharger le contrat de ce locataire" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
+			<button @click.prevent="getTenant(tn.uuid)" title="Historique des paiements" type="button" class="btn btn-datatable btn-icon btn-transparent-primary me-2">
+				<i class="text-primary fa fa-money-check-dollar"></i>
+            </button>
+
+			<button title="Télécharger le contrat de ce locataire" type="button" class="btn btn-datatable btn-icon btn-transparent-green">
 				<i class="fa fa-download me-2"></i>
             </button>
 
@@ -35,7 +39,39 @@
 	</tr>
 </template>
 
-<!-- update tenant modal -->
+{# history payment tenant modal #}
+<div class="modal fade" data-bs-backdrop="static" id="detailTenantModal">
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">
+					<h4 class="modal-title">
+						Historique de paiement : #{ tenant.vn_tenant_id } - { tenant.vn_fullname }
+					</h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<div class="d-flex align-items-center justify-content-between px-4">
+						<template v-for="tph in tenant.payment_history" :key="tph">
+							<div class="d-flex align-items-center">
+								<span class="badge bg-blue text-white me-2">{ tph.data.payment_method }</span>
+								<div class="ms-4">
+									<div class="small">{ tph.data.operator_id } - { tph.data.amount } { tph.data.currency }</div>
+									<div class="text-xs text-muted">{ tph.data.payment_date }</div>
+								</div>
+							</div>
+						</template>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-sm btn-danger shadow-none" data-bs-dismiss="modal">Fermer</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+{# update tenant modal #}
 <div class="modal fade" data-bs-backdrop="static" id="updateTenantConfirm">
 	<div class="modal-dialog modal-xl modal-dialog-centered">
 		<div class="modal-content">
@@ -58,7 +94,7 @@
 	</div>
 </div>
 
-<!-- delete tenant modal -->
+{# delete tenant modal #}
 <div class="modal fade" data-bs-backdrop="static" id="delTenantConfirmModal">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
