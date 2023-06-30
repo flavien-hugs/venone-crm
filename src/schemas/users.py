@@ -64,7 +64,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         return formatted_number(obj.total_houses_amount())
 
     def get_total_payments_received(self, obj):
-        return formatted_number(obj.get_total_payments_received())
+        return obj.get_total_payments_received()
 
     def get_amount_received(self, obj):
         return formatted_number(obj.get_amount_received())
