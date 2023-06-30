@@ -1,7 +1,7 @@
 const KpiComponent = {
-	props: ['user'],
+    props: ["user"],
 
-	template: `
+    template: `
 		<div class="row g-2">
 			<div :class="{ 'col-xl-3': user.vn_house_owner, 'col-xl-3': user.is_company }" class="col-xl-3 mb-4">
 				<div class="card border-start-lg border-start-primary h-100">
@@ -101,7 +101,7 @@ const KpiComponent = {
 				</div>
 			</div>
 		</div>
-	`
+	`,
 };
 
 export default KpiComponent
