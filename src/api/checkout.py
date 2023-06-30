@@ -8,6 +8,7 @@ from src.payment import VNTransferRequest
 from src.schemas import houses
 from src.schemas import users
 from src.utils import jsonify_response
+from .user import abort_if_user_doesnt_exist
 
 from . import api
 
@@ -71,7 +72,7 @@ def get_transfers():
     )
 
     return {
-        "transfers": [houses.transfers_schema.dump(t) for t in transfers],
+        "transfers": [houses.transfer_schema.dump(t) for t in transfers],
         "user": users.user_schema.dump(current_user),
         "prev": prev,
         "next": next,
@@ -85,42 +86,36 @@ def get_transfers():
 @login_required
 @jsonify_response
 def create_transfer_request():
-    user = current_user.id
+    abort_if_user_doesnt_exist(current_user.uuid)
 
-    if not user:
-        return {"success": False, "message": "Oups ! L'élément n'a pas été trouvé"}
-
-    if (transfer_data := request.json.get("transfer_data")) is None:
+    transfer_data = request.json.get("transfer_data")
+    if transfer_data is None:
         return {
             "success": False,
             "message": "Données de transfert manquantes dans la requête",
         }
 
-    if (vn_trans_amount := transfer_data.get("vn_trans_amount")) is None or (
-        vn_withdrawal_number := transfer_data.get("vn_withdrawal_number")
-    ) is None:
+    vn_trans_amount = transfer_data.get("vn_trans_amount")
+    vn_withdrawal_number = transfer_data.get("vn_withdrawal_number")
+    if vn_trans_amount is None or vn_withdrawal_number is None:
         return {
             "success": False,
-            "message": "Montant de transfert ou numéro de retrait\
-                manquant dans les données de transfert",
+            "message": "Montant de transfert ou numéro de retrait manquant dans les données de transfert",
         }
 
-    if vn_trans_amount < 20000:
+    if vn_trans_amount < 20_000:
         return {
             "success": False,
             "message": "Le montant de retrait doit être supérieur ou égal à 20 001",
         }
 
-    if current_user.vn_balance < vn_trans_amount:
+    if current_user.get_total_payments_received() is not None and vn_trans_amount >= current_user.get_total_payments_received():
         return {
             "success": False,
             "message": "Vous n'aviez pas assez de fonds disponibles pour le transfert.",
         }
 
-    transfer_amount = current_user.request_transfer(
-        vn_trans_amount, vn_withdrawal_number
-    )
-    current_user.deduct_payments_received(vn_trans_amount)
-    transfer_amount.save()
+    transfer_amount = current_user.request_transfer(vn_trans_amount, vn_withdrawal_number)
+    current_user.deduct_payments_received(int(vn_trans_amount))
 
     return {"success": True, "message": "Demande de transfert soumis avec succès !"}

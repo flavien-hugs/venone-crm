@@ -383,11 +383,10 @@ class VNUser(
         db.session.commit()
 
     def deduct_payments_received(self, amount):
-        total_payments_received = self.get_total_payments_received()
-        if amount > total_payments_received:
-            raise ValueError("Vous n'aviez pas suffisament de fond.")
-        self.vn_balance -= amount
+        deduct = int(self.get_total_payments_received()) - int(amount)
+        self.vn_balance = deduct
         db.session.commit()
+        return self.vn_balance
 
     def get_total_payments_received(self):
         from src.payment import VNPayment

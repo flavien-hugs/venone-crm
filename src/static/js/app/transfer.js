@@ -4,8 +4,8 @@ import messageComponent from "./components/messageComponent.js";
 window.addEventListener("DOMContentLoaded", (event) => {
 
     const TRANSFER_DATA = {
-        trans_amount: "",
-        withdrawal_number: "",
+        vn_trans_amount: "",
+        vn_withdrawal_number: "",
     };
 
     var app = Vue.createApp({
@@ -40,19 +40,19 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         watch: {
-            "transferData.trans_amount": function (f) {
-                this.transferData.trans_amount = this.filterNumber(f);
+            "transferData.vn_trans_amount": function (f) {
+                this.transferData.vn_trans_amount = this.filterNumber(f);
             },
             "transferData.withdrawal_number": function (f) {
-                this.transferData.withdrawal_number = this.filterNumber(f);
+                this.transferData.vn_withdrawal_number = this.filterNumber(f);
             },
         },
 
         computed: {
             isFormValid() {
                 return (
-                    this.transferData.trans_amount !== "" &&
-                    this.transferData.withdrawal_number !== ""
+                    this.transferData.vn_trans_amount !== "" &&
+                    this.transferData.vn_withdrawal_number !== ""
                 );
             },
         },
@@ -111,8 +111,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 try {
                     const createRequestURL = `/api/transfers/`;
 
-                    this.transferData.trans_amount = parseFloat(
-                        this.transferData.trans_amount
+                    this.transferData.vn_trans_amount = parseFloat(
+                        this.transferData.vn_trans_amount
                     );
 
                     const response = await fetch(createRequestURL, {
@@ -125,25 +125,25 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         }),
                     });
 
-                    const data = await response.json();
+                    const { success, message } = await response.json();
 
-                    if (data.success) {
+                    if (success) {
                         await this.getTransfers();
                         this.transferData = { ...TRANSFER_DATA };
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
                     } else {
                         this.showMessageAlert = true;
-                        this.messageAlert = data.message;
+                        this.messageAlert = message;
                         setTimeout(() => {
                             this.showMessageAlert = false;
                         }, 3000);
                     }
                 } catch (error) {
-                    console.log(error);
+                    console.error(error);
                     this.showMessageAlert = true;
                     this.messageAlert = "Oops ! Une erreur est survenue";
                 } finally {
