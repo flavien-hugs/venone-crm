@@ -1,12 +1,12 @@
-import logging as lg
 import secrets
+import logging as lg
 from datetime import datetime
 
-import pyshorteners
 import requests
-from cinetpay_sdk.s_d_k import Cinetpay
+import pyshorteners
 from flask import current_app
 from src.tenant import VNHouse
+from cinetpay_sdk.s_d_k import Cinetpay
 
 
 def run_process_payment(house):
@@ -45,12 +45,10 @@ def run_process_payment(house):
             return None
     except Exception as e:
         lg.warning(f"Error processing payment for house {house.vn_house_id}: {e}")
-        return None
+        raise e
 
 
 def send_sms_reminder(house, tenant):
-    """Send an SMS reminder to the tenant to pay rent"""
-
     current_date = datetime.utcnow().date()
     app = current_app._get_current_object()
 
