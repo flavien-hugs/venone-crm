@@ -1,4 +1,4 @@
-from marshmallow import fields
+from  marshmallow import fields
 from src.exts import ma
 from src.payment import VNPayment
 from src.payment import VNTransferRequest
@@ -84,12 +84,8 @@ class VNPaymentSchema(ma.SQLAlchemyAutoSchema):
 
     vn_created_at = fields.DateTime(format="%d %B %Y")
     payment_status = fields.Method("get_payment_status")
-    check_info_trans = fields.Method("check_info_trans")
     house = fields.Nested(house_schema)
     tenant = fields.Nested(tenant_schema)
-
-    def check_info_trans(self, obj):
-        return obj.check_info_trans()
 
     def get_payment_status(self, obj):
         return obj.get_status_payment()
