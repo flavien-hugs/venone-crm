@@ -52,7 +52,7 @@ class VNPayment(TimestampMixin):
 
     @classmethod
     def paids(cls):
-        return cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=True)
+        return cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=True).order_by(cls.vn_created_at.desc())
 
     @classmethod
     def payments(cls):
@@ -60,7 +60,7 @@ class VNPayment(TimestampMixin):
 
     @classmethod
     def unpaids(cls):
-        return cls.query.filter_by(vn_pay_status=False)
+        return cls.query.filter_by(vn_pay_status=False).order_by(cls.vn_created_at.desc())
 
     @classmethod
     def find_by_transaction_id(cls, transaction_id):
