@@ -21,6 +21,7 @@ def create_venone_app(config_name):
     venone_app.url_map.strict_slashes = False
     venone_app.jinja_env.globals.update(zip=zip)
 
+    exts.oauth.init_app(venone_app)
     exts.mail.init_app(venone_app)
     exts.bcrypt.init_app(venone_app)
     exts.moment.init_app(venone_app)

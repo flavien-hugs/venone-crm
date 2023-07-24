@@ -27,3 +27,4 @@ pyshorteners
 httpx
 flask-marshmallow
 marshmallow-sqlalchemy
+authlib

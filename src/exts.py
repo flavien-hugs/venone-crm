@@ -12,6 +12,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
+from authlib.integrations.flask_client import OAuth
 
 metadata = MetaData(
     naming_convention={
@@ -25,6 +26,7 @@ metadata = MetaData(
 
 cors = CORS()
 mail = Mail()
+oauth = OAuth()
 bcrypt = Bcrypt()
 ma = Marshmallow()
 db = SQLAlchemy(metadata=metadata)
