@@ -1,4 +1,3 @@
-import locale
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -9,10 +8,6 @@ from src.mixins.models import DefaultUserInfoModel
 from src.mixins.models import id_generator
 from src.mixins.models import TimestampMixin
 from src.payment import VNPayment
-
-
-loc = locale.getlocale()
-locale.setlocale(locale.LC_ALL, loc)
 
 
 class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
@@ -283,7 +278,9 @@ class VNTenant(DefaultUserInfoModel, TimestampMixin):
         return tenants
 
     def get_payment_history(self) -> list:
-        payments = VNPayment.query\
-            .filter_by(vn_tenant_id=self.id, vn_pay_status=True)\
-            .order_by(VNPayment.vn_pay_date.desc()).all()
+        payments = (
+            VNPayment.query.filter_by(vn_tenant_id=self.id, vn_pay_status=True)
+            .order_by(VNPayment.vn_pay_date.desc())
+            .all()
+        )
         return payments

@@ -1,3 +1,4 @@
+from dotenv import dotenv_values
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -18,10 +19,9 @@ from src.auth.forms.auth_form import PasswordResetRequestForm
 from src.auth.forms.owner_form import OwnerHouseSignupForm
 from src.auth.models import VNUser
 from src.exts import db
-from src.exts import oauth
 from src.exts import login_manager
+from src.exts import oauth
 from src.mixins.email import send_email
-from dotenv import dotenv_values
 
 env = dotenv_values(".flaskenv")
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/")
@@ -250,7 +250,6 @@ def change_email(token):
 
 @auth_bp.route("/google/")
 def google_login():
-
     CONF_URL = env.get("GG_CONF_URL")
     CLIENT_ID = env.get("GG_CLIENT_ID")
     CLIENT_SECRET = env.get("GG_SECRET_KEY")
@@ -260,26 +259,26 @@ def google_login():
     print(CLIENT_SECRET)
 
     oauth.register(
-        name='google',
+        name="google",
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         server_metadata_url=CONF_URL,
-        client_kwargs={'scope': 'openid email profile'}
+        client_kwargs={"scope": "openid email profile"},
     )
-    redirect_uri = url_for('auth_bp.google_auth', _external=True)
+    redirect_uri = url_for("auth_bp.google_auth", _external=True)
     print(redirect_uri)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
-@auth_bp.route('/google/auth/')
+@auth_bp.route("/google/auth/")
 def google_auth():
     token = oauth.google.authorize_access_token()
     user = oauth.google.parse_id_token(token)
     print(user)
-    user_info = token['userinfo']
-    session['user'] = user_info
+    user_info = token["userinfo"]
+    session["user"] = user_info
     print("Google User ", user_info)
-    return redirect('/dashboard/index/')
+    return redirect("/dashboard/index/")
 
 
 @auth_bp.get("/logout/")

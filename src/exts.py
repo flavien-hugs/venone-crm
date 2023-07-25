@@ -1,3 +1,4 @@
+from authlib.integrations.flask_client import OAuth
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
 from flask_cors import CORS
@@ -12,7 +13,6 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
-from authlib.integrations.flask_client import OAuth
 
 metadata = MetaData(
     naming_convention={
