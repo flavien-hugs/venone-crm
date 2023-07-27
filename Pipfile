@@ -37,6 +37,7 @@ flask-minify = "*"
 flask-marshmallow = "*"
 flask = {extras = ["async"], version = "*"}
 marshmallow-sqlalchemy = "*"
+authlib = "*"
 
 [dev-packages]
 pre-commit = "*"

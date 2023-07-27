@@ -11,6 +11,9 @@ from src import exts
 
 from celery import Celery
 from celery import Task
+from dotenv import dotenv_values
+
+env = dotenv_values(".flaskenv")
 
 
 def create_venone_app(config_name):
@@ -21,6 +24,7 @@ def create_venone_app(config_name):
     venone_app.url_map.strict_slashes = False
     venone_app.jinja_env.globals.update(zip=zip)
 
+    exts.oauth.init_app(venone_app)
     exts.mail.init_app(venone_app)
     exts.bcrypt.init_app(venone_app)
     exts.moment.init_app(venone_app)
@@ -153,8 +157,8 @@ def create_venone_app(config_name):
 def celery_init_app(app):
     celery_app = Celery(
         app.name,
-        broker_url=os.getenv("CELERY_BROKER_URL"),
-        result_backend=os.getenv("CELERY_BROKER_URL"),
+        broker_url=env.get("CELERY_BROKER_URL"),
+        result_backend=env.get("CELERY_BROKER_URL"),
     )
     celery_app.conf.update(app.config)
 

@@ -1,3 +1,4 @@
+from authlib.integrations.flask_client import OAuth
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
 from flask_cors import CORS
@@ -25,6 +26,7 @@ metadata = MetaData(
 
 cors = CORS()
 mail = Mail()
+oauth = OAuth()
 bcrypt = Bcrypt()
 ma = Marshmallow()
 db = SQLAlchemy(metadata=metadata)
