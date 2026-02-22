@@ -25,6 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pipenv
+        pipenv --python 3.10
         pipenv install --dev
 
     - name: Run Black
