@@ -1,12 +1,23 @@
-from flask import (Blueprint, current_app, flash, redirect, render_template,
-                   request, session, url_for)
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required, login_user, logout_user
 
 from src.auth import utils
 from src.auth.forms.agencie_form import AgencieSignupForm
-from src.auth.forms.auth_form import (ChangeEmailForm, LoginForm,
-                                      PasswordResetForm,
-                                      PasswordResetRequestForm)
+from src.auth.forms.auth_form import (
+    ChangeEmailForm,
+    LoginForm,
+    PasswordResetForm,
+    PasswordResetRequestForm,
+)
 from src.auth.forms.owner_form import OwnerHouseSignupForm
 from src.auth.models import VNUser
 from src.exts import db, login_manager, oauth

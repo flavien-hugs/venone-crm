@@ -1,6 +1,5 @@
 from wtforms import PasswordField, SelectField, StringField
-from wtforms.validators import (DataRequired, Email, EqualTo, Length,
-                                ValidationError)
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from src.auth.models import VNUser
 from src.constants import COUNTRY

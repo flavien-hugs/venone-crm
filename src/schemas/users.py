@@ -3,9 +3,7 @@ from marshmallow import fields
 from src.auth.models import VNUser
 from src.exts import ma
 from src.utils import formatted_number
-
-from .houses import (houses_schema, payments_schema, tenants_schema,
-                     transfers_schema)
+from .houses import houses_schema, payments_schema, tenants_schema, transfers_schema
 from .owners import owners_schema
 
 
@@ -20,10 +18,10 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
             "vn_password",
         )
 
-    is_admin = fields.Method("is_admin")
+    has_admin = fields.Method("is_admin")
     vn_created_at = fields.DateTime(format="%d %B %Y")
     owner_percent = fields.Method("get_owner_percent")
-    amount_apply_percent = fields.Method("amount_apply_percent")
+    amount_apply_percent = fields.Method("amount_application_percent")
     company_percent = fields.Method("get_company_percent")
     total_house_receive = fields.Method("total_houses_percent")
     total_house_amount = fields.Method("total_houses_amount")
@@ -44,15 +42,13 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     payments = fields.Method("get_payments")
     transfers = fields.Method("get_transfers")
 
-    @ma.validates_schema(pass_original=True)
     def is_admin(self, obj):
         return obj.is_administrator()
 
     def get_owner_percent(self, obj):
         return obj.get_owner_percent()
 
-    @ma.validates_schema(pass_original=True)
-    def amount_apply_percent(self, obj):
+    def amount_application_percent(self, obj):
         return obj.amount_apply_percent()
 
     def get_company_percent(self, obj):

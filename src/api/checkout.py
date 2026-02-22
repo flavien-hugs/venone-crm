@@ -115,9 +115,7 @@ def create_transfer_request():
             "message": "Vous n'aviez pas assez de fonds disponibles pour le transfert.",
         }
 
-    _ = current_user.request_transfer(
-        vn_trans_amount, vn_withdrawal_number
-    )
+    _ = current_user.request_transfer(vn_trans_amount, vn_withdrawal_number)
     current_user.deduct_payments_received(int(vn_trans_amount))
 
     return {"success": True, "message": "Demande de transfert soumis avec succès !"}

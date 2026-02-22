@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from flask_login import current_user
 
 from src.exts import db
-from src.mixins.models import (DefaultUserInfoModel, id_generator, TimestampMixin)
+from src.mixins.models import DefaultUserInfoModel, id_generator, TimestampMixin
 from src.payment import VNPayment
 
 

@@ -6,12 +6,10 @@ from flask_login import current_user, login_required
 
 from src.auth.models import VNUser
 from src.exts import cache, db
-from src.mixins.decorators import (admin_required, agency_required,
-                                   owner_required)
+from src.mixins.decorators import admin_required, agency_required, owner_required
 from src.schemas import users
 from src.tenant import VNHouse, VNHouseOwner, VNTenant
 from src.utils import jsonify_response
-
 from . import api
 
 

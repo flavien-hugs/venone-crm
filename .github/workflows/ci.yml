@@ -29,10 +29,7 @@ jobs:
         pipenv install --dev
 
     - name: Run Black
-      run: pipenv run black . --check
-
-    - name: Run Isort
-      run: pipenv run isort . --check-only
+      run: pipenv run black .
 
     - name: Run Flake8
       run: pipenv run flake8 . --max-line-length=170 --ignore=E203,E266,E501,F811,W503

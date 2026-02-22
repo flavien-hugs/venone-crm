@@ -1,7 +1,16 @@
 from datetime import datetime
 
-from flask import (Blueprint, Response, abort, flash, redirect,
-                   render_template, request, session, url_for)
+from flask import (
+    abort,
+    Blueprint,
+    flash,
+    redirect,
+    render_template,
+    request,
+    Response,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required, logout_user
 
 from src.auth.models import VNUser
