@@ -1,13 +1,8 @@
+from wtforms import PasswordField, SelectField, StringField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+
 from src.auth.models import VNUser
 from src.constants import COUNTRY
-from wtforms import PasswordField
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms.validators import DataRequired
-from wtforms.validators import Email
-from wtforms.validators import EqualTo
-from wtforms.validators import Length
-from wtforms.validators import ValidationError
 
 
 class FormMixin:
@@ -43,12 +38,10 @@ class FormMixin:
     def validate_addr_email(self, field):
         user = VNUser.query.filter_by(vn_addr_email=field.data.lower()).first()
         if user:
-            raise ValidationError(
-                f"""
+            raise ValidationError(f"""
                 Cet email '{field.data}!r' est déjà utilisé.
                 Veuillez choisir un autre nom !
-                """
-            )
+                """)
 
     def validate_phonenumber_one(self, field):
         if VNUser.query.filter_by(vn_phonenumber_one=field.data).first():

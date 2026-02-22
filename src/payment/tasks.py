@@ -2,12 +2,13 @@ import json
 import logging
 
 import requests
+from celery import shared_task
 from cinetpay_sdk.s_d_k import Cinetpay
 from flask import current_app
+
 from src.exts import db
 
 from .models import VNPayment
-from celery import shared_task
 
 logger = logging.getLogger(__name__)
 

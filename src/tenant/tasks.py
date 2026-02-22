@@ -1,12 +1,11 @@
 import logging
 from datetime import datetime
 
+from celery import shared_task, signature
+
 from src.exts import db
 from src.main.utils import send_sms_reminder
 from src.tenant import VNHouse
-
-from celery import shared_task
-from celery import signature
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +43,7 @@ def payment_reminders_for_expired_leases():
     current_date = datetime.utcnow().date()
 
     expired_houses = VNHouse.query.filter(
-        VNHouse.vn_house_is_open == True,
+        VNHouse.vn_house_is_open == True,  # noqa: E712
         VNHouse.vn_house_lease_end_date <= current_date,
     ).all()
 

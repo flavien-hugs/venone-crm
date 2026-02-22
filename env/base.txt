@@ -11,7 +11,7 @@ Flask-Mail
 Flask-Login
 gunicorn
 Flask-FlatPages
-Bcrypt-Flask
+Flask-Bcrypt
 email-validator
 PyJWT
 Flask-Minify

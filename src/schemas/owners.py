@@ -1,11 +1,10 @@
 from marshmallow import fields
+
 from src.exts import ma
 from src.tenant.models import VNHouseOwner
 from src.utils import formatted_number
 
-from .houses import houses_schema
-from .houses import payments_schema
-from .houses import tenants_schema
+from .houses import houses_schema, payments_schema, tenants_schema
 
 
 class VNHouseOwnerSchema(ma.SQLAlchemyAutoSchema):

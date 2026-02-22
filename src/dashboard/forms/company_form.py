@@ -1,10 +1,8 @@
 from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import InputRequired, Optional, ValidationError
+
 from src.dashboard.forms.default_form import DefaultForm
-from wtforms import StringField
-from wtforms import SubmitField
-from wtforms.validators import InputRequired
-from wtforms.validators import Optional
-from wtforms.validators import ValidationError
 
 
 class CompanySettingForm(DefaultForm, FlaskForm):

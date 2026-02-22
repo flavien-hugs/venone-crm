@@ -1,21 +1,21 @@
 import os
 
-from flask import Blueprint
-from flask import current_app
-from flask import flash
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import send_from_directory
-from flask import url_for
-from flask_login import current_user
-from flask_login import login_required
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
+from flask_login import current_user, login_required
+
 from src.auth.forms.auth_form import ChangePasswordForm
 from src.dashboard.forms import OwnerSettingForm
-from src.exts import cache
-from src.exts import csrf
+from src.exts import cache, csrf
 from src.mixins.decorators import owner_required
-
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(owner_bp)
@@ -23,7 +23,7 @@ csrf.exempt(owner_bp)
 
 @owner_bp.route("/index/", methods=["GET"])
 @login_required
-# @cache.cached(timeout=500)
+@cache.cached(timeout=500)
 def dashboard():
     page_title = "Tableau de board"
     return render_template(

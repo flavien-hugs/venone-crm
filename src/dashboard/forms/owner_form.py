@@ -1,10 +1,8 @@
 from flask_wtf import FlaskForm
+from wtforms import DateField, StringField, SubmitField
+from wtforms.validators import InputRequired, Optional
+
 from src.dashboard.forms.default_form import DefaultForm
-from wtforms import DateField
-from wtforms import StringField
-from wtforms import SubmitField
-from wtforms.validators import InputRequired
-from wtforms.validators import Optional
 
 
 class OwnerSettingForm(DefaultForm, FlaskForm):

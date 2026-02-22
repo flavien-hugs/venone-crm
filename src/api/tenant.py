@@ -1,14 +1,10 @@
 from http import HTTPStatus
 
-from flask import abort
-from flask import request
-from flask import url_for
-from flask_login import current_user
-from flask_login import login_required
-from src.exts import cache
-from src.exts import db
-from src.schemas import houses
-from src.schemas import users
+from flask import abort, request, url_for
+from flask_login import current_user, login_required
+
+from src.exts import cache, db
+from src.schemas import houses, users
 from src.tenant import VNTenant
 from src.utils import jsonify_response
 

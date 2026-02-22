@@ -1,12 +1,9 @@
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 
 from flask_login import current_user
+
 from src.exts import db
-from src.mixins.models import DefaultUserInfoModel
-from src.mixins.models import id_generator
-from src.mixins.models import TimestampMixin
+from src.mixins.models import DefaultUserInfoModel, id_generator, TimestampMixin
 from src.payment import VNPayment
 
 
@@ -39,9 +36,9 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
     def get_owner_houses(self):
         houses = VNHouse.query.filter(
-            VNHouse.vn_house_is_open == True,
+            VNHouse.vn_house_is_open == True,  # noqa: E712
             VNHouse.vn_user_id == current_user.id,
-            VNHouse.vn_owner_id == self.id,
+            VNHouse.vn_owner_id == self.id,  # noqa: E712
         ).all()
         return houses
 
