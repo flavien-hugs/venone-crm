@@ -2,15 +2,11 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from config import config
-from flask import Flask
-from flask import redirect
-from flask import render_template
-from flask import url_for
-from src import exts
+from celery import Celery, Task
+from flask import Flask, redirect, render_template, url_for
 
-from celery import Celery
-from celery import Task
+from config import config
+from src import exts
 
 
 def create_venone_app(config_name):
@@ -39,7 +35,7 @@ def create_venone_app(config_name):
     celery_init_app(venone_app)
 
     if venone_app.debug:
-        from werkzeug.middleware.profiler import ProfilerMiddleware as prof
+        from werkzeug.middleware.profiler import ProfilerMiddleware as prof  # noqa: F401
 
         exts.toolbar.init_app(venone_app)
 
@@ -53,9 +49,10 @@ def create_venone_app(config_name):
     )
 
     with venone_app.app_context():
-        from src.auth import auth_bp
-        from src.dashboard.routes import owner_bp, agency_bp, admin_bp, checkout_bp
         from src.api import api
+        from src.auth import auth_bp
+        from src.dashboard.routes import (admin_bp, agency_bp, checkout_bp,
+                                          owner_bp)
 
         venone_app.register_blueprint(auth_bp)
         venone_app.register_blueprint(owner_bp)

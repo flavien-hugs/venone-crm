@@ -2,8 +2,7 @@ import logging
 from functools import wraps
 
 import httpx
-from flask import jsonify
-from flask import make_response
+from flask import jsonify, make_response
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

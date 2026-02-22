@@ -1,12 +1,10 @@
 import logging
 import os
 import secrets
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import jwt
-from flask import current_app
-from flask import request
+from flask import current_app, request
 from werkzeug.utils import secure_filename
 
 logging.basicConfig(level=logging.DEBUG)

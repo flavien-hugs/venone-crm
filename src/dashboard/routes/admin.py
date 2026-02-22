@@ -1,7 +1,6 @@
-from flask import Blueprint
-from flask import render_template
-from flask_login import current_user
-from flask_login import login_required
+from flask import Blueprint, render_template
+from flask_login import current_user, login_required
+
 from src.mixins.decorators import admin_required
 
 admin_bp = Blueprint("admin_bp", __name__, url_prefix="/admin/dashboard/")

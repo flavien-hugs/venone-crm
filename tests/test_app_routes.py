@@ -1,5 +1,4 @@
 from unittest.mock import patch
-from src.exts import db
 
 from tests.base_case import BaseCase
 

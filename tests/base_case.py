@@ -2,9 +2,10 @@ import sys
 import unittest
 
 from flask import current_app
+
 from src import create_venone_app
-from src.exts import db, login_manager
 from src.auth.models import VNUser
+from src.exts import db, login_manager
 
 sys.path.append("..")
 

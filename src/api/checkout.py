@@ -1,16 +1,13 @@
-from flask import request
-from flask import url_for
-from flask_login import current_user
-from flask_login import login_required
+from flask import request, url_for
+from flask_login import current_user, login_required
+
 from src.exts import db
-from src.payment import VNPayment
-from src.payment import VNTransferRequest
-from src.schemas import houses
-from src.schemas import users
+from src.payment import VNPayment, VNTransferRequest
+from src.schemas import houses, users
 from src.utils import jsonify_response
-from .user import abort_if_user_doesnt_exist
 
 from . import api
+from .user import abort_if_user_doesnt_exist
 
 
 @api.get("/payments/")
@@ -109,13 +106,18 @@ def create_transfer_request():
             "message": "Le montant de retrait doit être supérieur ou égal à 20 001",
         }
 
-    if current_user.get_total_payments_received() is not None and vn_trans_amount >= current_user.get_total_payments_received():
+    if (
+        current_user.get_total_payments_received() is not None
+        and vn_trans_amount >= current_user.get_total_payments_received()
+    ):
         return {
             "success": False,
             "message": "Vous n'aviez pas assez de fonds disponibles pour le transfert.",
         }
 
-    transfer_amount = current_user.request_transfer(vn_trans_amount, vn_withdrawal_number)
+    _ = current_user.request_transfer(
+        vn_trans_amount, vn_withdrawal_number
+    )
     current_user.deduct_payments_received(int(vn_trans_amount))
 
     return {"success": True, "message": "Demande de transfert soumis avec succès !"}

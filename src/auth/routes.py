@@ -1,28 +1,16 @@
-from flask import Blueprint, current_app
-from flask import flash
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import session
-from flask import url_for
-from flask_login import current_user
-from flask_login import login_required
-from flask_login import login_user
-from flask_login import logout_user
+from flask import (Blueprint, current_app, flash, redirect, render_template,
+                   request, session, url_for)
+from flask_login import current_user, login_required, login_user, logout_user
 
 from src.auth import utils
 from src.auth.forms.agencie_form import AgencieSignupForm
-from src.auth.forms.auth_form import ChangeEmailForm
-from src.auth.forms.auth_form import LoginForm
-from src.auth.forms.auth_form import PasswordResetForm
-from src.auth.forms.auth_form import PasswordResetRequestForm
+from src.auth.forms.auth_form import (ChangeEmailForm, LoginForm,
+                                      PasswordResetForm,
+                                      PasswordResetRequestForm)
 from src.auth.forms.owner_form import OwnerHouseSignupForm
 from src.auth.models import VNUser
-from src.exts import db
-from src.exts import login_manager
-from src.exts import oauth
+from src.exts import db, login_manager, oauth
 from src.mixins.email import send_email
-
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/")
 
@@ -95,7 +83,7 @@ def registerowner_page():
             Hey {user_to_create.vn_fullname},
             votre compte a été créé ! Connectez-vous maintenant !
         """
-        # flash(msg_success, category="success")
+        flash(msg_success, category="success")
         return redirect(url_for("auth_bp.login"))
 
     page_title = "Créer un compte particulier"
@@ -256,26 +244,26 @@ def google_login():
     CLIENT_SECRET = current_app.config.get("GOOGLE_SECRET_KEY")
 
     oauth.register(
-        name='google',
+        name="google",
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         server_metadata_url=CONF_URL,
-        client_kwargs={'scope': 'openid email profile'}
+        client_kwargs={"scope": "openid email profile"},
     )
-    redirect_uri = url_for('auth_bp.google_auth', _external=True)
+    redirect_uri = url_for("auth_bp.google_auth", _external=True)
     print(redirect_uri)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
-@auth_bp.route('/google/auth/')
+@auth_bp.route("/google/auth/")
 def google_auth():
     token = oauth.google.authorize_access_token()
     user = oauth.google.parse_id_token(token)
     print(user)
-    user_info = token['userinfo']
-    session['user'] = user_info
+    user_info = token["userinfo"]
+    session["user"] = user_info
     print("Google User ", user_info)
-    return redirect('/dashboard/index/')
+    return redirect("/dashboard/index/")
 
 
 @auth_bp.get("/logout/")

@@ -1,7 +1,7 @@
+from celery.schedules import crontab
+
 from src import celery_init_app
 from src.venone import venone_app
-
-from celery.schedules import crontab
 
 celery_app = celery_init_app(venone_app)
 celery_app.autodiscover_tasks(["src.tenant.tasks", "src.payment.tasks"])

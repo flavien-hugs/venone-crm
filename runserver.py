@@ -69,6 +69,7 @@ def drop_db():
 @click.option("--count", default=5, help="Number of items to seed.")
 def seed_db(count):
     from src.seeder import SeedManager
+
     seeder = SeedManager(count=count)
     seeder.run()
 

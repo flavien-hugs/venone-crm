@@ -1,6 +1,4 @@
-from src.tenant.models import VNHouse
-from src.tenant.models import VNHouseOwner
-from src.tenant.models import VNTenant
+from src.tenant.models import VNHouse, VNHouseOwner, VNTenant
 
 __all__ = (
     "VNHouse",

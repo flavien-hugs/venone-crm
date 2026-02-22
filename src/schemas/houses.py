@@ -1,9 +1,8 @@
-from  marshmallow import fields
+from marshmallow import fields
+
 from src.exts import ma
-from src.payment import VNPayment
-from src.payment import VNTransferRequest
-from src.tenant.models import VNHouse
-from src.tenant.models import VNTenant
+from src.payment import VNPayment, VNTransferRequest
+from src.tenant.models import VNHouse, VNTenant
 
 
 class VNHouseSchema(ma.SQLAlchemyAutoSchema):

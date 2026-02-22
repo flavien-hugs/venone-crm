@@ -1,5 +1,5 @@
-from flask_login import current_user
-from flask_login import login_required
+from flask_login import current_user, login_required
+
 from src.utils import jsonify_response
 
 from . import api

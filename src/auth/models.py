@@ -1,26 +1,17 @@
 import logging
 from datetime import datetime
 
-from flask import current_app
-from flask import request
-from flask_login import AnonymousUserMixin
-from flask_login import current_user
-from flask_login import UserMixin
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
+from flask import current_app, request
+from flask_login import AnonymousUserMixin, UserMixin, current_user
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from src.constants import COUNTRY_DEFAULT
-from src.exts import db
-from src.exts import login_manager
-from src.mixins.models import DefaultUserInfoModel
-from src.mixins.models import TimestampMixin
-from src.tenant.models import VNHouse
-from src.tenant.models import VNHouseOwner
-from src.tenant.models import VNTenant
+from src.exts import db, login_manager
+from src.mixins.models import DefaultUserInfoModel, TimestampMixin
+from src.tenant.models import VNHouse, VNHouseOwner, VNTenant
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
 
 
 class Permission:
@@ -516,7 +507,9 @@ class VNUser(
             if admin_role:
                 user.vn_role_id = admin_role.id
             else:
-                logger.warning("Administrateur role not found, defaulting to Permission.ADMIN value")
+                logger.warning(
+                    "Administrateur role not found, defaulting to Permission.ADMIN value"
+                )
                 user.vn_role_id = Permission.ADMIN
 
             db.session.add(user)

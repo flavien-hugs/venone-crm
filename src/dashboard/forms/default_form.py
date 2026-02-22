@@ -1,11 +1,7 @@
-from src.constants import DEVISE
-from src.constants import DEVISE_DEFAULT
-from src.constants import GENDER
-from src.constants import GENDER_DEFAULT
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms.validators import InputRequired
-from wtforms.validators import Optional
+from wtforms import SelectField, StringField
+from wtforms.validators import InputRequired, Optional
+
+from src.constants import DEVISE, DEVISE_DEFAULT, GENDER, GENDER_DEFAULT
 
 
 class DefaultForm:

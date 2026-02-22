@@ -1,13 +1,14 @@
 import json
 import logging
-import requests
 
-from flask import current_app
-from src.exts import db
+import requests
+from celery import shared_task
 from cinetpay_sdk.s_d_k import Cinetpay
+from flask import current_app
+
+from src.exts import db
 
 from .models import VNPayment
-from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,7 @@ def check_transaction_trx():
                     else:
                         logger.warning(
                             "Invalid response data for transaction ID %s: %s",
-                            payment.vn_transaction_id
+                            payment.vn_transaction_id,
                         )
                     payment.vn_cinetpay_data = json.dumps(response)
                     db.session.commit()
@@ -61,7 +62,7 @@ def check_transaction_trx():
                 logger.warning(
                     "Invalid response for transaction ID %s: %s",
                     payment.vn_transaction_id,
-                    response.text
+                    response.text,
                 )
     except requests.exceptions.RequestException as req_error:
         logger.error("Error in request: %s", req_error)

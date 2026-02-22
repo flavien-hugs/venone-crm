@@ -4,8 +4,7 @@ from datetime import timedelta
 from typing import Generator
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 

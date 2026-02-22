@@ -1,12 +1,11 @@
 from marshmallow import fields
+
 from src.auth.models import VNUser
 from src.exts import ma
 from src.utils import formatted_number
 
-from .houses import houses_schema
-from .houses import payments_schema
-from .houses import tenants_schema
-from .houses import transfers_schema
+from .houses import (houses_schema, payments_schema, tenants_schema,
+                     transfers_schema)
 from .owners import owners_schema
 
 
@@ -45,12 +44,14 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     payments = fields.Method("get_payments")
     transfers = fields.Method("get_transfers")
 
+    @ma.validates_schema(pass_original=True)
     def is_admin(self, obj):
         return obj.is_administrator()
 
     def get_owner_percent(self, obj):
         return obj.get_owner_percent()
 
+    @ma.validates_schema(pass_original=True)
     def amount_apply_percent(self, obj):
         return obj.amount_apply_percent()
 

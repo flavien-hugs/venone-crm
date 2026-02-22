@@ -2,9 +2,9 @@ import logging
 from datetime import date
 
 from flask_login import current_user
+
 from src.exts import db
-from src.mixins.models import id_generator
-from src.mixins.models import TimestampMixin
+from src.mixins.models import TimestampMixin, id_generator
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -52,7 +52,9 @@ class VNPayment(TimestampMixin):
 
     @classmethod
     def paids(cls):
-        return cls.query.filter_by(vn_payee_id=current_user.id, vn_pay_status=True).order_by(cls.vn_created_at.desc())
+        return cls.query.filter_by(
+            vn_payee_id=current_user.id, vn_pay_status=True
+        ).order_by(cls.vn_created_at.desc())
 
     @classmethod
     def payments(cls):
@@ -60,7 +62,9 @@ class VNPayment(TimestampMixin):
 
     @classmethod
     def unpaids(cls):
-        return cls.query.filter_by(vn_pay_status=False).order_by(cls.vn_created_at.desc())
+        return cls.query.filter_by(vn_pay_status=False).order_by(
+            cls.vn_created_at.desc()
+        )
 
     @classmethod
     def find_by_transaction_id(cls, transaction_id):
