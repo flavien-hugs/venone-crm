@@ -1,0 +1,46 @@
+FLASK_DEBUG=True
+FLASK_CONFIG=""
+DATABASE_URL=postgresql://user:password@pgsql:5432/database
+
+# Mail API
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_SERVER='smtp.gmail.com'
+MAIL_USERNAME='flavienhgs@gmail.com'
+MAIL_PASSWORD=''
+
+# Cinetpay API
+CINETPAY_SITEID=""
+CINETPAY_APIKEY=""
+CINETPAY_SECRETKEY=""
+CINETPAY_BASEURLPAYMENT = "https://api-checkout.cinetpay.com/v2/payment"
+CINETPAY_BASEURLTRANSFERT = "https://client.cinetpay.com/v1/"
+
+# SMS API
+SMS_SENDERID=''
+SMS_APITOKEN=''
+SMS_APIKEY=''
+SMS_BASEURL='https://panel.smsing.app/smsAPI'
+
+CELERY_BROKER_URL='redis://localhost:6379/0'
+
+# ADMIN Config
+ADMIN_PASSWORD=""
+ADMIN_PHONE_NUMBER=""
+ADMIN_EMAIL=""
+ADMIN_USERNAME=""
+
+# Google API
+GG_SECRET_KEY=""
+GG_CONF_URL=""
+GG_CLIEND_ID=""
+
+# Nginx port
+NGINX_PORT=80
+
+# postgres
+DATABASE_NAME=""
+DATABASE_USERNAME=""
+DATABASE_PASSWORD=""
+DATABASE_HOSTNAME=""
+DATABASE_PORT=5432
