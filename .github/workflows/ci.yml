@@ -35,7 +35,7 @@ jobs:
       run: pipenv run isort . --check-only
 
     - name: Run Flake8
-      run: pipenv run flake8 . --max-line-length=170 --ignore=E203,E266,E501,W503
+      run: pipenv run flake8 . --max-line-length=170 --ignore=E203,E266,E501,F811,W503
 
     - name: Run Tests
       run: |

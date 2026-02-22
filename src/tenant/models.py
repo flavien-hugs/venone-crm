@@ -36,7 +36,7 @@ class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):
 
     def get_owner_houses(self):
         houses = VNHouse.query.filter(
-            VNHouse.vn_house_is_open == True,
+            VNHouse.vn_house_is_open == True,  # noqa: E712
             VNHouse.vn_user_id == current_user.id,
             VNHouse.vn_owner_id == self.id,  # noqa: E712
         ).all()
