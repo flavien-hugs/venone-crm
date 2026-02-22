@@ -9,6 +9,9 @@ verify_ssl = true
 name = "testpypi"
 
 [packages]
+flask-bcrypt = "*"
+cinetpay-sdk = {version = "==0.1.1", index = "testpypi"}
+flask = "*"
 python-dotenv = "*"
 flask-migrate = "*"
 flask-sqlalchemy = "*"
@@ -21,23 +24,29 @@ flask-mail = "*"
 flask-login = "*"
 gunicorn = "*"
 flask-flatpages = "*"
-flask-bcrypt = "*"
+bcrypt-flask = "*"
 email-validator = "*"
 pyjwt = "*"
+flask-minify = "*"
 flask-caching = "*"
 psycopg2-binary = "*"
 pillow = "*"
-cinetpay-sdk = {version = "==0.1.1", index = "testpypi"}
 requests = "*"
-celery = {extras = ["redis"], version = "*"}
+celery = "*"
+redis = "*"
 flower = "*"
 pyshorteners = "*"
 httpx = "*"
-flask-minify = "*"
 flask-marshmallow = "*"
-flask = {extras = ["async"], version = "*"}
 marshmallow-sqlalchemy = "*"
 authlib = "*"
+pre-commit = "*"
+black = "*"
+flake8 = "*"
+isort = "*"
+flask-debugtoolbar = "*"
+coverage = "*"
+faker = "*"
 
 [dev-packages]
 pre-commit = "*"

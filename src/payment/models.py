@@ -16,7 +16,7 @@ class VNPayment(TimestampMixin):
     vn_payment_id = db.Column(
         db.String(5), nullable=True, unique=True, default=id_generator
     )
-    vn_transaction_id = db.db.Column(db.String(10), nullable=True, unique=True)
+    vn_transaction_id = db.Column(db.String(10), nullable=True, unique=True)
     vn_pay_amount = db.Column(db.Float, nullable=False)
     vn_pay_late_penalty = db.Column(db.Float, nullable=True)
     vn_pay_date = db.Column(db.Date, nullable=False)

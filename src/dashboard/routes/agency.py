@@ -89,7 +89,7 @@ def agency_billing():
 
 @agency_bp.get("/houses/")
 @login_required
-# @cache.cached(timeout=500)
+@cache.cached(timeout=500)
 def agency_house_list():
     page_title = "Propriétés"
 
@@ -103,7 +103,7 @@ def agency_house_list():
 @agency_bp.get("/lessors/")
 @login_required
 @agency_required
-# @cache.cached(timeout=500)
+@cache.cached(timeout=500)
 def agency_owner_list():
     page_title = "Vos bailleurs"
 
@@ -117,7 +117,7 @@ def agency_owner_list():
 @agency_bp.get("/check-houses/")
 @login_required
 @agency_required
-# @cache.cached(timeout=500)
+@cache.cached(timeout=500)
 def check_houses():
     page_title = "Trouver des propriétés dans votre zone"
 

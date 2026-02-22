@@ -1,5 +1,5 @@
 from flask import url_for
-from src import db
+from src.exts import db
 from tests.base_case import BaseCase
 
 

@@ -11,8 +11,6 @@ from src.mixins.models import TimestampMixin
 from src.payment import VNPayment
 
 
-loc = locale.getlocale()
-locale.setlocale(locale.LC_ALL, loc)
 
 
 class VNHouseOwner(DefaultUserInfoModel, TimestampMixin):

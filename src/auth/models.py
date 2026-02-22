@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from flask import current_app
@@ -5,6 +6,9 @@ from flask import request
 from flask_login import AnonymousUserMixin
 from flask_login import current_user
 from flask_login import UserMixin
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
+
 from src.constants import COUNTRY_DEFAULT
 from src.exts import db
 from src.exts import login_manager
@@ -13,8 +17,10 @@ from src.mixins.models import TimestampMixin
 from src.tenant.models import VNHouse
 from src.tenant.models import VNHouseOwner
 from src.tenant.models import VNTenant
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 
 class Permission:
@@ -57,19 +63,21 @@ class VNRole(db.Model):
     def insert_roles():
         roles = {
             "Staff": [Permission.STAFF],
-            "Administrateur": (0xFF, False),
+            "Administrateur": [0xFF],
         }
         default_role = "Administrateur"
         for r in roles:
             role = VNRole.query.filter_by(role_name=r).first()
             if role is None:
                 role = VNRole(role_name=r)
+                logger.info(f"Creating role: {r}")
             role.reset_permission()
             for perm in roles[r]:
                 role.add_permission(perm)
-            role.default = role.role_name == default_role
+            role.role_default = role.role_name == default_role
             db.session.add(role)
         db.session.commit()
+        logger.info("Roles specialized successfully!")
 
 
 class VNAgencieInfoModelMixin(db.Model):
@@ -492,11 +500,6 @@ class VNUser(
         """
         Create the admin user.
         """
-        import logging
-
-        logging.basicConfig(level=logging.DEBUG)
-        logger = logging.getLogger(__name__)
-
         addr_email = current_app.config["ADMIN_EMAIL"]
         fullname = current_app.config["ADMIN_USERNAME"]
         password = current_app.config["ADMIN_PASSWORD"]
@@ -507,7 +510,15 @@ class VNUser(
             user.vn_fullname = fullname
             user.vn_password = generate_password_hash(password)
             user.vn_phonenumber_one = phonenumber_one
-            user.vn_role_id = Permission.ADMIN
+
+            # Look up Administrateur role instead of hardcoding ID 5
+            admin_role = VNRole.query.filter_by(role_name="Administrateur").first()
+            if admin_role:
+                user.vn_role_id = admin_role.id
+            else:
+                logger.warning("Administrateur role not found, defaulting to Permission.ADMIN value")
+                user.vn_role_id = Permission.ADMIN
+
             db.session.add(user)
             db.session.commit()
             logger.info(f"Admin with email {addr_email} created successfully!")

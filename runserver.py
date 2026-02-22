@@ -1,19 +1,13 @@
 import logging as lg
 
-from flask_migrate import Migrate
+import click
 from flask_migrate import upgrade
-from src.auth.models import VNPercent
-from src.auth.models import VNRole
-from src.auth.models import VNUser
-from src.exts import db
-from src.payment.models import VNPayment
-from src.payment.models import VNTransferRequest
-from src.tenant.models import VNHouse
-from src.tenant.models import VNHouseOwner
-from src.tenant.models import VNTenant
-from src.venone import venone_app
 
-migrate = Migrate(venone_app, db, render_as_batch=True)
+from src.auth.models import VNPercent, VNRole, VNUser
+from src.exts import db
+from src.payment.models import VNPayment, VNTransferRequest
+from src.tenant.models import VNHouse, VNHouseOwner, VNTenant
+from src.venone import venone_app
 
 
 @venone_app.shell_context_processor
@@ -30,13 +24,53 @@ def make_shell_context():
     )
 
 
-@venone_app.cli.command("init_db")
+@venone_app.cli.command("init-db")
 def init_db():
-    upgrade()
-    db.create_all()
+    try:
+        lg.info("Running migrations...")
+        upgrade()
+        lg.info("Migrations complete. Syncing roles...")
+        VNRole.insert_roles()
+        db.session.commit()
+        lg.info("Database initialized successfully!")
+    except Exception as e:
+        lg.error(f"Failed to initialize database: {e}")
+        db.session.rollback()
+        raise e
+
+
+@venone_app.cli.command("init-roles")
+def init_roles():
     VNRole.insert_roles()
     db.session.commit()
-    lg.info("Database initialized !")
+    lg.info("Roles initialized !")
+
+
+@venone_app.cli.command("create-admin")
+def create_admin():
+    VNUser.create_admin()
+
+
+@venone_app.cli.command("drop-db")
+def drop_db():
+    try:
+        db.drop_all()
+        # Ensure alembic_version is also dropped to allow fresh migrations
+        db.session.execute(db.text("DROP TABLE IF EXISTS alembic_version;"))
+        db.session.commit()
+        lg.info("Database dropped and migration history cleared !")
+    except Exception as e:
+        lg.error(f"Error dropping database: {e}")
+        db.session.rollback()
+        raise e
+
+
+@venone_app.cli.command("seed-db")
+@click.option("--count", default=5, help="Number of items to seed.")
+def seed_db(count):
+    from src.seeder import SeedManager
+    seeder = SeedManager(count=count)
+    seeder.run()
 
 
 if __name__ == "__main__":

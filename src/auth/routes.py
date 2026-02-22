@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, current_app
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -9,6 +9,7 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
+
 from src.auth import utils
 from src.auth.forms.agencie_form import AgencieSignupForm
 from src.auth.forms.auth_form import ChangeEmailForm
@@ -18,12 +19,11 @@ from src.auth.forms.auth_form import PasswordResetRequestForm
 from src.auth.forms.owner_form import OwnerHouseSignupForm
 from src.auth.models import VNUser
 from src.exts import db
-from src.exts import oauth
 from src.exts import login_manager
+from src.exts import oauth
 from src.mixins.email import send_email
-from dotenv import dotenv_values
 
-env = dotenv_values(".flaskenv")
+
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth/")
 
 
@@ -95,7 +95,7 @@ def registerowner_page():
             Hey {user_to_create.vn_fullname},
             votre compte a été créé ! Connectez-vous maintenant !
         """
-        flash(msg_success, category="success")
+        # flash(msg_success, category="success")
         return redirect(url_for("auth_bp.login"))
 
     page_title = "Créer un compte particulier"
@@ -251,13 +251,9 @@ def change_email(token):
 @auth_bp.route("/google/")
 def google_login():
 
-    CONF_URL = env.get("GG_CONF_URL")
-    CLIENT_ID = env.get("GG_CLIENT_ID")
-    CLIENT_SECRET = env.get("GG_SECRET_KEY")
-
-    print(CONF_URL)
-    print(CLIENT_ID)
-    print(CLIENT_SECRET)
+    CONF_URL = current_app.config.get("GOOGLE_CONF_URL")
+    CLIENT_ID = current_app.config.get("GOOGLE_CLIEND_ID")
+    CLIENT_SECRET = current_app.config.get("GOOGLE_SECRET_KEY")
 
     oauth.register(
         name='google',

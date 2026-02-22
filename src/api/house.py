@@ -210,8 +210,8 @@ def get_houses_country():
 def get_houses_listing():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    houses = VNHouse.get_houses_list()
-    pagination = houses.paginate(page=page, per_page=per_page)
+    houses_select = VNHouse.get_houses_list()
+    pagination = db.paginate(houses_select, page=page, per_page=per_page)
     return {
         "houses": [houses.house_schema.dump(house) for house in pagination.items],
     }

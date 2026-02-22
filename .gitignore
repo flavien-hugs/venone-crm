@@ -136,13 +136,8 @@ core.db
 .vscode
 dev.sqlite
 .flaskenv
-Pipfile.lock
-*/migrations/*.py
 alchemydumps-backup/
 alchemydumps-backup/*.gz
-migrations
 alchemydumps/
 /src/fixtures/
 upload
-alembic
-*.ini
