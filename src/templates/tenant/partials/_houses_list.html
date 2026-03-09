@@ -1,0 +1,52 @@
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="small">
+        <tr>
+            <th scope="col">ID Propriété</th>
+            {% if current_user.vn_company %}
+                <th scope="col">ID Propriétaire</th>
+            {% endif %}
+            <th scope="col">Locataire</th>
+            <th scope="col">Propriété &amp; Localisation</th>
+            <th scope="col">Loyer/mois</th>
+            <th scope="col">Ajouté le</th>
+            <th scope="col">Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for house in houses.items %}
+            {% include "tenant/paths/_house.html" %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-end mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if houses.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="#" hx-get="{{ url_for('api.get_all_houses', page=houses.prev_num) }}" hx-target="#house-list" hx-swap="innerHTML">Previous</a>
+                </li>
+            {% endif %}
+
+            {% for page_num in houses.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if houses.page == page_num %}active{% endif %}">
+                        <a class="page-link" href="#" hx-get="{{ url_for('api.get_all_houses', page=page_num) }}" hx-target="#house-list" hx-swap="innerHTML">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if houses.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="#" hx-get="{{ url_for('api.get_all_houses', page=houses.next_num) }}" hx-target="#house-list" hx-swap="innerHTML">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>

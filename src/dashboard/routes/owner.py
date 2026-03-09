@@ -12,22 +12,36 @@ from flask import (
 )
 from flask_login import current_user, login_required
 
-from src.auth.forms.auth_form import ChangePasswordForm
+from src.api.forms.auth_form import ChangePasswordForm
+from src.api.middlewares import owner_required
+from src.core import get_user_service
 from src.dashboard.forms import OwnerSettingForm
-from src.exts import cache, csrf
-from src.mixins.decorators import owner_required
+from src.infrastructure.config.plugins import cache, csrf
 
 owner_bp = Blueprint("owner_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(owner_bp)
 
 
-@owner_bp.route("/index/", methods=["GET"])
+@owner_bp.route("/-/", methods=["GET"])
 @login_required
 @cache.cached(timeout=500)
 def dashboard():
-    page_title = "Tableau de board"
+    page_title = "Tableau de bord"
+    user_service = get_user_service()
+    stats = user_service.get_dashboard_stats(current_user.id)
+    owner_data = user_service.get_owner_per_month(current_user.id)
+    tenant_data = user_service.get_tenant_per_month(current_user.id)
+    open_houses_data = user_service.houses_opened_count(current_user.id)
+    trend_price_data = user_service.get_trendprices(current_user.id)
     return render_template(
-        "dashboard/dashboard.html", page_title=page_title, current_user=current_user
+        "dashboard/dashboard.html",
+        page_title=page_title,
+        current_user=current_user,
+        stats=stats,
+        owner_data=owner_data,
+        tenant_data=tenant_data,
+        open_houses_data=open_houses_data,
+        trend_price_data=trend_price_data,
     )
 
 

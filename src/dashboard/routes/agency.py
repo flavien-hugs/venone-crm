@@ -13,11 +13,12 @@ from flask import (
 )
 from flask_login import current_user, login_required, logout_user
 
-from src.auth.models import VNUser
+from src.api.middlewares import agency_required
+from src.core import get_user_service
 from src.dashboard.forms import CompanySettingForm
 from src.dashboard.services import export_data
-from src.exts import cache, csrf
-from src.mixins.decorators import agency_required
+from src.infrastructure.config.plugins import cache, csrf
+from src.infrastructure.persistence.models import User
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(agency_bp)
@@ -65,11 +66,14 @@ def agency_setting():
 @login_required
 def agency_create_tenant():
     page_title = "Vos locataires"
+    user_service = get_user_service()
+    stats = user_service.get_dashboard_stats(current_user.id)
 
     return render_template(
         "tenant/tenant.html",
         page_title=page_title,
         current_user=current_user,
+        stats=stats,
     )
 
 
@@ -79,37 +83,59 @@ def agency_create_tenant():
 def agency_billing():
     page_title = "Facturation"
 
+    user_service = get_user_service()
+
+    # Get values computed for the current user
+    total_payments_received = user_service.get_total_payments_received(current_user.id)
+    total_house_amount = user_service.calculate_total_amount_of_houses(current_user.id)
+    total_house_percent = user_service.calculate_amount_apply_percent(current_user.id)
+
     return render_template(
         "dashboard/account/billing.html",
         page_title=page_title,
         current_user=current_user,
+        total_payments_received=total_payments_received,
+        total_house_amount=total_house_amount,
+        total_house_percent=total_house_percent,
     )
 
 
 @agency_bp.get("/houses/")
 @login_required
-@cache.cached(timeout=500)
 def agency_house_list():
     page_title = "Propriétés"
+    user_service = get_user_service()
+    stats = user_service.get_dashboard_stats(current_user.id)
+    total_house_amount = user_service.calculate_total_amount_of_houses(current_user.id)
+    total_house_percent = user_service.calculate_amount_apply_percent(current_user.id)
 
     return render_template(
         "tenant/house.html",
         page_title=page_title,
         current_user=current_user,
+        stats=stats,
+        total_house_amount=total_house_amount,
+        total_house_percent=total_house_percent,
     )
 
 
 @agency_bp.get("/lessors/")
 @login_required
 @agency_required
-@cache.cached(timeout=500)
 def agency_owner_list():
     page_title = "Vos bailleurs"
+    user_service = get_user_service()
+    stats = user_service.get_dashboard_stats(current_user.id)
+    total_house_amount = user_service.calculate_total_houses_amount(current_user.id)
+    total_house_percent = user_service.calculate_amount_apply_percent(current_user.id)
 
     return render_template(
         "tenant/owner.html",
         page_title=page_title,
         current_user=current_user,
+        stats=stats,
+        total_house_amount=total_house_amount,
+        total_house_percent=total_house_percent,
     )
 
 
@@ -130,7 +156,7 @@ def check_houses():
 @agency_bp.route("/delete-account/", methods=["POST"])
 @login_required
 def delete_account():
-    user = VNUser.get_user_logged()
+    user = User.get_user_logged()
     if current_user != user:
         abort(400)
     try:

@@ -1,15 +1,12 @@
 # .pre-commit-config.yaml
 
-default_stages: [commit]
+default_stages: [pre-commit]
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.3.0
+  rev: v4.6.0
   hooks:
     - id: fix-byte-order-marker
-    - id: check-yaml
     - id: end-of-file-fixer
-    - id: check-ast
-    - id: check-json
     - id: check-merge-conflict
     - id: check-symlinks
     - id: debug-statements
@@ -27,13 +24,14 @@ repos:
 
 # black
 - repo: https://github.com/ambv/black
-  rev: 23.3.0
+  rev: 24.3.0
   hooks:
     - id: black
       args:
-        - --line-length=88
+        - --line-length=128
         - --include='\.pyi?$'
         - --exclude="""\.git |
+          \.eggs |
           \.__pycache__|
           \.hg|
           \.mypy_cache|
@@ -42,28 +40,21 @@ repos:
           _build|
           buck-out|
           build|
+          migrations|
           dist"""
       language_version: python3.10
 
 # flake8
 - repo: https://github.com/PyCQA/flake8
-  rev: 6.0.0
+  rev: 7.0.0
   hooks:
     - id: flake8
       additional_dependencies:
         - flake8-bugbear
         - flake8-implicit-str-concat
       args:
-        - "--max-line-length=170"
-        - "--max-complexity=18"
-        - "--select=B,C,E,F,W,T4,B9"
-        - "--ignore=E203,E266,E501,W503"
-        - "--builtins='F821'"
-
-# reorder_python_imports
-- repo: https://github.com/asottile/reorder_python_imports
-  rev: v3.9.0
-  hooks:
-    - id: reorder-python-imports
-      args: ["--application-directories", "src"]
-      additional_dependencies: ["setuptools>60.9"]
+          - "--max-line-length=128"
+          - "--select=B,C,E,F,W,T4,B9"
+          - "--ignore=B006,B008,B010,B903,B907,E203,E231,E701,W503"
+          - "--builtins=F821, F405"
+          - "--exclude=.eggs,.git,.hg,.mypy_cache,.tox,.venv,.docker,build,dist,env,examples,_build,__pycache__,migrations"

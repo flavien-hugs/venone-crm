@@ -1,5 +1,5 @@
 # Variables
-MANAGE := FLASK_APP=runserver.py
+MANAGE := FLASK_APP=src/cli.py
 DOCKER_COMPOSE := docker compose
 APP_SERVICE := app
 
@@ -22,13 +22,8 @@ run: ## Lancer le serveur de développement local
 	$(MANAGE) flask run
 
 .PHONY: test
-test: ## Exécuter les tests unitaires
-	pipenv run python3 -m unittest discover -s tests
-
-.PHONY: coverage
-coverage: ## Exécuter la couverture de code
-	pipenv run coverage run -m unittest discover
-	pipenv run coverage report -m
+run-tests: ## Exécuter les tests unitaires
+	pipenv run pytest --cov=src --cov-report=term-missing --cov-report xml:coverage.xml tests
 
 # --- DATABASE (LOCAL) ---
 
@@ -46,7 +41,7 @@ db-migrate: ## Générer une nouvelle migration
 
 .PHONY: db-upgrade
 db-upgrade: ## Appliquer les migrations
-	$(MANAGE) flask db upgrade
+	$(MANAGE) flask db upgrade head
 
 .PHONY: db-drop
 db-drop: ## Vider la base de données (supprimer les tables)
@@ -56,8 +51,8 @@ db-drop: ## Vider la base de données (supprimer les tables)
 db-seed: ## Peupler la base de données avec des données de test
 	$(MANAGE) flask seed-db --count 5
 
-.PHONY: admin
-admin: ## Créer l'utilisateur administrateur par défaut
+.PHONY: create-admin
+create-admin: ## Créer l'utilisateur administrateur par défaut
 	$(MANAGE) flask create-admin
 
 # --- DOCKER ---

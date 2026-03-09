@@ -1,7 +1,8 @@
 <p>Hello {{ user.vn_fullname }},</p>
 <br>
 <p>Bienvenue chez <b>Venone</b>!</p>
-<p>Pour confirmer votre compte, veuillez <a href="{{ url_for('auth_bp.confirm', token=token, _external=True) }}">cliquer ici</a>.</p>
+<p>Pour confirmer votre compte, veuillez <a href="{{ url_for('auth_bp.confirm', token=token, _external=True) }}">cliquer
+    ici</a>.</p>
 <br>
 <p>Sinon, vous pouvez coller le lien suivant dans la barre d'adresse de votre navigateur:</p>
 <p>{{ url_for('auth_bp.confirm', token=token, _external=True) }}</p>

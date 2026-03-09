@@ -37,7 +37,8 @@
     <meta name="mobile-web-app-capable" content="yes">
 
     {% block other_css_src %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/font-awesome/css/all.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+        href="{{ url_for('static', filename='vendor/font-awesome/css/all.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     {% endblock other_css_src %}
 
@@ -56,20 +57,21 @@
     </main>
 
     {% block other_js_src %}
-    <script type="text/javascript" src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script type="text/javascript"
+        src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
     {% endblock other_js_src %}
 
     {{ moment.include_moment() }}
     {{ moment.locale(auto_detect=True) }}
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/static/sw.js');
-                console.log("Service Worker Registered")
-            });
-        }
-    </script>
+    <!-- <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/static/sw.js');
+            console.log("Service Worker Registered")
+        });
+    }
+    </script> -->
 </body>
 
 </html>

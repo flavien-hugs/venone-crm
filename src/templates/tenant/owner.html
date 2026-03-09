@@ -1,40 +1,34 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-    <section id="houseOwnerTable">
-        <message-component
-            :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">
-        </message-component>
+<section>
+    <div id="message-container"></div>
 
-        <div v-if="user.owners_count == 0" class="card card-body shadow-none bg-transparent border-0">
-            <div class="text-center py-2">
+    {% if stats.owners_count == 0 %}
+    <div class="card card-body shadow-none bg-transparent border-0">
+        <div class="text-center py-2">
+            <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="
+                img/element/avatar.png") }}" alt="">
 
-                <img loading="lazy" class="img-account-profile rounded-circle mb-4" src="{{ url_for('static', filename="img/element/avatar.png")}}" alt="">
-
-                <p class="d-flex justify-content-center text-muted mb-4">
-                    Vous n'avez aucun propriétaire enregistré en ce moment.
-                </p>
-            </div>
+            <p class="d-flex justify-content-center text-muted mb-4">
+                Vous n'avez aucun propriétaire enregistré en ce moment.
+            </p>
         </div>
-
-        <div v-if="isLoading" class="preloader">
-            <div class="preloader-body">
-                <p>Chargement en cours...</p>
-                <div class="cssload-container">
-                    <div class="cssload-speeding-wheel"></div>
-                </div>
-            </div>
-        </div>
-
-        <div v-if="user.owners_count > 0" class="row g-2">
+    </div>
+    {% else %}
+    <div id="owner-stats" hx-get="{{ url_for('agency_bp.agency_owner_list') }}" hx-trigger="reload-owner-list from:body"
+        hx-select="#owner-stats" hx-swap="outerHTML">
+        <div class="row g-2">
             <div class="col-md-3 mb-4">
                 <div class="card border-start-lg border-start-primary h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
-                                <div class="small fw-bold text-primary mb-2 text-uppercase">Total loyers à collecter</div>
-                                <div class="h1 fw-700">{ user.total_house_amount } { user.vn_device }</div>
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">Total loyers à collecter
+                                </div>
+                                <div class="h1 fw-700">{{ total_house_amount | format_amount }} {{
+                                    current_user.vn_devise }}
+                                </div>
                             </div>
                             <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                         </div>
@@ -47,8 +41,12 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
-                                <div class="small fw-bold text-primary mb-2 text-uppercase">gains sur loyers à collectés</div>
-                                <div class="h1 fw-700">{ user.total_house_percent } { user.vn_device }</div>
+                                <div class="small fw-bold text-primary mb-2 text-uppercase">gains sur loyers à
+                                    collectés
+                                </div>
+                                <div class="h1 fw-700">{{ total_house_percent | format_amount }} {{
+                                    current_user.vn_devise
+                                    }}</div>
                             </div>
                             <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                         </div>
@@ -62,7 +60,7 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
                                 <div class="small fw-bold text-primary mb-2 text-uppercase">total bailleurs</div>
-                                <div class="h1 fw-700">{ user.owners_count }</div>
+                                <div class="h1 fw-700">{{ stats.owners_count }}</div>
                             </div>
                             <div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
                         </div>
@@ -76,7 +74,7 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
                                 <div class="small fw-bold text-primary mb-2 text-uppercase">total locataires</div>
-                                <div class="h1 fw-700">{ user.tenants_count }</div>
+                                <div class="h1 fw-700">{{ stats.tenants_count }}</div>
                             </div>
                             <div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
                         </div>
@@ -84,66 +82,68 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div v-if="user.owners_count > 0" class="row">
-            <div class="col-12">
-                <div  class="card card-header-actions">
-                    <div class="card-header">
-                        <span class="fw-700">Vos bailleurs ({ user.owners_count })</span>
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-header-actions">
+                <div class="card-header">
+                    <span class="fw-700">Vos bailleurs ({{ stats.owners_count }})</span>
 
-                        <div>
-                            <button @click.prevent="downloadOwnerCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
-                                <i class="me-2" data-feather="download"></i>
-                                télécharger le csv
-                            </button>
-                        </div>
-                    </div>
+                    <div class="ms-auto d-flex gap-2 align-items-center">
+                        <button class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2" type="button"
+                            data-bs-toggle="modal" data-bs-target="#createOwnerModal">
+                            <i class="me-2" data-feather="user-plus"></i>
+                            Ajouter un bailleur
+                        </button>
 
-                    <div class="card-body">
-                        {# <div class="input-group input-group-joined input-group-solid shadow-none">
-                            <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
-                            <input
-                                type="text"
-                                placeholder="Rechercher un propriétaire ..."
-                                class="form-control shadow-none ps-0"
-                                aria-label="Rechercher"
-                            >
-                        </div>#}
-
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="small">
-                                    <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Nom &amp; prénoms / contact</th>
-                                        <th scope="col">Total Loyer</th>
-                                        <th scope="col">Montant à reverser</th>
-                                        <th scope="col">Total propriétés</th>
-                                        <th scope="col">Total locataires</th>
-                                        <th scope="col">Date d'ajout</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% include "tenant/paths/_owner.html" %}
-                                </tbody>
-                            </table>
+                        <div class="input-group input-group-joined border-0" style="width: 250px;">
+                            <span class="input-group-text"><i data-feather="search"></i></span>
+                            <input class="form-control ps-0" type="text" name="q" placeholder="Rechercher..."
+                                hx-get="{{ url_for('api.get_all_owners') }}" hx-trigger="keyup changed delay:500ms"
+                                hx-target="#owner-list" hx-swap="innerHTML" aria-label="Search">
                         </div>
 
-                        <paginate-component
-                            :current-page="currentPage"
-                            :total-pages="totalPages"
-                            :next-page="nextPage"
-                            :prev-page="prevPage"
-                        ></paginate-component>
+                        <a href="{{ url_for('agency_bp.export_owners_csv') }}"
+                            class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none ms-3">
+                            <i class="me-2" data-feather="download"></i>
+                            télécharger le csv
+                        </a>
                     </div>
+                </div>
+
+                <div class="card-body" id="owner-list" hx-get="{{ url_for('api.get_all_owners') }}"
+                    hx-trigger="load, reload-owner-list from:body" hx-swap="innerHTML">
+                    <!-- Owner list will be loaded here by HTMX -->
                 </div>
             </div>
         </div>
-    </section>
-{% endblock dashboard_content %}
+    </div>
+    {% endif %}
+    <div class="modal fade" data-bs-backdrop="static" id="createOwnerModal">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <form hx-post="{{ url_for('api.owners_register') }}" hx-target="#message-container" hx-swap="innerHTML"
+                    hx-on="htmx:afterRequest: this.closest('.modal').hide(); hx-trigger: reload-owner-list">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            Enregistrer un bailleur
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
 
-{% block other_js_src %}
-    {{ super() }}
-    <script type="module" src="{{ url_for('static', filename="js/app/owner.js") }}"></script>
-{% endblock other_js_src %}
+                    <div class="modal-body">
+                        {% include "tenant/fields/field_owner.html" %}
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success shadow-none">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock dashboard_content %}

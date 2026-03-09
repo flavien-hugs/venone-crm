@@ -1,25 +1,27 @@
+import os
 import sys
 import unittest
 
 from flask import current_app
 
-from src import create_venone_app
-from src.auth.models import VNUser
-from src.exts import db, login_manager
+from src.infrastructure.config.plugins import db, login_manager
+from src.infrastructure.persistence.models import User
+from src.main import create_app
 
-sys.path.append("..")
+# Add the project root to sys.path to allow absolute imports from 'src'
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class BaseCase(unittest.TestCase):
     def setUp(self):
-        self.app = create_venone_app("test")
+        self.app = create_app("test")
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
         self.client = self.app.test_client()
         login_manager.init_app(self.app)
 
-        self.user = VNUser(
+        self.user = User(
             vn_gender="Mr",
             vn_fullname="Flavien HUGS",
             vn_addr_email="test@example.com",
