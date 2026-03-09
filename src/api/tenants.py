@@ -50,7 +50,9 @@ def get_all_tenants():
             )
         )
 
-    pagination = db.paginate(tenants_query, page=page, per_page=per_page, error_out=False)
+    pagination = db.paginate(
+        tenants_query, page=page, per_page=per_page, error_out=False
+    )
 
     return render_template(
         "tenant/partials/_tenant_list.html",

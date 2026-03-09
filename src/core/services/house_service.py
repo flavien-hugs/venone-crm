@@ -5,7 +5,7 @@ from typing import Optional
 from src.core.repositories.house_repository import HouseOwnerRepository, HouseRepository
 from src.core.repositories.tenant_repository import TenantRepository
 from src.infrastructure.config.plugins import db
-from src.infrastructure.persistence.models import Payment, Tenant
+from src.infrastructure.persistence.models import Payment
 
 logger = logging.getLogger(__name__)
 

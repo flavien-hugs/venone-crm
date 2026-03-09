@@ -6,6 +6,7 @@ from src.core.mappers.payment_mapper import PaymentMapper
 from src.core.domain.entities.payment import PaymentEntity
 from src.infrastructure.persistence.models import Payment
 
+
 @pytest.fixture
 def mock_persistence_payment():
     """Fixture for a mock SQLAlchemy Payment model instance."""
@@ -21,6 +22,7 @@ def mock_persistence_payment():
     mock_payment.vn_cinetpay_data = {"some": "metadata"}
     return mock_payment
 
+
 @pytest.fixture
 def mock_domain_payment():
     """Fixture for a mock PaymentEntity domain instance."""
@@ -33,8 +35,9 @@ def mock_domain_payment():
         house_id=11,
         tenant_id=21,
         payee_id=31,
-        metadata={"other": "data"}
+        metadata={"other": "data"},
     )
+
 
 def test_to_domain_conversion(app_context, mock_persistence_payment):
     """Test that PaymentMapper correctly converts a persistence model to a domain entity."""
@@ -50,6 +53,7 @@ def test_to_domain_conversion(app_context, mock_persistence_payment):
     assert domain_entity.tenant_id == mock_persistence_payment.vn_tenant_id
     assert domain_entity.payee_id == mock_persistence_payment.vn_payee_id
     assert domain_entity.metadata == mock_persistence_payment.vn_cinetpay_data
+
 
 def test_to_persistence_conversion(app_context, mock_domain_payment):
     """Test that PaymentMapper correctly converts a domain entity to a persistence dictionary."""

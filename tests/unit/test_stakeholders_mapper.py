@@ -5,6 +5,7 @@ from src.core.mappers.stakeholders_mapper import OwnerMapper, TenantMapper
 from src.core.domain.entities.stakeholders import OwnerEntity, TenantEntity
 from src.infrastructure.persistence.models import HouseOwner, Tenant
 
+
 @pytest.fixture
 def mock_persistence_owner():
     """Fixture for a mock SQLAlchemy HouseOwner model instance."""
@@ -16,6 +17,7 @@ def mock_persistence_owner():
     mock_owner.vn_owner_percent = 12.5
     mock_owner.vn_user_id = 10
     return mock_owner
+
 
 @pytest.fixture
 def mock_persistence_tenant():
@@ -29,6 +31,7 @@ def mock_persistence_tenant():
     mock_tenant.vn_house_id = 22
     return mock_tenant
 
+
 def test_owner_to_domain_conversion(app_context, mock_persistence_owner):
     """Test that OwnerMapper correctly converts a persistence model to a domain entity."""
     domain_entity = OwnerMapper.to_domain(mock_persistence_owner)
@@ -40,6 +43,7 @@ def test_owner_to_domain_conversion(app_context, mock_persistence_owner):
     assert domain_entity.phone == mock_persistence_owner.vn_phonenumber_one
     assert domain_entity.owner_percent == mock_persistence_owner.vn_owner_percent
     assert domain_entity.user_id == mock_persistence_owner.vn_user_id
+
 
 def test_tenant_to_domain_conversion(app_context, mock_persistence_tenant):
     """Test that TenantMapper correctly converts a persistence model to a domain entity."""

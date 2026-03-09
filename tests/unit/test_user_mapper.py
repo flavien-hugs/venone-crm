@@ -37,6 +37,7 @@ def mock_persistence_user():
 
     return mock_user
 
+
 @pytest.fixture
 def mock_domain_user():
     """Fixture for a mock UserEntity domain instance."""
@@ -52,8 +53,9 @@ def mock_domain_user():
         is_company=True,
         is_administrator=False,
         owner_percent=7.0,
-        company_percent=6.0
+        company_percent=6.0,
     )
+
 
 def test_to_domain_conversion(app_context, mock_persistence_user):
     """Test that UserMapper correctly converts a persistence model to a domain entity."""
@@ -72,6 +74,7 @@ def test_to_domain_conversion(app_context, mock_persistence_user):
     assert domain_entity.owner_percent == mock_persistence_user.get_owner_percent()
     assert domain_entity.company_percent == mock_persistence_user.get_company_percent()
 
+
 def test_to_persistence_conversion(app_context, mock_domain_user):
     """Test that UserMapper correctly converts a domain entity to a persistence dictionary."""
     persistence_dict = UserMapper.to_persistence(mock_domain_user)
@@ -83,6 +86,7 @@ def test_to_persistence_conversion(app_context, mock_domain_user):
     assert persistence_dict["vn_balance"] == mock_domain_user.balance
     assert persistence_dict["vn_house_owner"] == mock_domain_user.is_house_owner
     assert persistence_dict["vn_company"] == mock_domain_user.is_company
+
 
 def test_to_domain_with_none_values(app_context):
     """Test to_domain with persistence user having None for optional fields."""
@@ -107,8 +111,8 @@ def test_to_domain_with_none_values(app_context):
     mock_percent.vn_company_percent = None
     mock_user.percent = mock_percent
 
-    mock_user.get_owner_percent.return_value = 7.0 # Default if None
-    mock_user.get_company_percent.return_value = 6.0 # Default if None
+    mock_user.get_owner_percent.return_value = 7.0  # Default if None
+    mock_user.get_company_percent.return_value = 6.0  # Default if None
 
     domain_entity = UserMapper.to_domain(mock_user)
 

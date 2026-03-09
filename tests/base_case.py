@@ -1,14 +1,15 @@
+import os
 import sys
 import unittest
-import os
-
-# Add the project root to sys.path to allow absolute imports from 'src'
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from flask import current_app
+
 from src.infrastructure.config.plugins import db, login_manager
-from src.main import create_app
 from src.infrastructure.persistence.models import User
+from src.main import create_app
+
+# Add the project root to sys.path to allow absolute imports from 'src'
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class BaseCase(unittest.TestCase):
