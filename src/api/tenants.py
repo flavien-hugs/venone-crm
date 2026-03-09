@@ -12,7 +12,7 @@ from .shared.helpers import jsonify_response
 
 
 def abort_if_tenant_doesnt_exist(uuid: str):
-    tenant = Tenant.query.filter_by(vn_tenant_id=uuid).first()
+    tenant = db.session.get(Tenant, uuid)
     if not tenant:
         abort(HTTPStatus.NOT_FOUND, f"Could not find tenant with ID {uuid}")
 
@@ -50,7 +50,7 @@ def get_all_tenants():
             )
         )
 
-    pagination = tenants_query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = db.paginate(tenants_query, page=page, per_page=per_page, error_out=False)
 
     return render_template(
         "tenant/partials/_tenant_list.html",

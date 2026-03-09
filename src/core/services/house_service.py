@@ -11,9 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 class HouseService:
-    def __init__(self, house_repo: HouseRepository, owner_repo: HouseOwnerRepository):
+    def __init__(
+        self,
+        house_repo: HouseRepository,
+        owner_repo: HouseOwnerRepository,
+        tenant_repo: TenantRepository,
+    ):
         self.house_repo = house_repo
         self.owner_repo = owner_repo
+        self.tenant_repo = tenant_repo
 
     def update_lease_end_date_if_expired(self, house_id: int):
         house = self.house_repo.model.query.get(house_id)
@@ -49,19 +55,11 @@ class HouseService:
         return "Occupée" if house.vn_house_is_open else "Libre"
 
     def get_current_tenant_id(self, house_id: int) -> Optional[int]:
-        tenant = (
-            Tenant.query.filter_by(vn_house_id=house_id)
-            .order_by(db.desc("vn_created_at"))
-            .first()
-        )
+        tenant = self.tenant_repo.find_by_house_id(house_id)
         return tenant.id if tenant else None
 
     def get_tenant_phone_number(self, house_id: int) -> Optional[str]:
-        tenant = (
-            Tenant.query.filter_by(vn_house_id=house_id)
-            .order_by(db.desc("vn_created_at"))
-            .first()
-        )
+        tenant = self.tenant_repo.find_by_house_id(house_id)
         return tenant.vn_phonenumber_one if tenant else None
 
 

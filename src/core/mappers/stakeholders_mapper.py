@@ -33,7 +33,6 @@ class TenantMapper:
             fullname=persistence.vn_fullname,
             phone=persistence.vn_phonenumber_one,
             user_id=persistence.vn_user_id,
-            house_id=persistence.vn_house_id,
         )
 
     @staticmethod
@@ -42,5 +41,4 @@ class TenantMapper:
             "vn_fullname": entity.fullname,
             "vn_phonenumber_one": entity.phone,
             "vn_user_id": entity.user_id,
-            "vn_house_id": entity.house_id,
         }

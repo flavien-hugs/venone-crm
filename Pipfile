@@ -49,6 +49,8 @@ isort = "*"
 flask-debugtoolbar = "*"
 coverage = "*"
 faker = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.10"

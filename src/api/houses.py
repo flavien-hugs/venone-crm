@@ -12,7 +12,7 @@ from .__main__ import api_bp
 
 
 def abort_if_house_doesnt_exist(uuid: str):
-    house = House.query.filter_by(vn_house_id=uuid).first()
+    house = db.session.get(House, uuid)
     if not house:
         abort(HTTPStatus.NOT_FOUND, f"Could not find house with ID {uuid}")
 
@@ -213,9 +213,7 @@ def get_house_info(uuid: str) -> dict:
         abort(HTTPStatus.NOT_FOUND)
 
     # We need the model for the schema dump usually, but schemas could be updated later
-    house_model = house_service.house_repo.model.query.filter_by(
-        vn_house_id=uuid
-    ).first()
+    house_model = db.session.get(House, house_entity.id)
     return {"house": houses.house_schema.dump(house_model)}
 
 

@@ -32,7 +32,8 @@ def get_user_service():
 def get_house_service():
     house_repo = HouseRepository()
     owner_repo = HouseOwnerRepository()
-    return HouseService(house_repo, owner_repo)
+    tenant_repo = TenantRepository()
+    return HouseService(house_repo, owner_repo, tenant_repo)
 
 
 def get_tenant_service():

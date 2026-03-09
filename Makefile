@@ -22,13 +22,8 @@ run: ## Lancer le serveur de développement local
 	$(MANAGE) flask run
 
 .PHONY: test
-test: ## Exécuter les tests unitaires
-	pipenv run python3 -m unittest discover -s tests
-
-.PHONY: coverage
-coverage: ## Exécuter la couverture de code
-	pipenv run coverage run -m unittest discover
-	pipenv run coverage report -m
+run-tests: ## Exécuter les tests unitaires
+	pipenv run pytest --cov=src --cov-report=term-missing --cov-report xml:coverage.xml tests
 
 # --- DATABASE (LOCAL) ---
 

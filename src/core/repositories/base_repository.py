@@ -7,7 +7,7 @@ class BaseRepository(IRepository):
     mapper = None
 
     def get_by_id(self, id: int):
-        record = self.model.query.get(id)
+        record = db.session.get(self.model, id)
         if record and self.mapper:
             return self.mapper.to_domain(record)
         return record

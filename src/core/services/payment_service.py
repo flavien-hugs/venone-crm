@@ -3,9 +3,9 @@ import secrets
 from datetime import datetime
 from typing import Optional
 
-from src.infrastructure.config.plugins import db
 from src.core.interfaces.payment_provider import IPaymentProvider
 from src.core.repositories.payment_repository import PaymentRepository
+from src.infrastructure.config.plugins import db
 from src.infrastructure.persistence.models import Payment, Tenant
 
 logger = logging.getLogger(__name__)
@@ -46,9 +46,9 @@ class PaymentService:
             logger.error("No payment provider configured for initiation.")
             return None
 
-        transaction_id = str(secrets.randbelow(10**8))
-        from src.core import get_house_service
+        from src.core import get_house_service  # Moved import
 
+        transaction_id = str(secrets.randbelow(10**8))
         house_service = get_house_service()
 
         tenant_id = house_service.get_current_tenant_id(house_model.id)
@@ -67,9 +67,6 @@ class PaymentService:
         )
 
         if response.get("code") == "201":
-            # Record it pending? or just return URL.
-            # In current logic, it marks as paid immediately on 201?
-            # Actually process_payment_data was doing that.
             self.process_payment_data(house_model.id, transaction_id)
             return response["data"]["payment_url"]
         else:
@@ -77,7 +74,7 @@ class PaymentService:
             return None
 
     def process_payment_data(self, house_id: int, transaction_id: str):
-        from src.core import get_house_service
+        from src.core import get_house_service  # Moved import
 
         house_service = get_house_service()
         house = house_service.house_repo.model.query.get(house_id)

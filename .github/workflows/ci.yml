@@ -38,7 +38,7 @@ jobs:
       run: |
         export FLASK_RUN_PORT=5000
         export FLASK_DEBUG=0
-        pipenv run python -m unittest discover -s tests
+        pipenv run pytest --cov=src --cov-report=term-missing --cov-report xml:coverage.xml tests
 
   build-and-push:
     needs: lint-and-test

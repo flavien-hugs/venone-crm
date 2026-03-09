@@ -10,3 +10,6 @@ class TenantRepository(BaseRepository):
 
     def find_by_user_id(self, user_id: int):
         return self.model.query.filter_by(vn_user_id=user_id).all()
+
+    def find_by_house_id(self, house_id: int):
+        return self.model.query.filter_by(vn_house_id=house_id).order_by(self.model.vn_created_at.desc()).first()
