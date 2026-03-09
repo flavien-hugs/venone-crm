@@ -1,65 +1,70 @@
 {% extends "_base.html" %}
 
 {% block other_css_src %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
 {% endblock other_css_src %}
 
 {% block head_title %}
-    {{ current_user.get_name() }} &smid; {{ super() }}
+{{ current_user.get_name() }} &smid; {{ super() }}
 {% endblock head_title %}
 
 {% block body_content %}
-    <section class="nav-fixed">
-        {% include "dashboard/partials/_sidenav.html" %}
+<section class="nav-fixed">
+    {% include "dashboard/partials/_sidenav.html" %}
 
-        <section id="layoutSidenav">
+    <section id="layoutSidenav">
 
-            {% include "dashboard/partials/_layoutsidenav.html" %}
+        {% include "dashboard/partials/_layoutsidenav.html" %}
 
-            <section id="layoutSidenav_content">
-                <main>
-                    <header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
-                        <div class="container-xl px-4">
-                            <div class="page-header-content">
-                                <div class="row align-items-center justify-content-between pt-3">
-                                    <div class="col-auto mb-3">
-                                        <h1 class="page-header-title text-muted text-uppercase">
-                                            {{ page_title | e }}
-                                        </h1>
-                                    </div>
-
-                                    {% block breadcrmub_plus %}
-                                    {% endblock breadcrmub_plus %}
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-
-                    <div class="container-xl px-4 mt-4">
-                        {% include "includes/partials/message.html" %}
-                        {% block dashboard_content %}
-                        {% endblock dashboard_content %}
-                    </div>
-                </main>
-
-                <footer class="footer-admin mt-auto">
+        <section id="layoutSidenav_content">
+            <main>
+                <header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
                     <div class="container-xl px-4">
-                        <div class="row">
-                            <div class="col-12 text-md-end">
-                                <p>&copy; {{ moment().format('YYYY') }} Venone, filiale CGIC GROUP</p>
+                        <div class="page-header-content">
+                            <div class="align-items-center justify-content-between pt-3">
+                                <div class="col-auto mb-3">
+                                    <h1 class="page-header-title text-muted text-uppercase">
+                                        {{ page_title | e }}
+                                    </h1>
+                                </div>
+
+                                {% block breadcrmub_plus %}
+                                {% endblock breadcrmub_plus %}
                             </div>
                         </div>
                     </div>
-                </footer>
-            </section>
+                </header>
+
+                <div class="container-xl px-4 mt-4">
+                    {% include "includes/partials/message.html" %}
+                    {% block dashboard_content %}
+                    {% endblock dashboard_content %}
+                </div>
+            </main>
+
+            <footer class="footer-admin mt-auto">
+                <div class="container-xl px-4">
+                    <div class="row">
+                        <div class="col-12 text-md-end">
+                            <p>&copy; {{ moment().format('YYYY') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </section>
     </section>
+</section>
 {% endblock body_content %}
 
 {% block other_js_src %}
-    {{ super() }}
-    <script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app/vue.global.prod.js') }}"></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token() }}';
+    });
+</script>
 {% endblock other_js_src %}

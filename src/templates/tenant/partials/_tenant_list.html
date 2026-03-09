@@ -1,0 +1,50 @@
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="small">
+        <tr>
+            <th scope="col">ID</th>
+            {% if current_user.vn_company %}
+                <th scope="col">ID Propriétaire</th>
+            {% endif %}
+            <th scope="col">Nom &amp; prénoms / téléphone</th>
+            <th scope="col">Loyer à payer</th>
+            <th scope="col">Date prochain loyer</th>
+            <th scope="col">Date d'ajout</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for tenant in tenants.items %}
+            {% include "tenant/paths/_tenant.html" %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-end mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if tenants.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="#" hx-get="{{ url_for('api.get_all_tenants', page=tenants.prev_num) }}" hx-target="#tenant-list" hx-swap="innerHTML">Précédent</a>
+                </li>
+            {% endif %}
+
+            {% for page_num in tenants.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if tenants.page == page_num %}active{% endif %}">
+                        <a class="page-link" href="#" hx-get="{{ url_for('api.get_all_tenants', page=page_num) }}" hx-target="#tenant-list" hx-swap="innerHTML">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if tenants.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="#" hx-get="{{ url_for('api.get_all_tenants', page=tenants.next_num) }}" hx-target="#tenant-list" hx-swap="innerHTML">Suivant</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>

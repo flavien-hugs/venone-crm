@@ -1,14 +1,13 @@
-from flask import Blueprint
-
-api = Blueprint("api", __name__, url_prefix="/api/")
-
-from . import chart, checkout, house, owner, tenant, user  # noqa
+from . import auth, chart, checkout, houses, owners, tenants, users  # noqa
+from .__main__ import api_bp
 
 __all__ = (
-    "user",
-    "tenant",
-    "owner",
-    "house",
+    "api_bp",
+    "auth",
+    "users",
+    "tenants",
+    "owners",
+    "houses",
     "checkout",
     "chart",
 )

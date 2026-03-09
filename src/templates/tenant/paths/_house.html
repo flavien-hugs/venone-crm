@@ -1,154 +1,55 @@
-<template v-for="hs in houses" :key="hs.uuid">
-	<tr v-if="hs.uuid">
-		<td>
-			<span class="badge bg-blue text-white">#{ hs.vn_house_id }</span>
-		</td>
-		<td v-if="user.vn_company">
-			<span v-show="hs.owner" class="badge bg-red text-white">#{ hs.owner }</span>
-			<span v-show="!hs.owner">
-				&ndash;
-			</span>
-		</td>
-		<td>
-			<span v-show="hs.tenant">{ hs.tenant }</span>
-			<span v-show="!hs.tenant">&ndash;</span>
-		</td>
-		<td>
-			{ hs.vn_house_type }
-			<span v-show="hs.vn_house_address">&ndash; { hs.vn_house_address }</span>
-		</td>
-		<td>{ hs.vn_house_rent.toLocaleString() } { hs.devise }</td>
-		<td>{ hs.vn_created_at }</td>
-		<td><span :class="{'bg-red': hs.vn_house_is_open, 'bg-blue': !hs.vn_house_is_open}" class="badge text-white">
-		{ hs.house_status }</span></td>
+<tr>
+    <td>
+        <span class="badge bg-blue text-white">#{{ house.vn_house_id }}</span>
+    </td>
+    {% if current_user.vn_company or current_user.is_administrator() %}
+    <td>
+        {% if house.owner %}
+        <span class="badge bg-red text-white">#{{ house.owner.vn_owner_id }}</span>
+        {% else %}
+        <span>&ndash;</span>
+        {% endif %}
+    </td>
+    {% endif %}
+    <td>
+        {% if house.house_tenants %}
+        {% for tenant in house.house_tenants %}
+        <span>{{ tenant.vn_fullname }}</span>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% else %}
+        <span>&ndash;</span>
+        {% endif %}
+    </td>
+    <td>
+        {{ house.vn_house_type }}
+        {% if house.vn_house_address %}&ndash; {{ house.vn_house_address }}{% endif %}
+    </td>
+    <td>{{ house.vn_house_rent | format_amount }} {{ current_user.vn_devise }}</td>
+    <td>{{ house.vn_created_at.strftime('%Y-%m-%d') if house.vn_created_at else 'N/A' }}</td>
+    <td>
+        <span class="badge text-white {{ 'bg-red' if house.vn_house_is_open else 'bg-blue' }}">
+            {{ 'Occupée' if house.vn_house_is_open else 'Disponible' }}
+        </span>
+    </td>
 
-		<td>
-			<button title="Assigner un locataire à cette propriété" @click="assignHouseToTenantConfirm(hs)" v-show="!hs.vn_house_is_open" class="btn btn-datatable btn-icon btn-transparent-success me-2">
-				<i class="text-success fa fa-user-plus"></i>
-			</button>
+    <td>
+        {% if not house.vn_house_is_open %}
+        <button title="Assigner un locataire à cette propriété"
+            class="btn btn-datatable btn-icon btn-transparent-success me-2">
+            <i class="text-success fa fa-user-plus"></i>
+        </button>
+        {% endif %}
 
-			<button title="Mettre à jour cette propriété" @click="updateHouse(hs)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-				<i class="text-primary fa fa-edit"></i>
-			</button>
+        <button title="Mettre à jour cette propriété" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+            <i class="text-primary fa fa-edit"></i>
+        </button>
 
-			<button title="Supprimer cette propriété" v-show="!hs.vn_house_is_open" @click="deleteHouseConfirm(hs.uuid)" class="btn btn-datatable btn-icon btn-transparent-danger">
-				<i class="text-danger fa fa-trash"></i>
-			</button>
-		</td>
-	</tr>
-</template>
-
-<!-- update house modal -->
-<div class="modal fade" data-bs-backdrop="static" id="updateHouseConfirm">
-	<div class="modal-dialog modal-xl modal-dialog-centered">
-		<div class="modal-content">
-			<form>
-				<div class="modal-header">
-					<div class="modal-title">
-						Mise à jour location : #{ houseData.vn_house_id }
-					</div>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-
-				<div class="modal-body">
-    				{% include "tenant/fields/field_house.html" %}
-				</div>
-
-				<div class="modal-footer">
-					<button @click="houseData.uuid = null; onUpdateHouse = false" type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
-					<button type="button" @click.prevent="onUpdateHouse" class="btn btn-success shadow-none">Mettre à jour</button>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
-
-<!-- delete house modal -->
-<div class="modal fade" data-bs-backdrop="static" id="deleteHouseModal">
-	<div class="modal-dialog modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Supprimer cette propriété ?</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-
-			<div class="modal-body">
-				Êtes-vous sûr de vouloir supprimer cette propriété ?
-			</div>
-
-			<div class="modal-footer">
-				<div class="row">
-					<div class="col-6 d-grid">
-						<button @click.prevent="deleteHouseUUID = null; onDeleteHouse = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">Annuler</button>
-					</div>
-
-					<div class="col-6 d-grid">
-						<button data-bs-dismiss="modal" @click.prevent="onDeleteHouse" type="button" class="btn btn-danger text-uppercase shadow-none">Oui</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-<!-- assign house to tenant modal -->
-<div class="modal fade" data-bs-backdrop="static" id="assignHouseToTenantModal">
-	<div class="modal-dialog modal-xl modal-dialog-centered">
-		<div class="modal-content">
-			<form>
-				<div class="modal-header">
-					<h4 class="modal-title">
-						Ajouter un locataire pour cette propriété : #{ houseData.vn_house_id }
-					</h4>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-				</div>
-
-				<div class="modal-body">
-					<div class="nav nav-pills nav-justified nav-wizard" role="tablist">
-						<div :class="{ active: currentStep === 1 }" class="nav-item nav-link p-3">
-							<div class="wizard-step-icon">2</div>
-							<div class="wizard-step-text">
-								<div class="modal-title wizard-step-text-name fw-700">
-									Propriété
-								</div>
-								<small class="wizard-step-text-details">Informations sur la propriété</small>
-							</div>
-						</div>
-						<div :class="{ active: currentStep === 2 }" class="nav-item nav-link p-3">
-							<div class="wizard-step-icon">3</div>
-							<div class="wizard-step-text">
-								<div class="modal-title wizard-step-text-name fw-700">
-									Locataire
-								</div>
-								<small class="wizard-step-text-details">Informations sur le locataire</small>
-							</div>
-						</div>
-					</div>
-
-					<hr class="my-3">
-
-					<div class="tab-content">
-					    <div :class="{ active: currentStep === 1 }" class="tab-pane fade show">
-					    	{% include "tenant/fields/field_house.html" %}
-					    </div>
-						<div :class="{ active: currentStep === 2 }"class="tab-pane fade show">
-					        {% include "tenant/fields/field_tenant.html" %}
-					    </div>
-					</div>
-				</div>
-
-				<div class="row modal-footer justify-content-center">
-					<div class="col-12">
-						<div class="d-flex justify-content-between">
-							<button :class="{ disabled: currentStep === 1 }" @click.prevent="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
-							<button v-if="currentStep < 2" @click.prevent="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
-							<button v-if="currentStep === 2" @click.prevent="onAssignHouseToTenant" class="btn btn-success shadow-none" type="submit">Valider</button>
-						</div>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
+        {% if not house.vn_house_is_open %}
+        <button title="Supprimer cette propriété" hx-delete="{{ url_for('api.delete_house', uuid=house.vn_house_id) }}"
+            hx-confirm="Êtes-vous sûr de vouloir supprimer cette propriété ?" hx-target="closest tr" hx-swap="outerHTML"
+            class="btn btn-datatable btn-icon btn-transparent-danger">
+            <i class="text-danger fa fa-trash"></i>
+        </button>
+        {% endif %}
+    </td>
+</tr>

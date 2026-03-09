@@ -1,7 +1,12 @@
 from wtforms import SelectField, StringField
 from wtforms.validators import InputRequired, Optional
 
-from src.constants import DEVISE, DEVISE_DEFAULT, GENDER, GENDER_DEFAULT
+from src.infrastructure.shared.constants import (
+    DEVISE,
+    DEVISE_DEFAULT,
+    GENDER,
+    GENDER_DEFAULT,
+)
 
 
 class DefaultForm:

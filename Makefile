@@ -1,5 +1,5 @@
 # Variables
-MANAGE := FLASK_APP=runserver.py
+MANAGE := FLASK_APP=src/cli.py
 DOCKER_COMPOSE := docker compose
 APP_SERVICE := app
 
@@ -56,8 +56,8 @@ db-drop: ## Vider la base de données (supprimer les tables)
 db-seed: ## Peupler la base de données avec des données de test
 	$(MANAGE) flask seed-db --count 5
 
-.PHONY: admin
-admin: ## Créer l'utilisateur administrateur par défaut
+.PHONY: create-admin
+create-admin: ## Créer l'utilisateur administrateur par défaut
 	$(MANAGE) flask create-admin
 
 # --- DOCKER ---

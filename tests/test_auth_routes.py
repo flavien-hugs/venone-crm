@@ -1,6 +1,6 @@
 from flask import url_for
 
-from src.exts import db
+from helpers.plugins import db
 from tests.base_case import BaseCase
 
 

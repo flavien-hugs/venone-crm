@@ -40,13 +40,6 @@ httpx = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 authlib = "*"
-pre-commit = "*"
-black = "*"
-flake8 = "*"
-isort = "*"
-flask-debugtoolbar = "*"
-coverage = "*"
-faker = "*"
 
 [dev-packages]
 pre-commit = "*"
@@ -55,7 +48,7 @@ flake8 = "*"
 isort = "*"
 flask-debugtoolbar = "*"
 coverage = "*"
+faker = "*"
 
 [requires]
 python_version = "3.10"
-python_full_version = "3.10.6"

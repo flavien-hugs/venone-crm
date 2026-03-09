@@ -1,86 +1,76 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-	<div id="billingApp">
-
-		<message-component :show-message-alert="showMessageAlert" :message-alert="messageAlert">
-    	</message-component>
-
-    	<div v-if="isLoading" class="preloader">
-            <div class="preloader-body">
-                <p>Chargement en cours...</p>
-                <div class="cssload-container">
-                    <div class="cssload-speeding-wheel"></div>
+<div class="row g-2">
+    <div class="col-md-4 mb-4">
+        <div class="card border-start-lg border-start-primary h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="small fw-bold text-primary mb-2 text-uppercase">solde</div>
+                        <div class="h1 fw-700">{{ total_payments_received | format_amount }} {{
+                            current_user.vn_devise }}</div>
+                    </div>
+                    <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                 </div>
             </div>
         </div>
-
-		<div class="row g-2">
-			<div class="col-md-4 mb-4">
-                <div class="card border-start-lg border-start-primary h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <div class="small fw-bold text-primary mb-2 text-uppercase">solde</div>
-                                <div class="h1 fw-700">{ user.total_payments_received } { user.vn_device }</div>
-                            </div>
-                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card border-start-lg border-start-primary h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <div class="small fw-bold text-primary mb-2 text-uppercase">Total loyers à collecter</div>
-                                <div class="h1 fw-700">{ user.total_house_amount } { user.vn_device }</div>
-                            </div>
-                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card border-start-lg border-start-primary h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <div class="small fw-bold text-primary mb-2 text-uppercase">gains sur loyers à collectés</div>
-                                <div class="h1 fw-700">{ user.total_house_percent } { user.vn_device }</div>
-                            </div>
-                            <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-		</div>
-
-		<div class="row">
-			<div class="col-lg-12">
-			    <div class="card mb-4">
-			    	<div class="card-header">Historique de vos retraits effectués</div>
-			    	<div class="card-body px-0">
-			    		<div class="d-flex align-items-center justify-content-between px-4">
-				    		<div class="d-flex align-items-center">
-				    			<i class="fab fa-cc-visa fa-2x cc-color-visa"></i>
-				    			<div class="ms-4">
-				    				<div class="small">Retrait effectué le 21 Avril 2023 sur le 07070707</div>
-				    				<div class="text-xs text-muted">le 04/2024</div>
-				    			</div>
-				    		</div>
-			    		</div>
-			    	</div>
-			    </div>
-		    </div>
-	    </div>
     </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card border-start-lg border-start-primary h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="small fw-bold text-primary mb-2 text-uppercase">Total loyers à collecter
+                        </div>
+                        <div class="h1 fw-700">{{ total_house_amount | format_amount }} {{ current_user.vn_devise }}
+                        </div>
+                    </div>
+                    <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card border-start-lg border-start-primary h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="small fw-bold text-primary mb-2 text-uppercase">gains sur loyers à
+                            collectés
+                        </div>
+                        <div class="h1 fw-700">{{ total_house_percent | format_amount }} {{ current_user.vn_devise
+                            }}</div>
+                    </div>
+                    <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header">Historique de vos retraits effectués</div>
+            <div class="card-body px-0">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fab fa-cc-visa fa-2x cc-color-visa"></i>
+                        <div class="ms-4">
+                            <div class="small">Retrait effectué le 21 Avril 2023 sur le 07070707</div>
+                            <div class="text-xs text-muted">le 04/2024</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock dashboard_content %}
 
 {% block other_js_src %}
-    {{ super() }}
-    <script type="module" src="{{ url_for('static', filename="js/app/billing.js") }}"></script>
+{{ super() }}
 {% endblock other_js_src %}

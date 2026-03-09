@@ -1,0 +1,65 @@
+{% if transfers %}
+<table class="table table-hover">
+    <thead class="small">
+        <tr>
+            <th>ID</th>
+            <th>Numéro de retrait</th>
+            <th>Montant</th>
+            <th>Date</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transfers %}
+        <tr>
+            <td><span class="badge bg-primary-soft text-primary">#{{ t.vn_transfer_id }}</span></td>
+            <td>{{ t.vn_withdrawal_number or '—' }}</td>
+            <td>{{ t.vn_trans_amount | format_amount }} {{ current_user.vn_devise }}</td>
+            <td>{{ t.vn_created_at.strftime('%d %B %Y') if t.vn_created_at else '—' }}</td>
+            <td>
+                {% if t.vn_trans_status %}
+                <span class="badge bg-success-soft text-success fw-500 p-2 rounded text-uppercase">
+                    <i class="fa fa-check me-1"></i> Validé
+                </span>
+                {% else %}
+                <span class="badge bg-warning-soft text-warning fw-500 p-2 rounded text-uppercase">
+                    <i class="fa fa-spinner me-1"></i> En attente
+                </span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{# Pagination HTMX #}
+<nav>
+    <ul class="pagination pagination-sm justify-content-end mb-0">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <button class="page-link" hx-get="{{ url_for('api.get_transfers', page=page-1) }}"
+                hx-target="#transfers-container" hx-swap="innerHTML" hx-indicator="#transfers-spinner">
+                &laquo; Précédent
+            </button>
+        </li>
+        {% endif %}
+        <li class="page-item disabled">
+            <span class="page-link text-muted">Page {{ page }} / {{ pagination.pages }}</span>
+        </li>
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <button class="page-link" hx-get="{{ url_for('api.get_transfers', page=page+1) }}"
+                hx-target="#transfers-container" hx-swap="innerHTML" hx-indicator="#transfers-spinner">
+                Suivant &raquo;
+            </button>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% else %}
+<div class="text-center py-5">
+    <img loading="lazy" class="mb-3" style="width:100px"
+        src="{{ url_for('static', filename='img/element/credit_card.svg') }}" alt="">
+    <h5 class="text-muted">Aucune demande de retrait effectuée pour le moment.</h5>
+</div>
+{% endif %}

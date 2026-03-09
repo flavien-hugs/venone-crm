@@ -1,93 +1,316 @@
 {% extends "dashboard/_base.html" %}
 
-{% block other_css_src %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
-{% endblock other_css_src %}
-
 {% block dashboard_content %}
-    <section id="dashboardApp">
-        <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row mb-4">
-            <div class="me-4 mb-3 mb-sm-0">
-                <h1 class="mb-0">{{ page_title | e }}</h1>
-                <div class="small">
-                    <span class="fw-500 text-muted">
-                        {{ moment().format('dddd') }} {{ moment().format('Do MMMM YYYY') }}
-                    </span> &smid; { user.vn_country }
-                </div>
+<section>
+    {# ─── En-tête ─── #}
+    <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row mb-4">
+        <div class="me-4 mb-3 mb-sm-0">
+            <h1 class="mb-0">{{ page_title | e }}</h1>
+            <div class="small">
+                <span class="fw-500 text-muted">
+                    {{ moment().format('dddd') }} {{ moment().format('Do MMMM YYYY') }}
+                </span>
+                {% if current_user.vn_country %}
+                &smid; {{ current_user.vn_country }}
+                {% endif %}
             </div>
         </div>
+    </div>
 
-        <kpi-component :user="user"></kpi-component>
-
-        <div v-if="isLoading" class="preloader">
-            <div class="preloader-body">
-                <p>Chargement en cours ...</p>
-                <div class="cssload-container">
-                    <div class="cssload-speeding-wheel"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12 mb-4">
-                <div class="card card-header-actions h-auto">
-                    <div class="card-header text-muted">
-                        Tendances des coûts de location
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-area">
-                            <canvas id="trendPriceChart" width="100%" height="50"></canvas>
+    {# ─── KPI Cards ─── #}
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card border-start-lg border-start-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-primary mb-2 text-uppercase">Paiements reçus</div>
+                            <div class="h1 fw-700">{{ stats.payments_count }}</div>
                         </div>
+                        <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <div :class="{ 'col-xl-6': user.vn_house_owner, 'col-xl-4': user.vn_company }" class="mb-4">
-                <div class="card card-header-actions h-auto">
-                    <div class="card-header text-muted">
-                        Nombre de locataires par mois
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-area">
-                            <canvas id="tenantChart" width="100%" height="30"></canvas>
+        <div class="col-md-3 mb-4">
+            <div class="card border-start-lg border-start-secondary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-secondary mb-2 text-uppercase">Propriétés</div>
+                            <div class="h1 fw-700">{{ stats.houses_count }}</div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div v-show="user.vn_company" class="col-xl-4 mb-4">
-                <div class="card card-header-actions h-auto">
-                    <div class="card-header text-muted">
-                        Nombre de bailleurs par mois
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-area">
-                            <canvas id="ownerChart" width="100%" height="30"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div :class="{ 'col-xl-6': user.vn_house_owner, 'col-xl-4': user.vn_company }" class="mb-4">
-                <div class="card card-header-actions h-auto">
-                    <div class="card-header text-muted">
-                        Disponibilté de vos propriétés
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-pie">
-                            <canvas id="openHouseChart" width="100%" height="50"></canvas>
-                        </div>
+                        <div class="ms-2"><i class="fas fa-home fa-2x text-gray-200"></i></div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+        <div class="col-md-3 mb-4">
+            <div class="card border-start-lg border-start-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-success text-uppercase mb-2">Locataires</div>
+                            <div class="h1 fw-700">{{ stats.tenants_count }}</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-users fa-2x text-gray-200"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-start-lg border-start-info h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-info text-uppercase mb-2">Bailleurs</div>
+                            <div class="h1 fw-700">{{ stats.owners_count }}</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-user-tie fa-2x text-gray-200"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ─── Tendances coûts ─── #}
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card card-header-actions h-auto">
+                <div class="card-header text-muted">
+                    Tendances des coûts de location
+                    <span id="trendPriceSpinner" class="spinner-border spinner-border-sm text-muted"
+                        role="status"></span>
+                    <small id="trendPriceError" class="text-danger d-none">Erreur de chargement</small>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="trendPriceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# ─── Charts secondaires ─── #}
+
+    <div class="row">
+        <div class="col-xl-4 mb-4">
+            <div class="card card-header-actions h-auto">
+                <div class="card-header text-muted d-flex align-items-center gap-2">
+                    Locataires / mois
+                    <span id="tenantSpinner" class="spinner-border spinner-border-sm text-muted" role="status"></span>
+                    <small id="tenantError" class="text-danger d-none">Erreur de chargement</small>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="tenantChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if current_user.vn_company or current_user.is_administrator() %}
+        <div class="col-xl-4 mb-4">
+            <div class="card card-header-actions h-auto">
+                <div class="card-header text-muted d-flex align-items-center gap-2">
+                    Bailleurs / mois
+                    <span id="ownerSpinner" class="spinner-border spinner-border-sm text-muted" role="status"></span>
+                    <small id="ownerError" class="text-danger d-none">Erreur de chargement</small>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="ownerChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="col-xl-4 mb-4">
+            <div class="card card-header-actions h-auto">
+                <div class="card-header text-muted d-flex align-items-center gap-2">
+                    Disponibilité des propriétés
+                    <span id="openHouseSpinner" class="spinner-border spinner-border-sm text-muted"
+                        role="status"></span>
+                    <small id="openHouseError" class="text-danger d-none">Erreur de chargement</small>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="openHouseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock dashboard_content %}
 
 {% block other_js_src %}
-    {{ super() }}
-    <script type="module" src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/app/dashboard.js') }}"></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
+<script>
+    /**
+     * Dashboard Charts — chargés via fetch() depuis les APIs JSON.
+     * Chaque spinner est caché après succès OU en cas d'erreur HTTP.
+     */
+
+    const months = Array.from({ length: 12 }, (_, i) => {
+        return new Date(2000, i, 1).toLocaleString('fr-FR', { month: 'short' });
+    });
+
+    /** Utilitaire : cache le spinner, montre l'erreur si besoin */
+    function finalize(spinnerId, errorId, isError) {
+        const spinner = document.getElementById(spinnerId);
+        const errorEl = document.getElementById(errorId);
+        if (spinner) spinner.classList.add('d-none');
+        if (isError && errorEl) errorEl.classList.remove('d-none');
+    }
+
+    /** Convertit les lignes API en tableau de 12 valeurs mensuelles */
+    function buildMonthlyArray(data, valueKey) {
+        const arr = new Array(12).fill(0);
+        (data || []).forEach(row => {
+            const idx = (row.month || 0) - 1;
+            if (idx >= 0 && idx < 12) arr[idx] = row[valueKey] || 0;
+        });
+        return arr;
+    }
+
+    /** fetch() robuste : rejette la promesse si le statut HTTP n'est pas ok */
+    function fetchJSON(url) {
+        return fetch(url).then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        });
+    }
+
+    /* ── Tendances des loyers ── */
+    fetchJSON("{{ url_for('api.get_trendprices_data') }}")
+        .then(data => {
+            finalize('trendPriceSpinner', 'trendPriceError', false);
+            new Chart(document.getElementById("trendPriceChart"), {
+                type: "line",
+                data: {
+                    labels: months,
+                    datasets: [{
+                        data: buildMonthlyArray(data, 'price'),
+                        fill: false,
+                        borderColor: "rgb(75, 192, 192)",
+                        tension: 0.3,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\u00A0/g, ' ');
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    return value.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\u00A0/g, ' ');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(() => finalize('trendPriceSpinner', 'trendPriceError', true));
+
+    /* ── Locataires par mois ── */
+    fetchJSON("{{ url_for('api.get_tenants_data') }}")
+        .then(data => {
+            finalize('tenantSpinner', 'tenantError', false);
+            new Chart(document.getElementById("tenantChart"), {
+                type: "bar",
+                data: {
+                    labels: months,
+                    datasets: [{
+                        data: buildMonthlyArray(data, 'count'),
+                        backgroundColor: "rgba(0, 97, 242, 0.85)",
+                        borderColor: "#4e73df",
+                        borderWidth: 1,
+                        maxBarThickness: 25,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        })
+        .catch(() => finalize('tenantSpinner', 'tenantError', true));
+
+    {% if current_user.vn_company or current_user.is_administrator() %}
+    /* ── Bailleurs par mois ── */
+    fetchJSON("{{ url_for('api.get_owners_data') }}")
+        .then(data => {
+            finalize('ownerSpinner', 'ownerError', false);
+            new Chart(document.getElementById("ownerChart"), {
+                type: "bar",
+                data: {
+                    labels: months,
+                    datasets: [{
+                        data: buildMonthlyArray(data, 'count'),
+                        backgroundColor: "rgba(0, 97, 242, 0.85)",
+                        borderColor: "#4e73df",
+                        borderWidth: 1,
+                        maxBarThickness: 25,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        })
+        .catch(() => finalize('ownerSpinner', 'ownerError', true));
+    {% endif %}
+
+    /* ── Disponibilité des propriétés ── */
+    fetchJSON("{{ url_for('api.get_available_properties_data') }}")
+        .then(data => {
+            finalize('openHouseSpinner', 'openHouseError', false);
+            // data is now a plain dict: {isOpen: n, notOpen: m}
+            new Chart(document.getElementById("openHouseChart"), {
+                type: "pie",
+                data: {
+                    labels: ["Disponible", "Indisponible"],
+                    datasets: [{
+                        data: [data.isOpen || 0, data.notOpen || 0],
+                        backgroundColor: [
+                            "rgba(0, 97, 242, 0.9)",
+                            "rgba(0, 172, 105, 0.9)",
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        })
+        .catch(() => finalize('openHouseSpinner', 'openHouseError', true));
+</script>
 {% endblock other_js_src %}

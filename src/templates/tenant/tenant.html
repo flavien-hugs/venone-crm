@@ -1,242 +1,132 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-    <section id="tenantTable">
-        <message-component
-            :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">
-        </message-component>
+<section>
+    <div id="message-container"></div>
 
-        <div v-show="user.tenants_count == 0" class="card card-body shadow-none bg-transparent border-0">
-            <div class="text-center py-2">
+    {% if stats.tenants_count == 0 %}
+    <div class="card card-body shadow-none bg-transparent border-0">
+        <div class="text-center py-2">
+            <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="
+                img/element/avatar.png") }}">
 
-                <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}">
+            <h4 class="d-flex justify-content-center text-muted mb-4">
+                Vous n'avez aucun locataire enregistré en ce moment.
+            </h4>
 
-                <h4 class="d-flex justify-content-center text-muted mb-4">
-                    Vous n'avez aucun locataire enregistré en ce moment.
-                </h4>
+            {% if current_user.vn_house_owner %}
+            <button class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button" data-bs-toggle="modal"
+                data-bs-target="#addOwnerTenantModal">
+                <i class="me-2" data-feather="user-plus"></i>
+                Ajouter un locataire
+            </button>
+            {% endif %}
 
-                <button v-show="user.vn_house_owner" @click="createOwnerTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+            {% if current_user.vn_company or current_user.is_administrator() %}
+            <button class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button" data-bs-toggle="modal"
+                data-bs-target="#createTenantModal">
+                <i class="me-2" data-feather="user-plus"></i>
+                Ajouter un locataire
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="card card-header-actions mx-auto">
+        <div class="card-header">
+            <span class="fw-700">Vos locataires ({{ stats.tenants_count }})</span>
+            <div>
+                {% if current_user.vn_company or current_user.is_administrator() %}
+                <button class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2" type="button"
+                    data-bs-toggle="modal" data-bs-target="#createTenantModal">
                     <i class="me-2" data-feather="user-plus"></i>
                     Ajouter un locataire
                 </button>
+                {% endif %}
 
-                <button v-show="user.vn_company" @click="createCompanyTenant" class="btn btn-sm btn-success text-uppercase text-white fw-500" type="button">
+                {% if current_user.vn_house_owner %}
+                <button class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2" type="button"
+                    data-bs-toggle="modal" data-bs-target="#addOwnerTenantModal">
                     <i class="me-2" data-feather="user-plus"></i>
                     Ajouter un locataire
                 </button>
-            </div>
-        </div>
+                {% endif %}
 
-        <div v-show="isLoading" class="preloader">
-            <div class="preloader-body">
-                <p>Chargement en cours...</p>
-                <div class="cssload-container">
-                    <div class="cssload-speeding-wheel"></div>
-                </div>
-            </div>
-        </div>
+                <div class="ms-auto d-flex gap-2 align-items-center">
+                    <div class="input-group input-group-joined border-0" style="width: 250px;">
+                        <span class="input-group-text"><i data-feather="search"></i></span>
+                        <input class="form-control ps-0" type="text" name="q" placeholder="Rechercher..."
+                            hx-get="{{ url_for('api.get_all_tenants') }}" hx-trigger="keyup changed delay:500ms"
+                            hx-target="#tenant-list" hx-swap="innerHTML" aria-label="Search">
+                    </div>
 
-        <div v-show="user.tenants_count > 0" class="card card-header-actions mx-auto">
-            <div class="card-header">
-                <span class="fw-700">Vos locataires ({ user.tenants_count })</span>
-                <div>
-                    <button v-show="user.vn_company" @click.prevent="createCompanyTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
-                        <i class="me-2" data-feather="user-plus"></i>
-                        Ajouter un locataire
-                    </button>
-
-                    <button v-show="user.vn_house_owner" @click.prevent="createOwnerTenant" class="btn btn-sm btn-success text-white text-uppercase fw-700 me-2">
-                        <i class="me-2" data-feather="user-plus"></i>
-                        Ajouter un locataire
-                    </button>
-
-                    <button @click.prevent="downloadTenantCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
+                    <a href="{{ url_for('agency_bp.export_tenants_csv') }}"
+                        class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
                         <i class="me-2" data-feather="download"></i>
                         télécharger le csv
-                    </button>
+                    </a>
                 </div>
-            </div>
-
-            <div class="card-body">
-
-                {#<div class="input-group input-group-joined input-group-solid shadow-none">
-                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
-                    <input
-                        type="text"
-                        placeholder="Rechercher un locataire ..."
-                        v-model="searchQuery"
-                        class="form-control shadow-none ps-0"
-                    >
-                </div>#}
-
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="small">
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th v-show="user.vn_company" scope="col">ID Propriétaire</th>
-                                <th scope="col">Nom &amp; prénoms / téléphone</th>
-                                <th scope="col">Loyer à payer</th>
-                                <th scope="col">Date prochain loyer</th>
-                                <th scope="col">Date d'ajout</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% include "tenant/paths/_tenant.html" %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <paginate-component
-                    :current-page="currentPage"
-                    :total-pages="totalPages"
-                    :next-page="nextPage"
-                    :prev-page="prevPage"
-                ></paginate-component>
             </div>
         </div>
 
-        <!-- modal company add tenant -->
-        <div v-show="user.vn_company" class="modal fade" data-bs-backdrop="static" id="createTenantModal">
-            <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-                <div class="modal-content">
+        <div class="card-body" id="tenant-list" hx-get="{{ url_for('api.get_all_tenants') }}" hx-trigger="load"
+            hx-swap="innerHTML">
+            <!-- Tenant list will be loaded here by HTMX -->
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- modal company add tenant -->
+    <div class="modal fade" data-bs-backdrop="static" id="createTenantModal">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form hx-post="{{ url_for('api.house_assign_tenant') }}" hx-target="#message-container"
+                    hx-swap="innerHTML"
+                    hx-on="htmx:afterRequest: this.closest('.modal').hide(); hx-trigger: reload-tenant-list">
                     <div class="modal-header">
                         <h5 class="modal-title">Enregistrer un locataire</h5>
                         <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body">
-                        <div class="nav nav-pills nav-justified nav-wizard" role="tablist">
-                            <div :class="{ active: currentStep === 1 }" class="nav-item nav-link p-3">
-                                <div class="wizard-step-icon">1</div>
-                                <div class="wizard-step-text">
-                                    <div class="modal-title wizard-step-text-name fw-700">
-                                        Propriétaire
-                                    </div>
-                                    <small class="wizard-step-text-details">Informations sur le propriétaire</small>
-                                </div>
-                            </div>
-
-                            <div :class="{ active: currentStep === 2 }" class="nav-item nav-link p-3" id="wizard2-tab">
-                                <div class="wizard-step-icon">2</div>
-                                <div class="wizard-step-text">
-                                    <div class="modal-title wizard-step-text-name fw-700">
-                                        Propriété
-                                    </div>
-                                    <small class="wizard-step-text-details">Informations sur la propriété</small>
-                                </div>
-                            </div>
-
-                            <div :class="{ active: currentStep === 3 }" class="nav-item nav-link p-3" id="wizard2-tab">
-                                <div class="wizard-step-icon">3</div>
-                                <div class="wizard-step-text">
-                                    <div class="modal-title wizard-step-text-name fw-700">
-                                       Locataire
-                                    </div>
-                                    <small class="wizard-step-text-details">Informations sur le locataire</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-3">
-
-                        <div class="tab-content">
-                            <div :class="{ active: currentStep === 1 }"class="tab-pane fade show">
-                                {% include "tenant/fields/field_owner.html" %}
-                            </div>
-
-                            <div :class="{ active: currentStep === 2 }"class="tab-pane fade show">
-                                {% include "tenant/fields/field_house.html" %}
-                            </div>
-
-                            <div :class="{ active: currentStep === 3 }" class="tab-pane fade show">
-                                {% include "tenant/fields/field_tenant.html" %}
-                            </div>
-                        </div>
+                        {% include "tenant/fields/field_owner.html" %}
+                        {% include "tenant/fields/field_house.html" %}
+                        {% include "tenant/fields/field_tenant.html" %}
                     </div>
 
-                    <div class="row modal-footer justify-content-center">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between">
-                                <button :class="{ disabled: currentStep === 1 }" @click.prevent="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
-                                <button v-if="currentStep < 3" @click.prevent="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
-                                <button v-if="currentStep === 3" @click.prevent="onCreateComapnyTenant" class="btn btn-success shadow-none" type="submit">Valider</button>
-                            </div>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success shadow-none">Valider</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <!-- modal owner add tenant -->
-        <div v-show="user.vn_house_owner" class="modal fade" data-bs-backdrop="static" id="addOwnerTenantModal">
-            <div class="modal-dialog modal-xl modal-dialog-centered">
-                <div class="modal-content">
-                    <form>
-                        <div class="modal-header">
-                            <h4 class="modal-title">
-                                Ajouter un locataire
-                            </h4>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
+    <!-- modal owner add tenant -->
+    <div class="modal fade" data-bs-backdrop="static" id="addOwnerTenantModal">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <form hx-post="{{ url_for('api.house_assign_tenant') }}" hx-target="#message-container"
+                    hx-swap="innerHTML"
+                    hx-on="htmx:afterRequest: this.closest('.modal').hide(); hx-trigger: reload-tenant-list">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            Ajouter un locataire
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
 
-                        <div class="modal-body">
-                            <div class="nav nav-pills nav-justified nav-wizard" role="tablist">
-                                <div :class="{ active: currentStep === 1 }" class="nav-item nav-link p-3">
-                                    <div class="wizard-step-icon">3</div>
-                                    <div class="wizard-step-text">
-                                        <div class="modal-title wizard-step-text-name fw-700">
-                                            Locataire
-                                        </div>
-                                        <small class="wizard-step-text-details">Informations sur le locataire</small>
-                                    </div>
-                                </div>
+                    <div class="modal-body">
+                        {% include "tenant/fields/field_tenant.html" %}
+                        {% include "tenant/fields/field_house.html" %}
+                    </div>
 
-                                <div :class="{ active: currentStep === 2 }" class="nav-item nav-link p-3">
-                                    <div class="wizard-step-icon">2</div>
-                                    <div class="wizard-step-text">
-                                        <div class="modal-title wizard-step-text-name fw-700">
-                                            Propriété
-                                        </div>
-                                        <small class="wizard-step-text-details">Informations sur la propriété</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr class="my-3">
-
-                            <div class="tab-content">
-                                <div :class="{ active: currentStep === 1 }"class="tab-pane fade show">
-                                    {% include "tenant/fields/field_tenant.html" %}
-                                </div>
-
-                                <div :class="{ active: currentStep === 2 }" class="tab-pane fade show">
-                                    {% include "tenant/fields/field_house.html" %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row modal-footer justify-content-center">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between">
-                                    <button :class="{ disabled: currentStep === 1 }" @click.prevent="prevStep" class="btn btn-light shadow-none" type="button">Précédent</button>
-
-                                    <button v-if="currentStep < 2" @click.prevent="nextStep" class="btn btn-primary shadow-none" type="button">Suivant</button>
-
-                                    <button v-if="currentStep === 2" @click.prevent="onCreateOwnerTenant" class="btn btn-success shadow-none">Valider</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success shadow-none">Valider</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 {% endblock dashboard_content %}
-
-{% block other_js_src %}
-    {{ super() }}
-    <script type="module" src="{{ url_for('static', filename="js/app/tenant.js") }}"></script>
-{% endblock other_js_src %}

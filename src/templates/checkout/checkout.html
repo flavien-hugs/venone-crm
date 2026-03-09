@@ -1,113 +1,30 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_content %}
-    <section id="checkoutTable">
-
-        <!-- Alert message -->
-        <message-component
-            :show-message-alert="showMessageAlert"
-            :message-alert="messageAlert">
-        </message-component>
-
-        <div v-show="payments.length == 0" class="card card-body shadow-none bg-transparent border-0">
-            <div class="text-center py-2">
-
-                <img loading="lazy" class="img-account-profile rounded-circle mb-2" src="{{ url_for('static', filename="img/element/avatar.png")}}">
-
-                <h4 class="d-flex justify-content-center text-muted mb-4">
-                    Vous n'avez aucun paiement en cours en ce moment.
-                </h4>
-            </div>
+<section>
+    <div class="card card-header-actions mx-auto">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-700">{{ page_title }}</span>
+            <a href="{{ url_for('checkout_bp.export_payments_csv') }}"
+                class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
+                <i class="me-2" data-feather="download"></i>
+                Télécharger CSV
+            </a>
         </div>
 
-        <div v-if="isLoading" class="preloader">
-            <div class="preloader-body">
-                <p>Chargement en cours...</p>
-                <div class="cssload-container">
-                    <div class="cssload-speeding-wheel"></div>
-                </div>
+        <div class="card-body">
+            {# Indicateur de chargement HTMX #}
+            <div id="payments-spinner" class="htmx-indicator text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                <span class="ms-2 text-muted small">Chargement des paiements...</span>
+            </div>
+
+            {# Conteneur rechargé par HTMX #}
+            <div id="payments-container" hx-get="{{ url_for('api.get_all_payments', page=1) }}" hx-trigger="load"
+                hx-swap="innerHTML" hx-indicator="#payments-spinner">
+                <div class="text-center py-4 text-muted small">Initialisation...</div>
             </div>
         </div>
-
-        <div v-show="payments.length > 0" class="card card-header-actions mx-auto">
-            <div class="card-header">
-                <span class="fw-700">{{ page_title }}</span>
-                <div>
-                    <button @click.prevent="downloadPaymentCSV" type="button" class="btn btn-sm btn-outline-primary text-uppercase fw-700 shadow-none">
-                        <i class="me-2" data-feather="download"></i>
-                        télécharger le csv
-                    </button>
-                </div>
-            </div>
-
-            <div class="card-body">
-                {#<div class="input-group input-group-joined input-group-solid shadow-none">
-                    <button type="submit" class="input-group-text"><i data-feather="search"></i></button>
-                    <input
-                        type="text"
-                        placeholder="Rechercher un paiement ..."
-                        v-model="searchQuery"
-                        class="form-control shadow-none ps-0"
-                    >
-                </div>#}
-
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="small">
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">ID Transaction</th>
-                                <th scope="col">Nom &amp; prénom</th>
-                                <th scope="col">ID Opérateur</th>
-                                <th scope="col">Montant ({ user.vn_device })</th>
-                                <th scope="col">Méthode de paiement</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Date de paiement</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <template v-for="p in payments" v-bind:key="p.uuid">
-                                <tr>
-                                    <td><span class="badge bg-secondary text-white">#{ p.vn_payment_id }</span></td>
-                                    <td><span class="badge bg-red text-white">{ p.vn_transaction_id }</span></td>
-                                    <td>{ p.house.tenant }</td>
-                                    <td>
-                                        <span class="badge bg-blue text-white">{ p.vn_cinetpay_data.data.operator_id }</span>
-                                    </td>
-                                    <td>{ p.vn_cinetpay_data.data.amount } { p.vn_cinetpay_data.data.currency }</td>
-                                    <td>{ p.vn_cinetpay_data.data.payment_method }</td>
-                                    <td><span :class="{'bg-red': p.vn_pay_status, 'bg-green': !p.vn_pay_status}" class="badge text-white text-uppercase">{ p.payment_status }</span></td>
-                                    <td>{ p.vn_cinetpay_data.data.payment_date }</td>
-                                    <td>
-                                        <button v-show="!p.payment_status" title="Afficher la facture du paiement" type="button" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-                                            <i class="text-secondary fa fa-eye"></i>
-                                        </button>
-
-                                        <button v-show="!p.payment_status" title="Télécharger la facture du paiement" type="button" class="btn btn-datatable btn-icon btn-transparent-green me-2">
-                                            <i class="text-green fa fa-download"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-
-                <paginate-component
-                    :current-page="currentPage"
-                    :total-pages="totalPages"
-                    :next-page="nextPage"
-                    :prev-page="prevPage"
-                ></paginate-component>
-            </div>
-        </div>
-
-    </section>
+    </div>
+</section>
 {% endblock dashboard_content %}
-
-{% block other_js_src %}
-    {{ super() }}
-    <script type="module" src="{{ url_for('static', filename="js/app/checkout.js") }}"></script>
-{% endblock other_js_src %}

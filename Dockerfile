@@ -41,8 +41,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     VIRTUAL_ENV=/venv \
     LANG=fr_FR.UTF-8 \
     LANGUAGE=fr_FR:fr \
-    LC_ALL=fr_FR.UTF-8 \
-    FLASK_APP=runserver.py
+    LC_ALL=fr_FR.UTF-8
 
 # Copier uniquement le virtualenv depuis le builder
 COPY --from=builder /venv /venv
@@ -56,5 +55,5 @@ RUN chgrp -R 0 /app && chmod -R g=u /app
 # Exposer le port applicatif
 EXPOSE 5000
 
-# Démarrer Gunicorn en production (Point d'entrée corrigé: venone_app)
-CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:5000", "--access-logfile", "-", "--error-logfile", "-", "runserver:venone_app"]
+# Démarrer Gunicorn en production (Point d'entrée corrigé: app)
+CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:5000", "--access-logfile", "-", "--error-logfile", "-", "src.cli:app"]

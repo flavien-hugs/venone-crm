@@ -35,7 +35,7 @@ services:
       - database
     restart: unless-stopped
 
-  db.migrate:
+  database-migrate:
     build:
       context: .
       dockerfile: Dockerfile

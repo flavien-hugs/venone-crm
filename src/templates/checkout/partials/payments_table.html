@@ -1,0 +1,67 @@
+{% if payments %}
+<table class="table table-hover">
+    <thead class="small">
+        <tr>
+            <th>ID</th>
+            <th>ID Transaction</th>
+            <th>Montant</th>
+            <th>Statut</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in payments %}
+        <tr>
+            <td><span class="badge bg-secondary text-white">#{{ p.vn_payment_id }}</span></td>
+            <td><span class="badge bg-danger text-white">{{ p.vn_transaction_id or '—' }}</span></td>
+            <td>
+                {% if p.vn_cinetpay_data and p.vn_cinetpay_data.get('data') %}
+                {{ p.vn_cinetpay_data.data.amount | format_amount }} {{ p.vn_cinetpay_data.data.currency }}
+                {% else %}
+                {{ p.vn_pay_amount | format_amount }} {{ current_user.vn_devise }}
+                {% endif %}
+            </td>
+            <td>
+                {% if p.vn_pay_status %}
+                <span class="badge bg-success text-uppercase">Payé</span>
+                {% else %}
+                <span class="badge bg-danger text-uppercase">Impayé</span>
+                {% endif %}
+            </td>
+            <td>{{ p.vn_pay_date.strftime('%d %B %Y') if p.vn_pay_date else '—' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{# Pagination HTMX #}
+<nav>
+    <ul class="pagination pagination-sm justify-content-end mb-0">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <button class="page-link" hx-get="{{ url_for('api.get_all_payments', page=page-1) }}"
+                hx-target="#payments-container" hx-swap="innerHTML" hx-indicator="#payments-spinner">
+                &laquo; Précédent
+            </button>
+        </li>
+        {% endif %}
+        <li class="page-item disabled">
+            <span class="page-link text-muted">Page {{ page }} / {{ pagination.pages }}</span>
+        </li>
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <button class="page-link" hx-get="{{ url_for('api.get_all_payments', page=page+1) }}"
+                hx-target="#payments-container" hx-swap="innerHTML" hx-indicator="#payments-spinner">
+                Suivant &raquo;
+            </button>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% else %}
+<div class="text-center py-5">
+    <img loading="lazy" class="mb-3" style="width:80px" src="{{ url_for('static', filename='img/element/avatar.png') }}"
+        alt="">
+    <h5 class="text-muted">Aucun paiement enregistré pour le moment.</h5>
+</div>
+{% endif %}

@@ -1,125 +1,50 @@
-<template v-for="tn in tenants" v-bind:key="tn.uuid">
-	<tr v-if='tn.uuid'>
-		<td scope="row">
-			<span
-				class="badge bg-purple text-white">
-				#{ tn.vn_tenant_id }
-			</span>
-		</td>
-		<td v-show="user.vn_company" scope="row">
-			<span v-show="tn.owner" class="badge bg-red text-white">
-				#{ tn.owner }
-			</span>
-			<span v-if="!tn.owner">&ndash;</span>
-		</td>
-		<td scope="row">{ tn.vn_fullname } ({ tn.vn_phonenumber_one })</td>
-		<td scope="row">
-			<span class="badge bg-blue text-white ms-2">#{ tn.house.vn_house_id }</span>
-			<span> &ndash; ({ tn.house.vn_house_rent.toLocaleString() } { user.vn_device })</span>
-		</td>
-		<td scope="row">{ tn.house.vn_house_lease_end_date } <span> <br> (dans { tn.house.remaining_days } jours)</span></td>
-		<td scope="row">{ tn.vn_created_at }</td>
-		<td scope="row">
-			<button @click.prevent="getTenant(tn.uuid)" title="Historique des paiements" type="button" class="btn btn-datatable btn-icon btn-transparent-primary me-2">
-				<i class="text-primary fa fa-money-check-dollar"></i>
-            </button>
+<tr>
+    <td scope="row">
+        <span class="badge bg-purple text-white">
+            #{{ tenant.vn_tenant_id }}
+        </span>
+    </td>
+    {% if current_user.vn_company or current_user.is_administrator() %}
+    <td scope="row">
+        {% if tenant.house and tenant.house.owner %}
+        <span class="badge bg-red text-white">
+            #{{ tenant.house.owner.vn_owner_id }}
+        </span>
+        {% else %}
+        <span>&ndash;</span>
+        {% endif %}
+    </td>
+    {% endif %}
+    <td scope="row">{{ tenant.vn_fullname }} ({{ tenant.vn_phonenumber_one }})</td>
+    <td scope="row">
+        <span class="badge bg-blue text-white ms-2">#{{ tenant.house.vn_house_id if tenant.house else 'N/A' }}</span>
+        <span> &ndash; ({{ (tenant.house.vn_house_rent if tenant.house else 0) | format_amount }} {{
+            current_user.vn_devise }})</span>
+    </td>
+    <td scope="row">
+        {{ tenant.house.vn_house_lease_end_date if tenant.house else 'N/A' }}
+    </td>
+    <td scope="row">{{ tenant.vn_created_at.strftime('%Y-%m-%d') if tenant.vn_created_at else 'N/A' }}</td>
+    <td scope="row">
+        <button title="Historique des paiements" type="button"
+            class="btn btn-datatable btn-icon btn-transparent-primary me-2">
+            <i class="text-primary fa fa-money-check-dollar"></i>
+        </button>
 
-			<button title="Télécharger le contrat de ce locataire" type="button" class="btn btn-datatable btn-icon btn-transparent-green">
-				<i class="fa fa-download me-2"></i>
-            </button>
+        <button title="Télécharger le contrat de ce locataire" type="button"
+            class="btn btn-datatable btn-icon btn-transparent-green">
+            <i class="fa fa-download me-2"></i>
+        </button>
 
-			<button title="Mettre à jour les informations de ce locataire" @click.prevent="updateTenant(tn)" class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
-				<i class="text-secondary fa fa-edit"></i>
-			</button>
+        <button title="Mettre à jour les informations de ce locataire"
+            class="btn btn-datatable btn-icon btn-transparent-secondary me-2">
+            <i class="text-secondary fa fa-edit"></i>
+        </button>
 
-			<button title="Supprimer ce locataire" @click.prevent="deleteTenantConfirm(tn.uuid)" class="btn btn-datatable btn-icon btn-transparent-dark">
-				<i class="text-danger fa fa-trash"></i>
-			</button>
-		</td>
-	</tr>
-</template>
-
-{# history payment tenant modal #}
-<div class="modal fade" data-bs-backdrop="static" id="detailTenantModal">
-	<div class="modal-dialog modal-xl modal-dialog-centered">
-		<div class="modal-content">
-			<form>
-				<div class="modal-header">
-					<h4 class="modal-title">
-						Historique de paiement : #{ tenant.vn_tenant_id } - { tenant.vn_fullname }
-					</h4>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-				</div>
-				<div class="modal-body">
-					<div class="d-flex align-items-center justify-content-between px-4">
-						<template v-for="tph in tenant.payment_history" :key="tph">
-							<div class="d-flex align-items-center">
-								<span class="badge bg-blue text-white me-2">{ tph.data.payment_method }</span>
-								<div class="ms-4">
-									<div class="small">{ tph.data.operator_id } - { tph.data.amount } { tph.data.currency }</div>
-									<div class="text-xs text-muted">{ tph.data.payment_date }</div>
-								</div>
-							</div>
-						</template>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-sm btn-danger shadow-none" data-bs-dismiss="modal">Fermer</button>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
-{# update tenant modal #}
-<div class="modal fade" data-bs-backdrop="static" id="updateTenantConfirm">
-	<div class="modal-dialog modal-xl modal-dialog-centered">
-		<div class="modal-content">
-			<form>
-				<div class="modal-header">
-					<h4 class="modal-title">
-						Mise à jour locataire : #{ tenantData.vn_tenant_id } - { tenantData.vn_fullname }
-					</h4>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-				</div>
-				<div class="modal-body">
-					{% include "tenant/fields/field_tenant.html" %}
-				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-outline-primary shadow-none" data-bs-dismiss="modal">Annuler</button>
-					<button type="button" @click.prevent="onUpdateTenant" class="btn btn-success shadow-none">Mettre à jour</button>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
-{# delete tenant modal #}
-<div class="modal fade" data-bs-backdrop="static" id="delTenantConfirmModal">
-	<div class="modal-dialog modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Retirer ce locataire ?</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-
-			<div class="modal-body">
-				Êtes-vous sûr de vouloir supprimer ce locataire ?
-			</div>
-
-			<div class="modal-footer">
-				<div class="row">
-					<div class="col-6 d-grid">
-						<button @click.prevent="tenantUUID = null; onDeleteTenant = false" class="btn btn-outline-primary text-uppercase me-3" type="button" data-bs-dismiss="modal">
-						Annuler</button>
-					</div>
-
-					<div class="col-6 d-grid">
-						<button @click.prevent="onDeleteTenant" type="button" class="btn btn-danger text-uppercase shadow-none" data-bs-dismiss="modal">
-						Oui</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+        <button title="Supprimer ce locataire" hx-delete="{{ url_for('api.delete_tenant', uuid=tenant.uuid) }}"
+            hx-confirm="Êtes-vous sûr de vouloir supprimer ce locataire ?" hx-target="closest tr" hx-swap="outerHTML"
+            class="btn btn-datatable btn-icon btn-transparent-dark">
+            <i class="text-danger fa fa-trash"></i>
+        </button>
+    </td>
+</tr>

@@ -1,12 +1,15 @@
 import logging
+import os
 from logging.config import fileConfig
 
 from alembic import context
 from flask import current_app
 
-from src.auth.models import VNPercent, VNRole, VNUser  # noqa
-from src.payment.models import VNPayment, VNTransferRequest  # noqa
-from src.tenant.models import VNHouse, VNHouseOwner, VNTenant  # noqa
+from src.infrastructure.config.plugins import db
+from src.infrastructure.config.settings import config as settings
+
+env = os.environ.get("FLASK_CONFIG", "dev")
+conf = settings.get(env, settings["dev"])
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -14,7 +17,9 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
 logger = logging.getLogger("alembic.env")
 
 
@@ -24,7 +29,7 @@ def get_engine():
         return current_app.extensions["migrate"].db.get_engine()
     except (TypeError, AttributeError):
         # this works with Flask-SQLAlchemy>=3
-        return current_app.extensions["migrate"].db.engine
+        return db.engine
 
 
 def get_engine_url():
@@ -40,6 +45,7 @@ def get_engine_url():
 # target_metadata = mymodel.Base.metadata
 config.set_main_option("sqlalchemy.url", get_engine_url())
 target_db = current_app.extensions["migrate"].db
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -65,8 +71,18 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=get_metadata(), literal_binds=True)
+    url = conf.SQLALCHEMY_DATABASE_URI
+    if "sqlite+aiosqlite" in url:
+        url = url.replace("sqlite+aiosqlite", "sqlite")
+    elif "postgresql+asyncpg" in url:
+        url = url.replace("postgresql+asyncpg", "postgresql")
+
+    context.configure(
+        url=url,
+        target_metadata=get_metadata(),
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
 
     with context.begin_transaction():
         context.run_migrations()

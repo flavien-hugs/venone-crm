@@ -2,11 +2,13 @@
     "name": "Venone",
     "short_name": "Venone",
     "description": "Système de gestion de propriété",
-    "icons": [{
-        "src": "img/logo/logo.png",
-        "type": "image/png",
-        "sizes": "48x48"
-    }],
+    "icons": [
+        {
+            "src": "img/logo/logo.png",
+            "type": "image/png",
+            "sizes": "48x48"
+        }
+    ],
     "start_url": "/auth/login/",
     "display": "standalone",
     "orientation": "portrait-primary",
