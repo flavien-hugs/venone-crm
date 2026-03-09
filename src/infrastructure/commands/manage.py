@@ -1,16 +1,17 @@
 import logging
+
 import click
 from flask_migrate import upgrade
 from src.infrastructure.config.plugins import db
 from src.infrastructure.persistence.models import (
-    Role, 
-    User, 
-    Percent, 
-    Tenant, 
-    House, 
-    HouseOwner, 
-    Payment, 
-    TransferRequest
+    House,
+    HouseOwner,
+    Payment,
+    Percent,
+    Role,
+    Tenant,
+    TransferRequest,
+    User,
 )
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ def register_commands(app):
             HouseOwner=HouseOwner,
             Payment=Payment,
             TransferRequest=TransferRequest,
-            Role=Role
+            Role=Role,
         )
 
     @app.cli.command("init-db")
@@ -73,7 +74,7 @@ def register_commands(app):
             logger.exception(f"Error creating admin: {e}")
 
     @app.cli.command("drop-db")
-    @click.confirmation_option(prompt='Are you sure you want to drop all data?')
+    @click.confirmation_option(prompt="Are you sure you want to drop all data?")
     def drop_db():
         """Dangerous: Drops all tables and migration history."""
         try:
@@ -93,6 +94,7 @@ def register_commands(app):
         """Populate database with development data."""
         try:
             from src.infrastructure.persistence.seeders import SeedManager
+
             logger.info(f"Seeding database with {count} entries...")
             seeder = SeedManager(count=count)
             seeder.run()

@@ -93,7 +93,7 @@ class DefaultUserInfoModel(db.Model):
         return cls.query.filter(
             (cls.vn_addr_email == obj) | (cls.vn_phonenumber_one == obj)
         ).first()
-    
+
     def ping(self):
         """Update last_seen timestamp."""
         self.vn_last_seen = datetime.utcnow()
@@ -102,4 +102,6 @@ class DefaultUserInfoModel(db.Model):
 
     def get_name(self):
         """Returns the full name or agency name if available."""
-        return getattr(self, 'vn_fullname', None) or getattr(self, 'vn_agencie_name', 'Unknown')
+        return getattr(self, "vn_fullname", None) or getattr(
+            self, "vn_agencie_name", "Unknown"
+        )

@@ -40,6 +40,7 @@ repos:
           _build|
           buck-out|
           build|
+          migrations|
           dist"""
       language_version: python3.10
 
@@ -56,4 +57,4 @@ repos:
           - "--select=B,C,E,F,W,T4,B9"
           - "--ignore=B006,B008,B010,B903,B907,E203,E231,E701,W503"
           - "--builtins=F821, F405"
-          - "--exclude=.eggs,.git,.hg,.mypy_cache,.tox,.venv,.docker,build,dist,env,examples,_build,__pycache__"
+          - "--exclude=.eggs,.git,.hg,.mypy_cache,.tox,.venv,.docker,build,dist,env,examples,_build,__pycache__,migrations"

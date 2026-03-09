@@ -22,6 +22,7 @@ class Permission:
     Permissions are defined as powers of 2, allowing for bitwise operations
     to combine and check for multiple permissions.
     """
+
     LOGIN = 1
     MANAGE_HOUSES = 2
     MANAGE_TENANTS = 4
@@ -70,12 +71,12 @@ class Role(db.Model):
         """Create or update roles with a predefined set of permissions."""
         roles = {
             "Staff": (
-                Permission.LOGIN |
-                Permission.MANAGE_HOUSES |
-                Permission.MANAGE_TENANTS |
-                Permission.MANAGE_PAYMENTS
+                Permission.LOGIN
+                | Permission.MANAGE_HOUSES
+                | Permission.MANAGE_TENANTS
+                | Permission.MANAGE_PAYMENTS
             ),
-            "Administrator": (0xff)  # All permissions
+            "Administrator": (0xFF),  # All permissions
         }
         default_role = "Staff"
 
@@ -87,7 +88,7 @@ class Role(db.Model):
 
             role.reset_permissions()
             role.add_permission(r_perms)
-            role.role_default = (role.role_name == default_role)
+            role.role_default = role.role_name == default_role
             db.session.add(role)
 
         db.session.commit()
@@ -202,7 +203,7 @@ class User(
             user = User(
                 vn_addr_email=addr_email,
                 vn_fullname=current_app.config["ADMIN_USERNAME"],
-                vn_phonenumber_one=current_app.config["ADMIN_PHONE_NUMBER"]
+                vn_phonenumber_one=current_app.config["ADMIN_PHONE_NUMBER"],
             )
             user.set_password(current_app.config["ADMIN_PASSWORD"])
 
@@ -210,7 +211,9 @@ class User(
             if admin_role:
                 user.role = admin_role
             else:
-                logger.warning("Administrator role not found. Admin user will have no role.")
+                logger.warning(
+                    "Administrator role not found. Admin user will have no role."
+                )
 
             db.session.add(user)
             db.session.commit()
@@ -273,7 +276,7 @@ class HouseOwner(DefaultUserInfoModel, TimestampMixin):
     @property
     def amount_repaid(self):
         # Using a logical assumption or matching existing pattern
-        # This can be refined but for now we'll sum the 90% of open house rents 
+        # This can be refined but for now we'll sum the 90% of open house rents
         # or just the total rent for now.
         return sum(h.vn_house_rent for h in self.owner_houses if h.vn_house_is_open)
 
@@ -377,7 +380,9 @@ class Tenant(DefaultUserInfoModel, TimestampMixin):
 
     @classmethod
     def get_tenants_list(cls):
-        return cls.query.filter_by(vn_user_id=current_user.id).order_by(db.desc("vn_created_at"))
+        return cls.query.filter_by(vn_user_id=current_user.id).order_by(
+            db.desc("vn_created_at")
+        )
 
 
 # --- Payment Models ---

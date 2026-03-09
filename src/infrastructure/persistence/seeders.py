@@ -5,14 +5,14 @@ from faker import Faker
 from werkzeug.security import generate_password_hash
 
 from src.infrastructure.config.plugins import db
-from src.infrastructure.persistence.models import Role, User
-from src.infrastructure.persistence.models import House, HouseOwner, Tenant
+from src.infrastructure.persistence.models import House, HouseOwner, Role, Tenant, User
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 fake = Faker(["fr_FR"])
+
 
 class SeedManager:
     def __init__(self, count=5):
@@ -77,7 +77,7 @@ class SeedManager:
                     vn_house_address=fake.address(),
                     vn_owner_id=owner.id,
                     vn_user_id=owner.vn_user_id,
-                    vn_house_is_open=False, # Available
+                    vn_house_is_open=False,  # Available
                 )
                 db.session.add(house)
                 houses.append(house)

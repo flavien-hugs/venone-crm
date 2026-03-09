@@ -1,9 +1,9 @@
-from flask import Blueprint, flash, render_template, request, redirect, url_for
+from flask import Blueprint, render_template
 from flask_login import current_user, login_required
 
 from src.core import get_payment_service, get_user_service
 from src.infrastructure.config.plugins import db
-from src.infrastructure.persistence.models import Payment, TransferRequest
+from src.infrastructure.persistence.models import TransferRequest
 
 checkout_bp = Blueprint("checkout_bp", __name__, url_prefix="/dashboard/")
 
@@ -15,6 +15,7 @@ def checkout():
     return render_template(
         "checkout/checkout.html", page_title=page_title, current_user=current_user
     )
+
 
 @checkout_bp.get("/requests/")
 @login_required
@@ -62,7 +63,7 @@ def export_payments_csv():
         mimetype="text/csv",
         headers={
             "Content-disposition": f"attachment; filename=paiements_{current_date}.csv"
-        }
+        },
     )
 
 
@@ -75,20 +76,26 @@ def export_transfers_csv():
     from datetime import datetime
     from flask import Response
 
-    transfers = TransferRequest.query.filter_by(vn_user_id=current_user.id).order_by(db.desc(TransferRequest.vn_created_at)).all()
+    transfers = (
+        TransferRequest.query.filter_by(vn_user_id=current_user.id)
+        .order_by(db.desc(TransferRequest.vn_created_at))
+        .all()
+    )
 
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(["ID Retrait", "Numéro", "Montant", "Date", "Statut"])
 
     for t in transfers:
-        writer.writerow([
-            t.vn_transfer_id,
-            t.vn_withdrawal_number,
-            t.vn_trans_amount,
-            t.vn_created_at.strftime('%Y-%m-%d %H:%M') if t.vn_created_at else '',
-            "Validé" if t.vn_trans_status else "En attente"
-        ])
+        writer.writerow(
+            [
+                t.vn_transfer_id,
+                t.vn_withdrawal_number,
+                t.vn_trans_amount,
+                t.vn_created_at.strftime("%Y-%m-%d %H:%M") if t.vn_created_at else "",
+                "Validé" if t.vn_trans_status else "En attente",
+            ]
+        )
 
     csv_data = output.getvalue()
     current_date = datetime.now().strftime("%d-%m-%Y")
@@ -98,5 +105,5 @@ def export_transfers_csv():
         mimetype="text/csv",
         headers={
             "Content-disposition": f"attachment; filename=retraits_{current_date}.csv"
-        }
+        },
     )

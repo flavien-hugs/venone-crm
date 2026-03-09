@@ -59,6 +59,7 @@ def register_blueprints(app):
     from src.dashboard.routes import admin_bp, agency_bp, checkout_bp, owner_bp
 
     from src.infrastructure.config.plugins import csrf
+
     csrf.exempt(api_bp)
     csrf.exempt(checkout_bp)
 

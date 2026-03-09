@@ -3,9 +3,14 @@ from typing import Optional
 from src.core.domain.entities.user import UserEntity
 from src.core.mappers.user_mapper import UserMapper
 from src.core.repositories.base_repository import BaseRepository
-from src.infrastructure.config.plugins import db
+from src.infrastructure.persistence.models import (
+    House,
+    HouseOwner,
+    Payment,
+    Tenant,
+    TransferRequest,
+)
 from src.infrastructure.persistence.models import User
-from src.infrastructure.persistence.models import TransferRequest, Payment, House, Tenant, HouseOwner
 
 
 class UserRepository(BaseRepository):

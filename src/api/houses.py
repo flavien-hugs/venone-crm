@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from http import HTTPStatus
 
-from flask import abort, render_template, request, url_for, make_response
+from flask import abort, make_response, render_template, request
 from flask_login import current_user, login_required
 
-from src.infrastructure.config.plugins import cache, db
-from src.api.schemas import houses, users
+from src.api.schemas import houses
 from src.core import get_house_service, get_user_service
-from src.infrastructure.persistence.models import House, Tenant, HouseOwner
+from src.infrastructure.config.plugins import db
+from src.infrastructure.persistence.models import House, HouseOwner, Tenant
 from .__main__ import api_bp
 
 
@@ -15,10 +15,10 @@ def abort_if_house_doesnt_exist(uuid: str):
     house = House.query.filter_by(vn_house_id=uuid).first()
     if not house:
         abort(HTTPStatus.NOT_FOUND, f"Could not find house with ID {uuid}")
-    
+
     if not current_user.is_administrator() and house.vn_user_id != current_user.id:
         abort(HTTPStatus.FORBIDDEN, "Access denied")
-        
+
     return house
 
 
@@ -42,10 +42,19 @@ def get_all_houses():
         )
 
     houses_items = db.paginate(
-        query, page=page, per_page=per_page, max_per_page=20, error_out=False, count=True
+        query,
+        page=page,
+        per_page=per_page,
+        max_per_page=20,
+        error_out=False,
+        count=True,
     )
 
-    return render_template("tenant/partials/_houses_list.html", houses=houses_items, current_user=current_user)
+    return render_template(
+        "tenant/partials/_houses_list.html",
+        houses=houses_items,
+        current_user=current_user,
+    )
 
 
 @api_bp.post("/houses/")
@@ -96,7 +105,9 @@ def houses_register():
     db.session.add(house)
     db.session.commit()
 
-    response = make_response('<div class="alert alert-success">Propriété ajoutée avec succès !</div>')
+    response = make_response(
+        '<div class="alert alert-success">Propriété ajoutée avec succès !</div>'
+    )
     response.headers["HX-Trigger"] = "reload-house-list"
     return response
 
@@ -175,7 +186,7 @@ def get_houses_country():
     return render_template(
         "dashboard/account/partials/_check_houses_list.html",
         houses=pagination.items,
-        pagination=pagination
+        pagination=pagination,
     )
 
 
@@ -229,11 +240,15 @@ def house_assign_tenant() -> str:
 
     lease_start_date_str = house_data.get("vn_house_lease_start_date")
     if lease_start_date_str:
-        house.vn_house_lease_start_date = datetime.strptime(lease_start_date_str, "%Y-%m-%d").date()
-        house.vn_house_lease_end_date = house.vn_house_lease_start_date + timedelta(days=31) - timedelta(days=10)
+        house.vn_house_lease_start_date = datetime.strptime(
+            lease_start_date_str, "%Y-%m-%d"
+        ).date()
+        house.vn_house_lease_end_date = (
+            house.vn_house_lease_start_date + timedelta(days=31) - timedelta(days=10)
+        )
 
     db.session.add(house)
-    db.session.flush() # Flush to get house.id for tenant
+    db.session.flush()  # Flush to get house.id for tenant
 
     # Create Tenant
     tenant = Tenant(
@@ -246,7 +261,7 @@ def house_assign_tenant() -> str:
         vn_phonenumber_one=tenant_data.get("vn_phonenumber_one"),
         vn_phonenumber_two=tenant_data.get("vn_phonenumber_two"),
         vn_house_id=house.id,
-        vn_owner_id=house.vn_owner_id, # Assuming owner_id is set on house or derived
+        vn_owner_id=house.vn_owner_id,  # Assuming owner_id is set on house or derived
         vn_user_id=current_user.id,
     )
     db.session.add(tenant)

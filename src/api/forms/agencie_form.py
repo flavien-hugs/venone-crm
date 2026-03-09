@@ -2,9 +2,9 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
-from src.infrastructure.shared.constants import GENDER
 from src.api.forms.default_form import FormMixin
 from src.infrastructure.persistence.models import User
+from src.infrastructure.shared.constants import GENDER
 
 
 class AgencieSignupForm(FormMixin, FlaskForm):

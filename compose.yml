@@ -6,7 +6,7 @@ services:
       target: runtime
     restart: unless-stopped
     ports:
-      - "5001:5000"
+      - "5000:5000"
     depends_on:
       database:
         condition: service_healthy
@@ -14,6 +14,8 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    environment:
+      - FLASK_APP=src/cli.py
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')" ]
       interval: 30s
@@ -26,10 +28,11 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runtime
-    # Utilisation de la factory pour récupérer l'instance celery
     command: [ "celery", "-A", "src.celery_worker:celery", "worker", "--loglevel=info" ]
     env_file:
       - .env
+    environment:
+      - FLASK_APP=src/cli.py
     depends_on:
       - redis
       - database
@@ -40,10 +43,11 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runtime
-    entrypoint: []
-    command: [ "flask", "db", "upgrade" ]
+    entrypoint: [ "flask", "db", "upgrade" ]
     env_file:
       - .env
+    environment:
+      - FLASK_APP=src/cli.py
     depends_on:
       database:
         condition: service_healthy
@@ -56,7 +60,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-venone}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_DB: ${POSTGRES_DB:-venone_db}
+      POSTGRES_DB: ${POSTGRES_DB:-venone}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

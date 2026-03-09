@@ -9,7 +9,7 @@ class UserEntity:
     fullname: Optional[str]
     email: Optional[str]
     phone: Optional[str]
-    country: Optional[str]      # Optional: can be NULL in DB
+    country: Optional[str]  # Optional: can be NULL in DB
     balance: float
     is_house_owner: bool
     is_company: bool

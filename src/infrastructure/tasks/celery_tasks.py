@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 
 from celery import shared_task, signature
+from src.core import get_house_service, get_notification_service, get_payment_service
 from src.infrastructure.config.plugins import db
-from src.core import get_house_service, get_payment_service, get_notification_service
 
 logger = logging.getLogger(__name__)
 

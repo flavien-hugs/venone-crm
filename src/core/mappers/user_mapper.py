@@ -11,10 +11,10 @@ class UserMapper:
             fullname=persistence.vn_fullname,
             email=persistence.vn_addr_email,
             phone=persistence.vn_phonenumber_one,
-            country=persistence.vn_country,                    # Optional[str]
+            country=persistence.vn_country,  # Optional[str]
             balance=persistence.vn_balance or 0.0,
             is_house_owner=bool(persistence.vn_house_owner),  # None -> False
-            is_company=bool(persistence.vn_company),          # None -> False
+            is_company=bool(persistence.vn_company),  # None -> False
             is_administrator=persistence.is_administrator(),
             owner_percent=persistence.get_owner_percent(),
             company_percent=persistence.get_company_percent(),

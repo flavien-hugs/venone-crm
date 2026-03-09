@@ -2,8 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, InputRequired
 
-from src.infrastructure.shared.constants import GENDER
 from src.api.forms.default_form import FormMixin
+from src.infrastructure.shared.constants import GENDER
 
 
 class OwnerHouseSignupForm(FormMixin, FlaskForm):

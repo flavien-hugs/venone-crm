@@ -1,4 +1,5 @@
 from marshmallow import fields
+
 from src.infrastructure.config.plugins import ma
 from src.infrastructure.persistence.models import HouseOwner
 from src.infrastructure.shared.helpers import formatted_number
@@ -25,6 +26,7 @@ class HouseOwnerSchema(ma.SQLAlchemyAutoSchema):
 
     def get_owner_percent(self, obj):
         return formatted_number(obj.vn_owner_percent or 0.0)
+
 
 owner_schema = HouseOwnerSchema()
 owners_schema = HouseOwnerSchema(many=True)

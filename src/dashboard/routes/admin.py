@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template
 from flask_login import current_user, login_required
 
-from src.core import get_user_service
 from src.api.middlewares import admin_required
+from src.core import get_user_service
 
 admin_bp = Blueprint("admin_bp", __name__, url_prefix="/admin/dashboard/")
 

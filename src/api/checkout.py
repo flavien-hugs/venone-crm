@@ -1,11 +1,9 @@
-from flask import request, url_for, render_template
+from flask import render_template, request, url_for
 from flask_login import current_user, login_required
 
-from src.api.schemas import houses, users
-from src.core import get_payment_service, get_user_service
+from src.core import get_user_service
 from src.infrastructure.config.plugins import db
 from .__main__ import api_bp
-from .shared.helpers import jsonify_response
 from .users import abort_if_user_doesnt_exist
 
 
@@ -16,11 +14,14 @@ def get_all_payments():
     per_page = 20
 
     user_service = get_user_service()
-    query = user_service.get_payments_list(current_user.id).filter_by(vn_pay_status=True)
+    query = user_service.get_payments_list(current_user.id).filter_by(
+        vn_pay_status=True
+    )
 
     search_term = request.args.get("q", "", type=str)
     if search_term:
         from src.infrastructure.persistence.models import Tenant, Payment
+
         query = query.join(Tenant, isouter=True).filter(
             db.or_(
                 Payment.vn_transaction_id.ilike(f"%{search_term}%"),
@@ -33,7 +34,7 @@ def get_all_payments():
     pagination = db.paginate(
         query, page=page, per_page=per_page, max_per_page=20, error_out=False
     )
-    
+
     return render_template(
         "checkout/partials/payments_table.html",
         payments=pagination.items,
@@ -50,9 +51,9 @@ def get_transfers():
     per_page = 10
 
     user_service = get_user_service()
-    pagination = user_service.get_transfers_request(
-        current_user.id
-    ).paginate(page=page, per_page=per_page, error_out=False)
+    pagination = user_service.get_transfers_request(current_user.id).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
 
     return render_template(
         "checkout/partials/transfers_table.html",
@@ -66,8 +67,8 @@ def get_transfers():
 @api_bp.post("/transfers/")
 @login_required
 def create_transfer_request():
-    from flask import redirect, flash
-    
+    from flask import flash, redirect
+
     abort_if_user_doesnt_exist(current_user.uuid)
 
     vn_trans_amount = request.form.get("vn_trans_amount", type=float)

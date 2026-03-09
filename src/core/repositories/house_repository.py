@@ -15,7 +15,7 @@ class HouseRepository(BaseRepository):
 
     def find_expired_leases(self, current_date):
         records = self.model.query.filter(
-            self.model.vn_house_is_open == True,  # noqa: E712
+            self.model.vn_house_is_open,  # noqa: E712
             self.model.vn_house_lease_end_date <= current_date,
         ).all()
         return [self.mapper.to_domain(r) for r in records]

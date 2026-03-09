@@ -10,7 +10,6 @@ from flask import (
 )
 from flask_login import current_user, login_required, login_user, logout_user
 
-from src.infrastructure.config.plugins import db, login_manager, oauth
 from src.api.forms.agencie_form import AgencieSignupForm
 from src.api.forms.auth_form import (
     ChangeEmailForm,
@@ -19,6 +18,7 @@ from src.api.forms.auth_form import (
     PasswordResetRequestForm,
 )
 from src.api.forms.owner_form import OwnerHouseSignupForm
+from src.infrastructure.config.plugins import db, login_manager, oauth
 from src.infrastructure.external.email import send_email
 from src.infrastructure.persistence.models import User
 from src.infrastructure.security import utils
@@ -106,7 +106,10 @@ def registerowner_page():
         db.session.add(user_to_create)
         db.session.commit()
 
-        msg_success = f"Hey {user_to_create.vn_fullname}, votre compte a été créé ! Connectez-vous maintenant !"
+        msg_success = (
+            f"Hey {user_to_create.vn_fullname}, votre compte a été créé ! "
+            f"Connectez-vous maintenant !"
+        )
         flash(msg_success, category="success")
         return redirect(url_for("auth_bp.login"))
 
@@ -138,7 +141,10 @@ def agencieregister_page():
         db.session.add(user_to_create)
         db.session.commit()
 
-        msg_success = f"Hey {user_to_create.vn_fullname}, votre compte a été créé ! Connectez-vous maintenant !"
+        msg_success = (
+            f"Hey {user_to_create.vn_fullname}, votre compte a été créé ! "
+            f"Connectez-vous maintenant !"
+        )
         flash(msg_success, category="success")
         return redirect(url_for("auth_bp.login"))
 

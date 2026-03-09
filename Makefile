@@ -46,7 +46,7 @@ db-migrate: ## Générer une nouvelle migration
 
 .PHONY: db-upgrade
 db-upgrade: ## Appliquer les migrations
-	$(MANAGE) flask db upgrade
+	$(MANAGE) flask db upgrade head
 
 .PHONY: db-drop
 db-drop: ## Vider la base de données (supprimer les tables)

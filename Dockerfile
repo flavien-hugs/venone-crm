@@ -16,8 +16,8 @@ RUN pip install --no-cache-dir pipenv
 # Copier uniquement les fichiers de dépendances pour profiter du cache Docker
 COPY Pipfile Pipfile.lock ./
 
-# Generate requirements.txt from Pipfile.lock
-RUN pipenv requirements > requirements.txt
+# Generate requirements.txt from Pipfile.lock, including dev dependencies
+RUN pipenv requirements --dev > requirements.txt
 
 # Installer les dépendances dans un virtualenv isolé
 RUN python -m venv /venv && \

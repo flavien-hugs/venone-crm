@@ -109,9 +109,11 @@ class UserService:
                 if house.owner and house.owner.vn_owner_percent:
                     # Let's assume a default or sum across all companies
                     # This is complex, but to avoid 0.0:
-                    owner_share = house.vn_house_rent * (house.owner.vn_owner_percent / 100)
+                    owner_share = house.vn_house_rent * (
+                        house.owner.vn_owner_percent / 100
+                    )
                     # Use a default 10% or similar if we can't find a company percent
-                    total_percents += owner_share * 0.1 
+                    total_percents += owner_share * 0.1
         elif user.is_house_owner:
             percent = user.owner_percent / 100
             houses = House.query.filter_by(
@@ -122,9 +124,7 @@ class UserService:
             percent = user.company_percent / 100
             houses = (
                 House.query.join(HouseOwner)
-                .filter(
-                    HouseOwner.vn_user_id == user.id, House.vn_house_is_open == True
-                )
+                .filter(HouseOwner.vn_user_id == user.id, House.vn_house_is_open)
                 .all()
             )
 
@@ -171,8 +171,12 @@ class UserService:
             return {
                 "payments_count": Payment.query.count(),
                 "houses_count": House.query.count(),
-                "houses_close_count": House.query.filter_by(vn_house_is_open=True).count(),
-                "houses_open_count": House.query.filter_by(vn_house_is_open=False).count(),
+                "houses_close_count": House.query.filter_by(
+                    vn_house_is_open=True
+                ).count(),
+                "houses_open_count": House.query.filter_by(
+                    vn_house_is_open=False
+                ).count(),
                 "tenants_count": Tenant.query.count(),
                 "owners_count": HouseOwner.query.count(),
                 "transfers_count": TransferRequest.query.count(),
@@ -223,12 +227,14 @@ class UserService:
         if user and user.is_administrator:
             return TransferRequest.query.order_by(db.desc("vn_created_at")).all()
         return self.repository.get_transfers_list(user_id)
-        
+
     def get_transfers_request(self, user_id: int):
         user = self.repository.get_by_id(user_id)
         if user and user.is_administrator:
             return TransferRequest.query.order_by(db.desc("vn_created_at"))
-        return self.repository.get_transfers_request(user_id).order_by(db.desc("vn_created_at"))
+        return self.repository.get_transfers_request(user_id).order_by(
+            db.desc("vn_created_at")
+        )
 
     def request_transfer(
         self,
@@ -255,7 +261,7 @@ class UserService:
 
     def get_owner_per_month(self, user_id: int):
         user = self.repository.get_by_id(user_id)
-        
+
         # Ensure we filter out records with no creation date to avoid grouping errors
         year_expr = db.extract("year", HouseOwner.vn_created_at)
         month_expr = db.extract("month", HouseOwner.vn_created_at)
@@ -277,7 +283,7 @@ class UserService:
 
     def get_tenant_per_month(self, user_id: int):
         user = self.repository.get_by_id(user_id)
-        
+
         year_expr = db.extract("year", Tenant.vn_created_at)
         month_expr = db.extract("month", Tenant.vn_created_at)
 
@@ -305,18 +311,15 @@ class UserService:
             year.label("year"),
             month.label("month"),
             db.func.sum(Payment.vn_pay_amount).label("total"),
-        ).filter(Payment.vn_pay_status == True)
+        ).filter(Payment.vn_pay_status)
 
         if user and not user.is_administrator:
             query = query.filter(Payment.vn_payee_id == user_id)
 
-        return (
-            query.group_by(
-                db.extract("year", Payment.vn_pay_date),
-                db.extract("month", Payment.vn_pay_date),
-            )
-            .all()
-        )
+        return query.group_by(
+            db.extract("year", Payment.vn_pay_date),
+            db.extract("month", Payment.vn_pay_date),
+        ).all()
 
     def houses_opened_count(self, user_id: int):
         user = self.repository.get_by_id(user_id)

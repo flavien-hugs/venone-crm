@@ -4,6 +4,6 @@ include =
 
 omit =
     */tests/*
+    */migrations/*
     */src/templates/*
-    */src/static/*
     */src/static/*

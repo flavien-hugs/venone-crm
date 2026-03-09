@@ -1,8 +1,8 @@
 from wtforms import PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
-from src.infrastructure.shared.constants import COUNTRY
 from src.infrastructure.persistence.models import User
+from src.infrastructure.shared.constants import COUNTRY
 
 
 class FormMixin:
@@ -38,10 +38,12 @@ class FormMixin:
     def validate_addr_email(self, field):
         user = User.query.filter_by(vn_addr_email=field.data.lower()).first()
         if user:
-            raise ValidationError(f"""
-                Cet email '{field.data}!r' est déjà utilisé.
+            raise ValidationError(
+                f"""
+                Cet email '{field.data!r}' est déjà utilisé.
                 Veuillez choisir un autre nom !
-                """)
+                """
+            )
 
     def validate_phonenumber_one(self, field):
         if User.query.filter_by(vn_phonenumber_one=field.data).first():

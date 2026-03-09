@@ -1,7 +1,6 @@
 import os
 from src.main import create_app
 
-
 # Use FLASK_CONFIG from environment or default to 'dev'
 config_name = os.environ.get("FLASK_CONFIG", "dev")
 app = create_app(config_name)

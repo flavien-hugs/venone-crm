@@ -1,9 +1,9 @@
 from marshmallow import fields
 
-from src.infrastructure.config.plugins import ma
-from src.infrastructure.shared.helpers import formatted_number
 from src.core import get_user_service
+from src.infrastructure.config.plugins import ma
 from src.infrastructure.persistence.models import User
+from src.infrastructure.shared.helpers import formatted_number
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):

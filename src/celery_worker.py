@@ -1,4 +1,4 @@
-from main import celery_init_app
+from src.infrastructure.config.celery_config import celery_init_app
 from src.cli import app
 
 # Initialiser l'application Flask avec la configuration appropriée

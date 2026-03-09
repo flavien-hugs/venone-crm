@@ -13,8 +13,8 @@ class PaymentMapper:
             date=persistence.vn_pay_date,
             house_id=persistence.vn_house_id,
             tenant_id=persistence.vn_tenant_id,
-            owner_id=persistence.vn_owner_id,
-            cinetpay_data=persistence.vn_cinetpay_data,
+            payee_id=persistence.vn_payee_id,
+            metadata=persistence.vn_cinetpay_data,
         )
 
     @staticmethod
@@ -26,6 +26,6 @@ class PaymentMapper:
             "vn_pay_date": entity.date,
             "vn_house_id": entity.house_id,
             "vn_tenant_id": entity.tenant_id,
-            "vn_owner_id": entity.owner_id,
-            "vn_cinetpay_data": entity.cinetpay_data,
+            "vn_payee_id": entity.payee_id,
+            "vn_cinetpay_data": entity.metadata,
         }

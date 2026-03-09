@@ -13,12 +13,12 @@ from flask import (
 )
 from flask_login import current_user, login_required, logout_user
 
+from src.api.middlewares import agency_required
 from src.core import get_user_service
-from src.infrastructure.config.plugins import cache, csrf
-from src.infrastructure.persistence.models import User
 from src.dashboard.forms import CompanySettingForm
 from src.dashboard.services import export_data
-from src.api.middlewares import agency_required
+from src.infrastructure.config.plugins import cache, csrf
+from src.infrastructure.persistence.models import User
 
 agency_bp = Blueprint("agency_bp", __name__, url_prefix="/dashboard/")
 csrf.exempt(agency_bp)
@@ -82,9 +82,9 @@ def agency_create_tenant():
 @agency_required
 def agency_billing():
     page_title = "Facturation"
-    
+
     user_service = get_user_service()
-    
+
     # Get values computed for the current user
     total_payments_received = user_service.get_total_payments_received(current_user.id)
     total_house_amount = user_service.calculate_total_amount_of_houses(current_user.id)

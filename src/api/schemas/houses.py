@@ -1,7 +1,7 @@
 from marshmallow import fields
 
-from src.infrastructure.config.plugins import ma
 from src.core import get_house_service
+from src.infrastructure.config.plugins import ma
 from src.infrastructure.persistence.models import (
     House,
     Payment,

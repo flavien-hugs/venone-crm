@@ -1,8 +1,8 @@
 from flask_login import current_user, login_required
 
-from .shared.helpers import jsonify_response
 from src.core import get_user_service
 from .__main__ import api_bp
+from .shared.helpers import jsonify_response
 
 
 @api_bp.get("/owners/data/")

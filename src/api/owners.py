@@ -1,14 +1,14 @@
 from datetime import datetime, timedelta
 from http import HTTPStatus
 
-from flask import abort, render_template, request, make_response
+from flask import abort, make_response, render_template, request
 from flask_login import current_user, login_required
 
 from src.api.schemas import owners
 from src.api.shared.helpers import jsonify_response
 from src.core import get_user_service
 from src.infrastructure.config.plugins import cache, db
-from src.infrastructure.persistence.models import House, Tenant, HouseOwner
+from src.infrastructure.persistence.models import House, HouseOwner, Tenant
 from .__main__ import api_bp
 
 
@@ -31,7 +31,9 @@ def owners_register():
         "vn_owner_percent",
     ]
 
-    missing_fields = [f for f in ["vn_fullname", "vn_phonenumber_one"] if not data.get(f)]
+    missing_fields = [
+        f for f in ["vn_fullname", "vn_phonenumber_one"] if not data.get(f)
+    ]
     if missing_fields:
         return f'<div class="alert alert-danger">Les champs suivants sont obligatoires : {", ".join(missing_fields)}</div>'
 
@@ -50,7 +52,9 @@ def owners_register():
     db.session.add(owner)
     db.session.commit()
 
-    response = make_response(f'<div class="alert alert-success">Le bailleur {owner.vn_fullname} a été enregistré avec succès !</div>')
+    response = make_response(
+        f'<div class="alert alert-success">Le bailleur {owner.vn_fullname} a été enregistré avec succès !</div>'
+    )
     response.headers["HX-Trigger"] = "reload-owner-list"
     return response
 
@@ -59,10 +63,10 @@ def abort_if_owner_doesnt_exist(uuid: str):
     owner = HouseOwner.query.filter_by(uuid=uuid).first()
     if not owner:
         abort(HTTPStatus.NOT_FOUND, f"Could not find owner with ID {uuid}")
-        
+
     if not current_user.is_administrator() and owner.vn_user_id != current_user.id:
         abort(HTTPStatus.FORBIDDEN, "Access denied")
-        
+
     return owner
 
 
@@ -88,10 +92,19 @@ def get_all_owners():
         )
 
     owners_items = db.paginate(
-        query, page=page, per_page=per_page, max_per_page=20, error_out=False, count=True
+        query,
+        page=page,
+        per_page=per_page,
+        max_per_page=20,
+        error_out=False,
+        count=True,
     )
 
-    return render_template("tenant/partials/_owner_list.html", owners=owners_items, current_user=current_user)
+    return render_template(
+        "tenant/partials/_owner_list.html",
+        owners=owners_items,
+        current_user=current_user,
+    )
 
 
 @api_bp.get("/owners/<string:uuid>/")
